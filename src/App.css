@@ -1,38 +1,917 @@
-.App {
+/* =========================================
+   ПЕРЕМЕННЫЕ И БАЗОВЫЕ СТИЛИ
+   ========================================= */
+:root {
+  --neon: #00ff41;
+  --neon-dim: rgba(0, 255, 65, 0.2);
+  --bg: #050505;
+  --surface: #0f0f0f;
+  --surface-light: #1a1a1a;
+  --text: #e0e0e0;
+  --text-dim: #666;
+  --danger: #ff4d4d;
+  --safe: #4d94ff;
+  --font-main: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: var(--font-main);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow: hidden; /* Чтобы не было прокрутки всего сайта */
+}
+
+/* =========================================
+   АНИМАЦИИ
+   ========================================= */
+@keyframes scanning {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+@keyframes blinker {
+  50% { opacity: 0; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* =========================================
+   ЭКРАН ВХОДА (LOGIN)
+   ========================================= */
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle, #0a1f0a 0%, #050505 100%);
+}
+
+.login-box {
+  background: var(--surface);
+  padding: 50px;
+  border: 1px solid var(--neon);
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.1);
+  text-align: center;
+  width: 400px;
+}
+
+.login-box h1 {
+  color: var(--neon);
+  letter-spacing: 4px;
+  margin: 20px 0;
+}
+
+.login-box input {
+  background: #000;
+  border: 1px solid #333;
+  color: var(--neon);
+  padding: 15px;
+  width: 100%;
+  margin-bottom: 20px;
+  outline: none;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
+.login-box button {
+  background: var(--neon);
+  color: #000;
+  border: none;
+  padding: 15px 30px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: 0.3s;
+}
+
+.login-box button:hover {
+  box-shadow: 0 0 20px var(--neon);
+  transform: scale(1.02);
+}
+
+/* =========================================
+   ОСНОВНОЙ ЛЕЙАУТ (SIDEBAR & MAIN)
+   ========================================= */
+.os-wrapper {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: #0a0a0a;
+  border-right: 1px solid var(--surface-light);
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--neon);
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 50px;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+nav button {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  cursor: pointer;
+  text-align: left;
+  border-radius: 4px;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+nav button:hover, nav button.active {
+  background: #141414;
+  color: var(--neon);
+}
+
+.user-info {
+  border-top: 1px solid var(--surface-light);
+  padding-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--neon);
+}
+
+/* ВОРКСПЕЙС */
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.top-bar {
+  height: 70px;
+  border-bottom: 1px solid var(--surface-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.blink {
+  animation: blinker 1.5s linear infinite;
+  color: var(--neon);
+}
+
+.view-area {
+  padding: 40px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+/* =========================================
+   ОБЩИЕ КОМПОНЕНТЫ (КНОПКИ, ОКНА)
+   ========================================= */
+.window {
+  background: var(--surface);
+  padding: 30px;
+  border: 1px solid var(--surface-light);
+  position: relative;
+}
+
+.btn-main {
+  background: var(--neon);
+  color: #000;
+  border: none;
+  padding: 12px 25px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-action {
+  background: none;
+  border: 1px solid var(--neon);
+  color: var(--neon);
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.3s;
+}
+
+.btn-action:hover {
+  background: var(--neon);
+  color: #000;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 12px;
+}
+
+.btn-back:hover { color: #fff; }
+
+/* =========================================
+   МИССИЯ: ПАРОЛЬ (ДЕТЕКТИВ)
+   ========================================= */
+.detective-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 25px;
+}
+
+.panel-header {
+  background: #1a1a1a;
+  padding: 10px 15px;
+  font-size: 11px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #333;
+  margin: -30px -30px 25px -30px;
+}
+
+.task-desc {
+  font-size: 18px;
+  color: var(--neon);
+  margin-bottom: 30px;
+  border-left: 3px solid var(--neon);
+  padding-left: 20px;
+}
+
+.input-container {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.hack-input {
+  width: 100%;
+  background: #000;
+  border: 1px solid #333;
+  padding: 20px;
+  color: var(--neon);
+  font-size: 24px;
+  outline: none;
+}
+
+.hack-input:focus {
+  border-color: var(--neon);
+}
+
+.scan-line {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 2px;
+  background: rgba(0, 255, 65, 0.4);
+  animation: scanning 2s linear infinite;
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* ЧЕК-ЛИСТ ПРАВИЛ */
+.rule-item {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: #111;
+  border: 1px solid #222;
+  margin-bottom: 10px;
+  transition: 0.3s;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.rule-item.met {
+  border-color: var(--neon);
+  color: var(--neon);
+  background: rgba(0, 255, 65, 0.05);
+}
+
+.rule-item.failed {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.rule-label { font-weight: bold; font-size: 13px; }
+.rule-desc-short { font-size: 10px; opacity: 0.7; margin-top: 4px; }
+
+/* =========================================
+   МИССИЯ: ФИШИНГ (СКАНЕР)
+   ========================================= */
+.phishing-container {
   display: flex;
   flex-direction: column;
+  gap: 20px;
+}
+
+.phishing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  background: #111;
+  padding: 5px;
+  border-radius: 30px;
+}
+
+.filter-pills button {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.filter-pills button.active {
+  background: var(--neon);
+  color: black;
+}
+
+.phishing-content {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 25px;
+  height: 600px;
+}
+
+.mail-sidebar {
+  overflow-y: auto;
+  padding: 10px !important;
+}
+
+.mail-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  border: 1px solid #222;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.mail-card.selected {
+  border-color: var(--neon);
+  background: rgba(0, 255, 65, 0.05);
+}
+
+.m-sender { font-size: 10px; color: var(--neon); }
+.m-subject { font-size: 12px; color: #fff; margin-top: 4px; display: block; }
+
+/* ДЕТАЛИ ПИСЬМА */
+.detail-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 40px !important;
+}
+
+.mail-body {
+  flex-grow: 1;
+  background: #000;
+  padding: 25px;
+  border: 1px solid #1a1a1a;
+  margin: 25px 0;
+  line-height: 1.8;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.analysis-box {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 20px;
+  border-radius: 4px;
+  margin-bottom: 30px;
+  border-left: 2px solid #f7b500;
+}
+
+.analysis-box h4 {
+  margin: 0 0 10px 0;
+  color: #f7b500;
+  font-size: 12px;
+}
+
+/* КНОПКИ ДЕЙСТВИЙ (ФИШИНГ) */
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.btn-phish {
+  background: var(--danger);
+  color: black;
+  border: none;
+  padding: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  gap: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-safe-action {
+  background: var(--safe);
+  color: black;
+  border: none;
+  padding: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* =========================================
+   ПУСТЫЕ СОСТОЯНИЯ И УСПЕХ
+   ========================================= */
+.empty-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #444;
 }
+
+.radar {
+  width: 60px; height: 60px;
+  border: 2px solid #222;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.radar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  border: 2px solid var(--neon);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.win-box {
+  text-align: center;
+  padding: 80px;
+  border: 1px solid var(--neon);
+  background: var(--surface);
+}
+
+.glitch-text {
+  font-size: 40px;
+  font-weight: bold;
+  color: var(--neon);
+  text-shadow: 2px 2px var(--danger);
+  margin-bottom: 20px;
+}
+
+.btn-huge {
+  width: 100%;
+  padding: 20px;
+  background: var(--neon);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.btn-huge.disabled {
+  background: #222;
+  color: #444;
+  cursor: not-allowed;
+}
+
+/* СЕТКА МИССИЙ */
+.missions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.mission-card {
+  border: 1px solid var(--surface-light);
+  padding: 30px;
+  transition: 0.3s;
+}
+
+.mission-card:hover {
+  border-color: var(--neon);
+  transform: translateY(-5px);
+}
+/* Статусы в сайдбаре */
+.status-dot { width: 24px; display: flex; align-items: center; }
+.dot-empty { width: 8px; height: 8px; border: 1px solid #333; border-radius: 50%; }
+.mail-card.processed { opacity: 0.7; border-color: #1a1a1a; }
+
+/* Блок анализа */
+.analysis-box {
+  margin-top: 20px;
+  padding: 20px;
+  border-left: 4px solid #fff;
+  background: #111;
+  overflow: hidden;
+}
+
+.analysis-box.correct { border-color: var(--neon); color: var(--neon); }
+.analysis-box.wrong { border-color: var(--danger); color: var(--danger); }
+
+.analysis-box h4 {
+  margin: 0 0 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 4px 12px;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 2px;
+}
+
+.status-badge.correct { background: var(--neon); color: black; }
+.status-badge.wrong { background: var(--danger); color: black; }
+
+/* Кнопка завершения */
+.finish-btn {
+  background: var(--neon);
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
+  animation: pulse-border 2s infinite;
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 10px rgba(0, 255, 65, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.6); }
+  100% { box-shadow: 0 0 10px rgba(0, 255, 65, 0.4); }
+}
+
+.sender-info { font-size: 12px; color: #666; margin-top: 5px; }
+.sender-info code { color: #aaa; background: #111; padding: 2px 6px; }
+
+/* Фикс для наложения */
+.detail-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.dot-unread {
+  width: 8px;
+  height: 8px;
+  background: var(--neon);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--neon);
+  animation: blinker 2s infinite;
+}
+
+.mail-card.processed {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: #222;
+}
+
+.status-badge.wrong {
+  background: #ff4d4d;
+  color: black;
+}
+
+.analysis-box.wrong {
+  border-left: 4px solid #ff4d4d;
+}
+
+/* Добавь, чтобы кнопка финиша не прыгала */
+.finish-btn {
+  margin-top: 20px;
+  background: var(--neon);
+  color: black;
+  box-shadow: 0 0 20px var(--neon-dim);
+}
+.firewall-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 25px;
+}
+
+.health-bar-container {
+  width: 150px;
+  height: 8px;
+  background: #222;
+  margin-left: auto;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.health-fill {
+  height: 100%;
+  background: #ff4d4d;
+  transition: 0.3s;
+}
+
+.traffic-logs {
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.log-entry {
+  padding: 12px;
+  background: #111;
+  border-left: 3px solid #444;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.log-entry.warning { border-color: #f7b500; color: #f7b500; }
+.log-entry.blocked { border-color: var(--neon); color: var(--neon); opacity: 0.5; }
+
+.add-rule-box {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.add-rule-box input {
+  flex-grow: 1;
+  background: #000;
+  border: 1px solid #333;
+  color: var(--neon);
+  padding: 10px;
+}
+
+.add-rule-box button {
+  background: var(--neon);
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.active-rules {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.rule-tag {
+  background: #1a1a1a;
+  border: 1px solid var(--neon);
+  color: var(--neon);
+  padding: 5px 10px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 4px;
+}
+
+.rule-tag svg { cursor: pointer; }
+.difficulty-selector {
+  text-align: center;
+  padding: 50px;
+}
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.diff-btn {
+  background: #111;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 30px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: 0.3s;
+}
+
+.diff-btn span { font-size: 10px; opacity: 0.5; }
+.diff-btn:hover { border-color: var(--neon); transform: translateY(-5px); }
+.diff-btn.hard:hover { border-color: var(--danger); color: var(--danger); }
+
+.firewall-container {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+}
+
+.firewall-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.hp-bar { width: 150px; height: 10px; background: #222; border-radius: 5px; overflow: hidden; }
+.hp-fill { height: 100%; background: var(--danger); transition: 0.4s; }
+
+.traffic-display {
+  height: 450px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.traffic-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 12px;
+  font-size: 11px;
+  border-left: 3px solid #333;
+}
+
+.traffic-row.is-attack { border-color: #f7b500; color: #f7b500; }
+.traffic-row.is-blocked { border-color: var(--neon); color: var(--neon); opacity: 0.4; text-decoration: line-through; }
+
+.lockdown-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 77, 77, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 24px;
+  color: #ff4d4d;
+  z-index: 10;
+}
+
+.lockdown-btn {
+  width: 100%;
+  padding: 15px;
+  background: none;
+  border: 1px solid #f7b500;
+  color: #f7b500;
+  cursor: pointer;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.lockdown-btn.active { background: #f7b500; color: #000; }
+
+.input-with-btn { display: flex; gap: 5px; margin-top: 10px; }
+.input-with-btn input { flex-grow: 1; background: #000; border: 1px solid #333; color: var(--neon); padding: 10px; }
+.input-with-btn button { background: var(--neon); border: none; padding: 10px; cursor: pointer; }
+
+.rules-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.rules-tags .tag { background: #111; border: 1px solid #333; padding: 4px 8px; font-size: 10px; display: flex; gap: 5px; align-items: center; }
+.firewall-v3 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.game-stats {
+  display: flex;
+  justify-content: space-around;
+  background: #111;
+  padding: 15px;
+  border: 1px solid #333;
+  font-size: 14px;
+}
+
+.battle-area {
+  height: 500px;
+  background: radial-gradient(circle, #0a0a0a 0%, #000 100%);
+  border: 1px solid #222;
+  position: relative;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.core-ok { color: var(--neon); filter: drop-shadow(0 0 10px var(--neon)); }
+.core-warn { color: #ff4d4d; animation: blinker 0.5s infinite; }
+
+.core-pulse {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 100px; height: 100px;
+  border: 1px solid var(--neon-dim);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 2s infinite;
+}
+
+.threat-node {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.threat-node.attacker {
+  background: rgba(255, 77, 77, 0.2);
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+}
+
+.threat-node.data {
+  background: rgba(0, 255, 65, 0.1);
+  border: 1px solid var(--neon);
+  color: var(--neon);
+}
+
+.port-label { font-size: 9px; margin-top: 2px; font-weight: bold; }
+
+.controls-v3 {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-row { display: flex; gap: 10px; }
+.input-row input { flex-grow: 1; background: #000; border: 1px solid #333; color: var(--neon); padding: 12px; }
+.input-row button { background: var(--neon); color: #000; border: none; padding: 0 20px; font-weight: bold; cursor: pointer; }
+
+.emp-btn {
+  background: #f7b500;
+  color: #000;
+  border: none;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
+
+.emp-btn:disabled { background: #444; cursor: not-allowed; }
+
+.game-over-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  font-weight: bold;
+  color: #fff;
+  z-index: 100;
+}
+
+.blink-red { color: #ff4d4d; animation: blinker 0.5s infinite; }
