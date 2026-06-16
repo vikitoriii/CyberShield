@@ -1,116 +1,149 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    FileText, MapPin, User, Cpu, Camera, 
-    HelpCircle, Mail, Lock, Zap, Search, Fingerprint 
+    Lock, HelpCircle, X, Paperclip, 
+    MapPin, User, Cpu, Search, Fingerprint, Zap, Camera 
 } from 'lucide-react';
 
 const CaseFiles = ({ unlockedClues = [] }) => {
-    // Список всех 10 улик, привязанных к сюжету
-    const ALL_CLUES = [
-        { id: 1, label: "Лог входа", icon: <Lock />, value: "Агент: 'Shadow_Walker'", mission: "Пароли" },
-        { id: 2, label: "Заголовок письма", icon: <Mail />, value: "Отправитель: 'hr-support@corp-it.ru'", mission: "Фишинг" },
-        { id: 3, label: "IP-адрес атаки", icon: <MapPin />, value: "91.210.10.45 (Франция)", mission: "Файрволл" },
-        { id: 4, label: "Скрытый токен", icon: <Cpu />, value: "CS_OS{SQL_MASTER_777}", mission: "База данных" },
-        { id: 5, label: "Метаданные чата", icon: <User />, value: "Сотрудник 'Иван П.' был обманут", mission: "Соц. инженерия" },
-        { id: 6, label: "Зашифрованный ключ", icon: <Fingerprint />, value: "Base64: 'Y2F0IC9ldGMvcGFzc3dk'", mission: "Криптография" },
-        { id: 7, label: "GPS Координаты", icon: <Search />, value: "48.8584° N, 2.2945° E (Эйфелева башня)", mission: "Геолокация" },
-        { id: 8, label: "Хэш вируса", icon: <Zap />, value: "MD5: d41d8cd98f00b204e9800998ecf8427e", mission: "Малварь" },
-        { id: 9, label: "Админ-панель", icon: <Camera />, value: "Endpoint: /admin_hidden_v3", mission: "Уязвимость URL" },
-        { id: 10, label: "Настоящее имя", icon: <FileText />, value: "Жан-Пьер Леруа", mission: "Финал" },
+    const [selectedDoc, setSelectedDoc] = useState(null);
+
+    const DOCUMENTS = {
+        1: { title: "ПРОФИЛЬ: Shadow_Walker", date: "10.05", text: "Я нашел этот ник в логах входа. Кто-то заходил под ним ровно в 3:00 ночи. Пароль был изменен внешним скриптом. Это не человек, это алгоритм.", type: "photo" },
+        2: { title: "СКРИНШОТ: ПЕРЕХВАТ", date: "12.05", text: "Письмо выглядело идеально. Но адрес отправителя... там была кириллическая 'о' вместо латинской. Классический гомограф. Макс был прав — они бьют по невнимательности.", type: "note" },
+        3: { title: "ОТЧЕТ: ГЕО-ЛОКАЦИЯ", date: "14.05", text: "Сигнал прыгает по прокси-серверам, но мы зацепили реальный IP. Точка выхода: Париж. Это слишком очевидно... или они хотят, чтобы мы так думали?", type: "map" },
+        4: { title: "ФРАГМЕНТ: БД", date: "18.05", text: "Проект 'Мертвая петля' — это база данных лиц. Neocorp хочет объединить все камеры города в одну сеть. Это цифровой концлагерь.", type: "photo" },
+        5: { title: "ЛОГ: МАНИПУЛЯЦИЯ", date: "20.05", text: "Иван из бухгалтерии признался. Ему позвонили и представились МНОЙ. Сказали, что у меня ЧП. Социальная инженерия в чистом виде.", type: "note" },
+    };
+
+    const CLUES_CONFIG = [
+        { id: 1, label: "КТО ОН?", icon: <User />, x: "10%", y: "15%", rotate: -5 },
+        { id: 2, label: "УЛИКА: EMAIL", icon: <Search />, x: "40%", y: "10%", rotate: 3 },
+        { id: 3, label: "ГДЕ ХАКЕР?", icon: <MapPin />, x: "70%", y: "15%", rotate: -2 },
+        { id: 4, label: "ПРОЕКТ: ПЕТЛЯ", icon: <Cpu />, x: "15%", y: "55%", rotate: 4 },
+        { id: 5, label: "СВИДЕТЕЛЬ", icon: <Search />, x: "45%", y: "60%", rotate: -6 },
+        { id: 6, label: "ШИФРОВКА", icon: <Fingerprint />, x: "75%", y: "55%", rotate: 2 },
     ];
 
-    const progress = Math.round((unlockedClues.length / ALL_CLUES.length) * 100);
-
     return (
-        <div style={{ padding: '30px', color: '#e0e0e0', height: '100%', overflowY: 'auto' }}>
-            {/* Заголовок и прогресс */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', borderBottom: '1px solid #222', paddingBottom: '20px' }}>
-                <div>
-                    <h1 className="glitch-text" style={{ color: '#00ff41', margin: 0, fontSize: '32px' }}>ДОСКА УЛИК</h1>
-                    <p style={{ color: '#666', marginTop: '10px' }}>Расследование взлома корпорации Neocorp</p>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '24px', color: '#00ff41', fontWeight: 'bold' }}>{progress}%</div>
-                    <div style={{ fontSize: '10px', color: '#444' }}>СБОР ДАННЫХ ЗАВЕРШЕН</div>
-                </div>
-            </div>
+        <div style={{ 
+            padding: '20px', 
+            height: '100%', 
+            background: 'radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%)',
+            position: 'relative',
+            overflow: 'hidden',
+            border: '10px solid #111',
+            boxShadow: 'inset 0 0 50px #000'
+        }}>
+            {/* Текстура пробковой доски (условно) */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.05, pointerEvents: 'none', backgroundImage: 'url("https://www.transparenttextures.com/patterns/cork-board.png")' }} />
 
-            {/* Сетка улик */}
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
-                gap: '20px' 
-            }}>
-                {ALL_CLUES.map(clue => {
+            <h1 className="glitch-text" style={{ color: '#00ff41', textAlign: 'center', marginBottom: '20px', fontSize: '24px', opacity: 0.8 }}>
+                DOSSIER: CASE #992-MAX
+            </h1>
+
+            {/* СЕТКА УЛИК В СТИЛЕ "ДОСКИ" */}
+            <div style={{ position: 'relative', width: '100%', height: '80%' }}>
+                {CLUES_CONFIG.map(clue => {
                     const isUnlocked = unlockedClues.includes(clue.id);
                     return (
                         <motion.div 
                             key={clue.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            whileHover={isUnlocked ? { scale: 1.1, zIndex: 10 } : {}}
+                            onClick={() => isUnlocked && setSelectedDoc({ ...DOCUMENTS[clue.id], id: clue.id })}
                             style={{
-                                background: isUnlocked ? 'rgba(0, 255, 65, 0.03)' : '#0a0a0a',
-                                border: isUnlocked ? '1px solid #00ff41' : '1px solid #1a1a1a',
-                                padding: '20px',
-                                position: 'relative',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '15px',
-                                boxShadow: isUnlocked ? '0 0 15px rgba(0, 255, 65, 0.1)' : 'none'
+                                position: 'absolute',
+                                left: clue.x,
+                                top: clue.y,
+                                rotate: `${clue.rotate}deg`,
+                                cursor: isUnlocked ? 'pointer' : 'default',
+                                width: '180px',
+                                background: isUnlocked ? '#eee' : '#222',
+                                padding: '10px 10px 30px 10px',
+                                boxShadow: isUnlocked ? '5px 5px 15px rgba(0,0,0,0.5)' : 'none',
+                                border: '1px solid rgba(255,255,255,0.1)'
                             }}
                         >
+                            <Paperclip size={16} style={{ position: 'absolute', top: '-10px', left: '50%', transform: 'translateX(-50%)', color: '#888' }} />
+                            
                             <div style={{ 
-                                color: isUnlocked ? '#00ff41' : '#222',
+                                width: '100%', 
+                                height: '120px', 
+                                background: isUnlocked ? '#000' : '#111',
                                 display: 'flex',
-                                justifyContent: 'space-between'
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: isUnlocked ? '#00ff41' : '#333'
                             }}>
-                                {isUnlocked ? clue.icon : <HelpCircle size={24} />}
-                                <span style={{ fontSize: '10px', opacity: 0.5 }}>#{clue.id}</span>
-                            </div>
-
-                            <div>
-                                <div style={{ fontSize: '10px', color: '#444', textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                    Миссия: {clue.mission}
-                                </div>
-                                <div style={{ 
-                                    fontSize: '14px', 
-                                    fontWeight: 'bold', 
-                                    marginTop: '5px',
-                                    color: isUnlocked ? '#fff' : '#333'
-                                }}>
-                                    {clue.label}
-                                </div>
+                                {isUnlocked ? clue.icon : <Lock size={30} />}
                             </div>
 
                             <div style={{ 
-                                background: '#000', 
-                                padding: '10px', 
-                                fontSize: '12px', 
-                                fontFamily: 'monospace',
-                                border: '1px solid #111',
-                                minHeight: '40px',
-                                color: isUnlocked ? '#00ff41' : 'transparent',
-                                userSelect: isUnlocked ? 'text' : 'none'
+                                marginTop: '10px', 
+                                color: isUnlocked ? '#000' : '#444', 
+                                fontFamily: 'Permanent Marker, cursive', // Можно добавить такой шрифт в Google Fonts
+                                fontSize: '14px',
+                                textAlign: 'center'
                             }}>
-                                {isUnlocked ? clue.value : "DATA_ENCRYPTED"}
+                                {isUnlocked ? clue.label : "LOCKED"}
                             </div>
+
+                            {isUnlocked && (
+                                <div style={{ position: 'absolute', bottom: '5px', right: '5px', fontSize: '10px', color: '#888' }}>
+                                    #{clue.id}
+                                </div>
+                            )}
                         </motion.div>
                     );
                 })}
+
+                {/* Красная нить (декоративный элемент между 1 и 3 уликой) */}
+                {unlockedClues.includes(1) && unlockedClues.includes(3) && (
+                    <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 1 }}>
+                        <line x1="20%" y1="25%" x2="70%" y2="25%" stroke="rgba(255,0,0,0.4)" strokeWidth="2" strokeDasharray="5,5" />
+                    </svg>
+                )}
             </div>
 
-            {unlockedClues.length === 10 && (
-                <motion.div 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }}
-                    style={{ marginTop: '50px', textAlign: 'center', padding: '40px', border: '1px dashed #00ff41' }}
-                >
-                    <h2 style={{ color: '#00ff41' }}>ВСЕ УЛИКИ СОБРАНЫ</h2>
-                    <p>Теперь вы можете сопоставить данные и найти преступника в финальной миссии.</p>
-                    <button className="btn-huge ready">ВЫДВИНУТЬ ОБВИНЕНИЕ</button>
-                </motion.div>
-            )}
+            {/* ПРОГРЕСС РАССЛЕДОВАНИЯ */}
+            <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', width: '300px' }}>
+                <div style={{ fontSize: '10px', color: '#444', marginBottom: '5px', textAlign: 'center' }}>
+                    СИНХРОНИЗАЦИЯ УЛИК: {unlockedClues.length} / 10
+                </div>
+                <div style={{ height: '4px', background: '#111', borderRadius: '2px' }}>
+                    <motion.div animate={{ width: `${(unlockedClues.length / 10) * 100}%` }} style={{ height: '100%', background: '#00ff41' }} />
+                </div>
+            </div>
+
+            {/* МОДАЛЬНОЕ ОКНО "ВЗГЛЯД ВБЛИЗИ" */}
+            <AnimatePresence>
+                {selectedDoc && (
+                    <motion.div 
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        onClick={() => setSelectedDoc(null)}
+                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.5, rotate: 10 }} 
+                            animate={{ scale: 1, rotate: 0 }} 
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ 
+                                width: '90%', maxWidth: '500px', background: '#fff', 
+                                padding: '40px', color: '#000', boxShadow: '0 0 50px rgba(0,0,0,1)',
+                                position: 'relative'
+                            }}
+                        >
+                            <div style={{ position: 'absolute', top: '10px', left: '10px', fontSize: '10px', color: '#ccc' }}>DOCUMENT_ID: {selectedDoc.id}</div>
+                            <h2 style={{ fontFamily: 'monospace', borderBottom: '2px solid #000', paddingBottom: '10px' }}>{selectedDoc.title}</h2>
+                            <p style={{ marginTop: '20px', fontSize: '18px', lineHeight: '1.5', fontFamily: 'serif' }}>{selectedDoc.text}</p>
+                            <div style={{ marginTop: '30px', textAlign: 'right', fontStyle: 'italic', color: '#666' }}>Дата перехвата: {selectedDoc.date}</div>
+                            <button className="btn-main" onClick={() => setSelectedDoc(null)} style={{ marginTop: '20px', width: '100%', background: '#000' }}>ВЕРНУТЬ НА ДОСКУ</button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

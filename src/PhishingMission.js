@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { supabase } from './supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, ShieldAlert, ShieldCheck, Search, ChevronRight, AlertCircle, Info, CheckCircle } from 'lucide-react';
+import { Search, AlertCircle, Info, CheckCircle } from 'lucide-react';
 
 const PhishingMission = ({ username, currentPoints, onComplete }) => {
   const [selectedMail, setSelectedMail] = useState(null);
@@ -31,11 +30,11 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
     setProcessedIds(prev => [...prev, selectedMail.id]);
   };
 
-  const finishMission = async () => {
+  const finishMission = () => {
     const correctCount = Object.values(results).filter(r => r === 'correct').length;
     const reward = correctCount * 100;
-    const { error } = await supabase.from('profiles').update({ points: currentPoints + reward }).eq('username', username);
-    if (!error) { setIsFinished(true); onComplete(currentPoints + reward); }
+    setIsFinished(true);
+    onComplete(currentPoints + reward);
   };
 
   // НОВАЯ ЛОГИКА ФИЛЬТРАЦИИ
@@ -49,7 +48,7 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
     <div className="window success-screen animate-fade">
       <div className="glitch-text">DATA CLEANSED</div>
       <p>Вы проанализировали {emails.length} объектов. Правильных диагнозов: {Object.values(results).filter(r => r === 'correct').length}</p>
-      <button className="btn-huge" onClick={() => window.location.reload()}>ВЕРНУТЬСЯ В ШТАБ</button>
+      <button className="btn-huge" onClick={() => onComplete(currentPoints)}>ВЕРНУТЬСЯ В ШТАБ</button>
     </div>
   );
 

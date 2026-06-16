@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://fxwykgczkazhuwleceny.supabase.co';
-const supabaseKey = 'sb_publishable_2ztJg1W2FzXQkVFupWC6Jg_EuP_yCN8';
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Supabase credentials are missing. Check your .env file.');
+}
+
+export const supabase = createClient(supabaseUrl || '', supabaseKey || '');

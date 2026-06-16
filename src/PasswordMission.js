@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from './supabaseClient';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldAlert, CheckCircle2, XCircle, Search, Terminal } from 'lucide-react';
+import { ShieldAlert, CheckCircle2, Terminal } from 'lucide-react';
 
 const PasswordMission = ({ username, currentPoints, onComplete }) => {
   const [password, setPassword] = useState('');
@@ -45,18 +44,12 @@ const PasswordMission = ({ username, currentPoints, onComplete }) => {
   const activeRules = allRules.slice(0, level);
   const allRulesMet = activeRules.every(rule => rule.check(password));
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (allRulesMet) {
       if (level < allRules.length) {
         setLevel(level + 1);
       } else {
-        const reward = 1000;
-        const { error } = await supabase
-          .from('profiles')
-          .update({ points: currentPoints + reward })
-          .eq('username', username);
-
-        if (!error) setIsFinished(true);
+        setIsFinished(true);
       }
     }
   };
@@ -66,7 +59,7 @@ const PasswordMission = ({ username, currentPoints, onComplete }) => {
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="win-box">
         <div className="glitch-text">ACCESS GRANTED</div>
         <p>Вы взломали систему. Получено 1000 XP</p>
-        <button className="btn-huge" onClick={() => window.location.reload()}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+        <button className="btn-huge" onClick={() => onComplete(currentPoints + 1000)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
       </motion.div>
     );
   }

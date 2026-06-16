@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Database, Search, Terminal, AlertCircle, Check, Book, Filter, Trash2, Play } from 'lucide-react';
+import { Database, Terminal, AlertCircle, Check, Book, Filter, Trash2, Play } from 'lucide-react';
 
 const DatabaseMission = ({ username, currentPoints, onComplete }) => {
     const [taskStep, setTaskStep] = useState(1); // 1: List all, 2: Find token
