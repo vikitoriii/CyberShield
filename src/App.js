@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from './supabaseClient';
 import { 
   Shield, Terminal, Trophy, User, Lock, Search, 
-  Activity, Database, Book, Command, MessageSquare, Zap, AlertTriangle 
+  Activity, Database, Book, Command, MessageSquare, Zap, AlertTriangle, Fingerprint, Camera, Network 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
@@ -16,6 +16,9 @@ import PhishingMission from './PhishingMission';
 import FirewallMission from './FirewallMission'; 
 import DatabaseMission from './DatabaseMission';
 import SocialMission from './SocialMission';
+import CryptoMission from './CryptoMission';
+import MetadataMission from './MetadataMission'
+import SnifferMission from './SnifferMission';
 
 function App() {
   // --- 1. СОСТОЯНИЯ СИСТЕМЫ (SYSTEM STATES) ---
@@ -217,6 +220,21 @@ function App() {
                     <h3>5. Соц. Инженерия</h3>
                     <button className="btn-action" onClick={() => setCurrentMission('social')}>Запустить</button>
                   </div>
+                  <div className="mission-card card-glow">
+    <div className="icon-box"><Fingerprint color="#00ff41" /></div>
+    <h3>6. Криптография</h3>
+    <button className="btn-action" onClick={() => setCurrentMission('crypto')}>Запустить</button>
+</div>
+<div className="mission-card card-glow">
+    <div className="icon-box"><Camera color="#00ff41" /></div>
+    <h3>7. Цифровой след</h3>
+    <button className="btn-action" onClick={() => setCurrentMission('metadata')}>Запустить</button>
+</div>
+<div className="mission-card card-glow">
+    <div className="icon-box"><Network color="#4d94ff" /></div>
+    <h3>8. Сниффер трафика</h3>
+    <button className="btn-action" onClick={() => setCurrentMission('sniffer')}>ЗАПУСТИТЬ</button>
+</div>
                 </div>
               ) : (
                 <>
@@ -226,6 +244,21 @@ function App() {
                   {currentMission === 'firewall' && <FirewallMission username={username} currentPoints={points} onComplete={(p) => {saveProgress(p, 3); setCurrentMission(null);}} />}
                   {currentMission === 'database' && <DatabaseMission username={username} currentPoints={points} onComplete={(p) => {saveProgress(p, 4); setCurrentMission(null);}} />}
                   {currentMission === 'social' && <SocialMission username={username} currentPoints={points} onComplete={(p) => {saveProgress(p, 5); setCurrentMission(null);}} />}
+                    {currentMission === 'crypto' && (
+    <CryptoMission 
+        username={username} 
+        currentPoints={points} 
+        onComplete={(p) => { saveProgress(p, 6); setCurrentMission(null); }} 
+    />
+)}
+{currentMission === 'metadata' && (
+    <MetadataMission 
+        username={username} 
+        currentPoints={points} 
+        onComplete={(p) => { saveProgress(p, 7); setCurrentMission(null); }} 
+    />
+)}
+{currentMission === 'sniffer' && <SnifferMission username={username} currentPoints={points} onComplete={(p) => {saveProgress(p, 8); setCurrentMission(null);}} />}
                 </>
               )}
             </div>

