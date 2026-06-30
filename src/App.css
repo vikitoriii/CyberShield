@@ -2110,6 +2110,11 @@ nav button:hover .nav-shortcut {
   color: #aaa;
 }
 
+/* Mobile bottom nav - hidden on desktop */
+.mobile-bottom-nav {
+  display: none;
+}
+
 /* =========================================
    CASE FILES
    ========================================= */
@@ -5442,27 +5447,46 @@ nav button:hover .nav-shortcut {
 @media (max-width: 768px) {
   .os-wrapper { flex-direction: column; }
   
-  /* Sidebar → horizontal nav */
   .sidebar {
-    width: 100%;
-    height: auto;
+    display: none;
+  }
+  
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #0a0a0a;
+    border-top: 1px solid #222;
+    z-index: 999;
+    padding: 6px 0 env(safe-area-inset-bottom, 0);
+  }
+  
+  .mobile-bottom-nav button {
+    flex: 1;
+    display: flex;
     flex-direction: column;
-    border-right: none;
-    border-bottom: 1px solid var(--surface-light);
-    padding: 8px 12px;
-    gap: 0;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 9px;
+    cursor: pointer;
+    transition: 0.2s;
   }
-  .glitch-logo-container { margin-bottom: 8px; }
-  .brand { margin-bottom: 0 !important; font-size: 14px !important; }
-  nav { flex-direction: row; gap: 2px; flex-grow: 0; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
-  nav button { padding: 8px 10px; font-size: 10px; white-space: nowrap; gap: 6px; }
-  .nav-shortcut { display: none; }
-  .about-btn { padding: 8px 10px; font-size: 10px; }
-  .user-info { 
-    flex-direction: row; gap: 8px; padding: 8px 0 0; 
-    border-top: none; border-top: 1px solid #222; margin-top: 4px;
+  
+  .mobile-bottom-nav button.active {
+    color: #00ff41;
   }
-  .main-content { height: calc(100vh - auto); }
+  
+  .mobile-bottom-nav button span {
+    letter-spacing: 0.5px;
+  }
+  
+  .main-content { height: calc(100vh - 60px); padding-bottom: 60px; }
   .top-bar { height: 44px; padding: 0 12px; font-size: 11px; }
   .view-area { padding: 12px; }
   

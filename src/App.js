@@ -365,72 +365,74 @@ function App() {
         setTerminalLogs(prev => [...prev, 
           `> ${terminalInput}`,
           '> ╔══════════════════════════════════════╗',
-          '> ║  ДОСТУПНЫЕ КОМАНДЫ:                 ║',
+          '> ║  КОМАНДЫ:                           ║',
           '> ╠══════════════════════════════════════╣',
           '> ║  help     — список команд            ║',
           '> ║  whoami   — информация об агенте     ║',
-          '> ║  clues    — прогресс расследования   ║',
+          '> ║  status   — статус расследования     ║',
           '> ║  scan     — сканирование сети        ║',
-          '> ║  hack     — взлом системы            ║',
-          '> ║  status   — статус системы           ║',
+          '> ║  decode   — декодировать сообщение   ║',
           '> ║  rank     — информация о ранге      ║',
           '> ║  missions — список миссий            ║',
           '> ║  clear    — очистить консоль         ║',
-          '> ║  matrix   — следовать за белым кроликом',
-          '> ║  about    — о системе                ║',
+          '> ║  joke      — случайная шутка         ║',
+          '> ║  matrix   — следовать за кроликом    ║',
           '> ╚══════════════════════════════════════╝'
         ]);
         setTerminalInput('');
         return;
       }
       if (cmd === 'whoami') res = `> Агент: ${username.toUpperCase()} | Ранг: ${rank.title} | XP: ${points} | Улики: ${unlockedClues.length}/10`;
-      if (cmd === 'clues') res = `> РАССЛЕДОВАНИЕ: ${unlockedClues.length}/10 улик найдено. ${unlockedClues.length === 10 ? 'ВСЕ УЛИКИ СОБРАНЫ!' : 'Продолжай искать.'}`;
       if (cmd === 'scan') {
         setTerminalLogs(prev => [...prev, 
           `> ${terminalInput}`,
-          '> Инициализация сканирования сети...',
+          '> Сканирование сети...',
           '> [████████████████████] 100%',
-          '> РЕЗУЛЬТАТ: Обнаружена зашифрованная активность в Секторе 7-G',
-          '> IP-адрес: 192.168.7.42 | Статус: АКТИВЕН',
-          '> Предупреждение: Обнаружен след Shadow_Walker'
+          '> Результат: обнаружена зашифрованная активность',
+          '> IP: 192.168.7.42 | Статус: АКТИВЕН',
+          '> Предупреждение: след Shadow_Walker'
         ]);
         setTerminalInput('');
         return;
       }
-      if (cmd === 'secret') res = '> ОШИБКА: Недостаточно доступа. Соберите все 10 улик для расшифровки финального сообщения Макса.';
+      if (cmd === 'decode') {
+        const messages = [
+          'Кодовое имя: SHADOW_WALKER',
+          'Проект: MERTVAYA_PETLA_2024',
+          'Локация: 48.8584, 2.2945',
+          'Статус Макса: ЖИВ, но изолирован',
+          'Ключ доступа: LOOP_BREAKER_2024'
+        ];
+        const msg = messages[Math.floor(Math.random() * messages.length)];
+        setTerminalLogs(prev => [...prev, `> ${terminalInput}`, `> ДЕШИФРОВКА: ${msg}`, '> Улика добавлена в архив.']);
+        setTerminalInput('');
+        return;
+      }
+      if (cmd === 'joke') {
+        const jokes = [
+          'Почему программист путает Хеллоуин и Рождество? Потому что OCT 31 = DEC 25',
+          'Что сказал нулевик единице? "Ты такая красивая!"',
+          'Как программист засыпает? boolean isSleeping = true...',
+          'Хакер зашёл в бар. Бармен: "Что будете?" Хакер: "DELETE FROM drinks WHERE user = \'hacker\'"'
+        ];
+        setTerminalLogs(prev => [...prev, `> ${terminalInput}`, `> ${jokes[Math.floor(Math.random() * jokes.length)]}`]);
+        setTerminalInput('');
+        return;
+      }
       if (cmd === 'clear') { setTerminalLogs([]); setTerminalInput(''); return; }
       if (cmd === 'matrix') {
         setTerminalLogs(prev => [...prev, '> Следуй за белым кроликом...', '> _nEO_wAKe_Up_nEo_...']);
         setTerminalInput('');
         return;
       }
-      if (cmd === 'hack') {
-        setTerminalLogs(prev => [...prev, 
-          `> ${terminalInput}`,
-          '> Инициализация последовательности взлома...',
-          '> [██░░░░░░░░░░░░░░░░░░] 10%',
-          '> [████░░░░░░░░░░░░░░░░] 20%',
-          '> [██████░░░░░░░░░░░░░░] 30%',
-          '> [████████░░░░░░░░░░░░] 40%',
-          '> [██████████░░░░░░░░░░] 50%',
-          '> [████████████░░░░░░░░] 60%',
-          '> [██████████████░░░░░░] 70%',
-          '> [████████████████░░░░] 80%',
-          '> [██████████████████░░] 90%',
-          '> [████████████████████] 100%',
-          '> ДОСТУП ПОЛУЧЕН. Добро пожаловать, Оператор.'
-        ]);
-        setTerminalInput('');
-        return;
+      if (cmd === 'rank') {
+        const nextRank = points < 1000 ? 1000 - points : points < 3000 ? 3000 - points : points < 7000 ? 7000 - points : 0;
+        res = `> РАНГ: ${rank.title} | До следующего ранга: ${nextRank > 0 ? nextRank + ' XP' : 'МАКСИМУМ'}`;
       }
       if (cmd === 'status') {
         const missionsDone = unlockedClues.length;
         const progress = Math.round((missionsDone / 10) * 100);
-        res = `> СИСТЕМА: ОНЛАЙН | Цель: Neocorp | Прогресс: ${progress}% (${missionsDone}/10 миссий) | XP: ${points}`;
-      }
-      if (cmd === 'rank') {
-        const nextRank = points < 1000 ? 1000 - points : points < 3000 ? 3000 - points : points < 7000 ? 7000 - points : 0;
-        res = `> РАНГ: ${rank.title} | До следующего ранга: ${nextRank > 0 ? nextRank + ' XP' : 'МАКСИМУМ'}`;
+        res = `> СИСТЕМА: ОНЛАЙН | Прогресс: ${progress}% (${missionsDone}/10 миссий) | XP: ${points}`;
       }
       if (cmd === 'missions') {
         setTerminalLogs(prev => [...prev, 
@@ -447,7 +449,6 @@ function App() {
         setTerminalInput('');
         return;
       }
-      if (cmd === 'about') res = '> CYBER-SHIELD v1.0.5 | Операционная система кибербезопасности | Neocorp Investigation System';
 
       setTerminalLogs(prev => [...prev, `> ${terminalInput}`, res].slice(-12));
       setTerminalInput('');
@@ -798,6 +799,27 @@ function App() {
         </div>
       </aside>
 
+      {/* Mobile bottom nav */}
+      {isLoggedIn && (
+        <div className="mobile-bottom-nav">
+          <button className={activeTab === 'desktop' ? 'active' : ''} onClick={() => setActiveTab('desktop')}>
+            <Activity size={18} /><span>Главная</span>
+          </button>
+          <button className={activeTab === 'missions' ? 'active' : ''} onClick={() => setActiveTab('missions')}>
+            <Lock size={18} /><span>Миссии</span>
+          </button>
+          <button className={activeTab === 'academy' ? 'active' : ''} onClick={() => setActiveTab('academy')}>
+            <Book size={18} /><span>Академия</span>
+          </button>
+          <button className={activeTab === 'casefiles' ? 'active' : ''} onClick={() => setActiveTab('casefiles')}>
+            <Search size={18} /><span>Улики</span>
+          </button>
+          <button className={activeTab === 'leaderboard' ? 'active' : ''} onClick={() => setActiveTab('leaderboard')}>
+            <Trophy size={18} /><span>Рейтинг</span>
+          </button>
+        </div>
+      )}
+
       {/* Logout confirmation modal */}
       {showLogoutConfirm && (
         <div className="modal-overlay" onClick={() => setShowLogoutConfirm(false)}>
@@ -857,7 +879,7 @@ function App() {
                     </div>
                     <div className="terminal-input-line" style={{ padding: '12px 16px' }}>
                       <span className="terminal-prompt">$</span>
-                      <input type="text" value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} onKeyDown={handleTerminalCommand} placeholder="введите команду..." autoFocus />
+                      <input type="text" value={terminalInput} onChange={(e) => setTerminalInput(e.target.value)} onKeyDown={handleTerminalCommand} placeholder="введите команду..." />
                       <span className="terminal-cursor" />
                     </div>
                   </div>
