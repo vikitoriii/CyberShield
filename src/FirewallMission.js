@@ -112,14 +112,14 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
 
                 {/* ЭТАП 1: ТЕРМИНАЛ */}
                 {stage === 1 && (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '30px', width: '100%' }}>
-                        <div style={{ background: '#000', padding: '20px', border: '1px solid #222', height: '300px', overflow: 'hidden', fontFamily: 'monospace', fontSize: '13px', color: '#333' }}>
-                            {logs.map((l, i) => <div key={i} style={{ color: l.includes(targetCode) ? '#00ff41' : 'inherit' }}>{l}</div>)}
+                    <div className="firewall-stage-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '20px', width: '100%' }}>
+                        <div style={{ background: '#000', padding: '15px', border: '1px solid #222', height: '250px', overflow: 'auto', fontFamily: 'monospace', fontSize: '12px', color: '#333' }}>
+                            {logs.map((l, i) => <div key={i} style={{ color: l.includes(targetCode) ? '#00ff41' : 'inherit', marginBottom: '2px' }}>{l}</div>)}
                         </div>
                         <div className="window" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <Hash size={40} color="#00ff41" style={{ margin: '0 auto 20px' }} />
                             <h3 style={{ fontSize: '12px', marginBottom: '20px' }}>ВВЕДИТЕ ПОРТ ДОСТУПА</h3>
-                            <input type="text" value={authCode} onChange={handleAuth} maxLength="3" style={{ background: '#000', border: '2px solid #00ff41', color: '#00ff41', padding: '15px', fontSize: '32px', textAlign: 'center', outline: 'none' }} autoFocus />
+                            <input type="text" value={authCode} onChange={handleAuth} maxLength="3" style={{ background: '#000', border: '2px solid #00ff41', color: '#00ff41', padding: '15px', fontSize: '28px', textAlign: 'center', outline: 'none' }} />
                         </div>
                     </div>
                 )}
@@ -150,12 +150,12 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
                     <div style={{ textAlign: 'center' }}>
                         <Lock size={40} color="#ff4d4d" style={{ marginBottom: '20px' }} />
                         <h2 style={{ marginBottom: '30px' }}>ИНЪЕКЦИЯ КЛЮЧА В ЯДРО</h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 80px)', gap: '10px', background: '#0a0a0a', padding: '20px', border: '1px solid #333' }}>
+                        <div className="firewall-matrix" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 80px)', gap: '8px', background: '#0a0a0a', padding: '15px', border: '1px solid #333', justifyContent: 'center' }}>
                             {Array.from({ length: 16 }).map((_, i) => (
                                 <motion.div key={i} whileTap={{ scale: 0.9 }} onClick={() => handleMatrixClick(i + 1)}
-                                    style={{ height: '80px', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                    style={{ height: '70px', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                                     background: matrixClicks.includes(i + 1) ? '#00ff41' : '#000',
-                                    color: matrixClicks.includes(i + 1) ? '#000' : '#444', fontSize: '18px', fontWeight: 'bold' }}>
+                                    color: matrixClicks.includes(i + 1) ? '#000' : '#444', fontSize: '16px', fontWeight: 'bold' }}>
                                     {i + 1}
                                 </motion.div>
                             ))}

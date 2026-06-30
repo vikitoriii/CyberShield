@@ -53,7 +53,8 @@ function App() {
   const [terminalInput, setTerminalInput] = useState('');
   const [terminalLogs, setTerminalLogs] = useState([
     '> CS-OS Kernel v1.0.5 loaded...', 
-    '> Welcome back, Agent. Max\'s traces found.'
+    '> Welcome back, Agent. Max\'s traces found.',
+    '> Введите "help" для списка команд'
   ]);
   const [scanning, setScanning] = useState(false);
   const [flashEffect, setFlashEffect] = useState(null);
@@ -370,13 +371,45 @@ function App() {
           '> ║  help     — список команд            ║',
           '> ║  whoami   — информация об агенте     ║',
           '> ║  status   — статус расследования     ║',
+          '> ║  ref      — справочник (пароли,      ║',
+          '> ║            сети, шифры, SQL)          ║',
           '> ║  scan     — сканирование сети        ║',
           '> ║  decode   — декодировать сообщение   ║',
           '> ║  rank     — информация о ранге      ║',
           '> ║  missions — список миссий            ║',
           '> ║  clear    — очистить консоль         ║',
-          '> ║  joke      — случайная шутка         ║',
-          '> ║  matrix   — следовать за кроликом    ║',
+          '> ║  joke     — случайная шутка          ║',
+          '> ╚══════════════════════════════════════╝'
+        ]);
+        setTerminalInput('');
+        return;
+      }
+      if (cmd === 'ref') {
+        setTerminalLogs(prev => [...prev, 
+          `> ${terminalInput}`,
+          '> ╔══════════════════════════════════════╗',
+          '> ║  СПРАВОЧНИК КИБЕРБЕЗОПАСНОСТИ:       ║',
+          '> ╠══════════════════════════════════════╣',
+          '> ║ ПАРОЛИ:                              ║',
+          '> ║  Минимум 12 символов                 ║',
+          '> ║  Буквы + цифры + спецсимволы         ║',
+          '> ║  2FA — обязательна!                  ║',
+          '> ╠══════════════════════════════════════╣',
+          '> ║ ПОРТЫ:                               ║',
+          '> ║  22=SSH  80=HTTP  443=HTTPS          ║',
+          '> ║  3389=RDP  3306=MySQL                ║',
+          '> ╠══════════════════════════════════════╣',
+          '> ║ ШИФРЫ:                               ║',
+          '> ║  AES-256=надёжный  RSA=асимметричный ║',
+          '> ║  SHA-256=хеш  ROT13=простой сдвиг    ║',
+          '> ╠══════════════════════════════════════╣',
+          '> ║ SQL-ИНЪЕКЦИЯ:                       ║',
+          '> ║  WHERE name=\'admin\' --  (уязвимо)    ║',
+          '> ║  Используй Prepared Statements!      ║',
+          '> ╠══════════════════════════════════════╣',
+          '> ║ ФИШИНГ:                              ║',
+          '> ║  Проверяй домен, ссылки, просьбы     ║',
+          '> ║  о паролях — всегда фишинг!         ║',
           '> ╚══════════════════════════════════════╝'
         ]);
         setTerminalInput('');
@@ -445,6 +478,74 @@ function App() {
             return `> ║  ${i < 9 ? '0' : ''}${i + 1}. ${done ? '✓ ВЫПОЛНЕНА' : '○ НЕ НАЧАТА'}${' '.repeat(done ? 21 : 20)}║`;
           }),
           '> ╚══════════════════════════════════════╝'
+        ]);
+        setTerminalInput('');
+        return;
+      }
+      if (cmd === 'hints') {
+        const missionsDone = unlockedClues.length;
+        const hints = [];
+        if (missionsDone < 1) hints.push('> МИССИЯ 01: Пароль должен быть сложным — буквы, цифры, спецсимволы');
+        if (missionsDone < 2) hints.push('> МИССИЯ 02: Проверяй ссылки — фишинговые содержат подменные домены');
+        if (missionsDone < 3) hints.push('> МИССИЯ 03: Файрвол блокирует по портам — найди открытый');
+        if (missionsDone < 4) hints.push('> МИССИЯ 04: SQL-запросы — используй SELECT для извлечения данных');
+        if (missionsDone < 5) hints.push('> МИССИЯ 05: Социальная инженерия — ищи манипуляции в тексте');
+        if (missionsDone < 6) hints.push('> МИССИЯ 06: Шифр Цезаря — сдвиг буквы на N позиций');
+        if (missionsDone < 7) hints.push('> МИССИЯ 07: Метаданные — настрой RGB-фильтры для скрытого слоя');
+        if (missionsDone < 8) hints.push('> МИССИЯ 08: Сейф — комбинация из 4 цифр, попробуй систематически');
+        if (missionsDone < 9) hints.push('> МИССИЯ 09: Админ-панель — извлеки данные из ВСЕХ 6 вкладок');
+        if (missionsDone < 10) hints.push('> МИССИЯ 10: Финал — собери все улики, восстанови таймлайн');
+        if (hints.length === 0) hints.push('> Все миссии выполнены! Вы — лучший агент!');
+        setTerminalLogs(prev => [...prev, `> ${terminalInput}`, '> ═══ ПОДСКАЗКИ К МИССИЯМ ═══', ...hints]);
+        setTerminalInput('');
+        return;
+      }
+      if (cmd === 'tips') {
+        setTerminalLogs(prev => [...prev, 
+          `> ${terminalInput}`,
+          '> ═══ СОВЕТЫ ПО КИБЕРБЕЗОПАСНОСТИ ═══',
+          '> • Используйте разные пароли для разных сервисов',
+          '> • Включайте двухфакторную аутентификацию (2FA)',
+          '> • Не переходите по подозрительным ссылкам',
+          '> • Проверяйте адрес отправителя в письмах',
+          '> • Используйте VPN в открытых Wi-Fi сетях',
+          '> • Регулярно обновляйте программное обеспечение',
+          '> • Не делитесь личными данными в соцсетях',
+          '> • Шифруйте важные файлы и диски'
+        ]);
+        setTerminalInput('');
+        return;
+      }
+      if (cmd === 'ports') {
+        setTerminalLogs(prev => [...prev, 
+          `> ${terminalInput}`,
+          '> ═══ ИЗВЕСТНЫЕ ПОРТЫ ═══',
+          '> 21   — FTP (передача файлов)',
+          '> 22   — SSH (безопасный доступ)',
+          '> 23   — Telnet (небезопасный доступ)',
+          '> 25   — SMTP (отправка почты)',
+          '> 53   — DNS (резолвинг имён)',
+          '> 80   — HTTP (веб-сервер)',
+          '> 443  — HTTPS (защищённый веб)',
+          '> 3306 — MySQL (база данных)',
+          '> 5432 — PostgreSQL (база данных)',
+          '> 8080 — альтернативный HTTP'
+        ]);
+        setTerminalInput('');
+        return;
+      }
+      if (cmd === 'tools') {
+        setTerminalLogs(prev => [...prev, 
+          `> ${terminalInput}`,
+          '> ═══ ИНСТРУМЕНТЫ АГЕНТА ═══',
+          '> • Nmap — сканирование сетей и портов',
+          '> • Wireshark — анализ сетевого трафика',
+          '> • Metasploit — фреймворк для пентеста',
+          '> • Burp Suite — тестирование веб-приложений',
+          '> • John the Ripper — взлом паролей',
+          '> • Hashcat — восстановление хешей',
+          '> • SQLMap — автоматизация SQL-инъекций',
+          '> • Aircrack-ng — анализ Wi-Fi сетей'
         ]);
         setTerminalInput('');
         return;
@@ -864,7 +965,7 @@ function App() {
         <section className="view-area">
           {activeTab === 'desktop' && (
             <div className="window animate-fade">
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '20px' }}>
+              <div className="desktop-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '16px' }}>
                 <div>
                   <h2 style={{ marginBottom: '8px' }}>Аналитический терминал: {username}</h2>
                   <div className="news-feed" style={{ marginBottom: '16px' }}>

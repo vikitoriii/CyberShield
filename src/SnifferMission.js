@@ -108,7 +108,7 @@ const SnifferMission = ({ username, currentPoints, onComplete }) => {
                 <span style={{ color: attemptsLeft <= 3 ? '#ff4d4d' : '#00ff41' }}>ОСТАЛОСЬ: {attemptsLeft}</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px', flex: 1, minHeight: 0 }}>
+            <div className="sniffer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px', flex: 1, minHeight: 0 }}>
                 {/* Левая: история попыток */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {/* Поле ввода */}

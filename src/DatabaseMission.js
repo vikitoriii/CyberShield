@@ -116,7 +116,7 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '20px', flex: 1, minHeight: 0 }}>
+            <div className="database-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '20px', flex: 1, minHeight: 0 }}>
                 
                 {/* ЛЕВАЯ ПАНЕЛЬ: КОНСОЛЬ */}
                 <div className="window" style={{ display: 'flex', flexDirection: 'column' }}>

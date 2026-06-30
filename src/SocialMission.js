@@ -140,7 +140,7 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
 
     // 3. ГЕЙМПЛЕЙ
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '20px', height: '100%', padding: '10px' }}>
+        <div className="social-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '20px', height: '100%', padding: '10px' }}>
             
             {/* ЧАТ */}
             <div className="window" style={{ display: 'flex', flexDirection: 'column', background: '#050505', border: '1px solid #222' }}>

@@ -257,7 +257,7 @@ const PortalMission = ({ username, currentPoints, onComplete }) => {
                 <span style={{ color: evidenceCount >= 6 ? '#00ff41' : '#f7b500' }}>УЛИКИ: {evidenceCount}/6 {canFinish && '- ВСЕ СОБРАНЫ'}</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '20px', flex: 1, minHeight: 0 }}>
+            <div className="portal-grid" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '20px', flex: 1, minHeight: 0 }}>
                 <div style={{ background: '#0a0a0a', border: '1px solid #222', padding: '10px', overflowY: 'auto' }}>
                     {ADMIN_TABS.map(tab => (
                         <div key={tab.id} onClick={() => { setSelectedTab(tab); setActivePuzzle(tab.puzzle); setShowHint(false); setHintLevel(0); }}

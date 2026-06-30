@@ -11,16 +11,29 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
     const [filters, setFilters] = useState({ red: 100, green: 100, blue: 100 });
     const [isFound, setIsFound] = useState(false);
     const [showHint, setShowHint] = useState(false);
+    const [tapMode, setTapMode] = useState(true);
+    const [capturedPackets, setCapturedPackets] = useState([]);
 
-    // Идеальные настройки для проявления шифра
     const TARGET = { red: 10, green: 160, blue: 60 };
+
+    const handlePacketTap = (id) => {
+        if (!capturedPackets.includes(id)) {
+            const newCaptured = [...capturedPackets, id];
+            setCapturedPackets(newCaptured);
+            setCapturedCount(newCaptured.length);
+            if (newCaptured.length >= 3) {
+                setTimeout(() => setStage(2), 500);
+            }
+        }
+    };
 
     useEffect(() => {
         const $ = window.$;
         if (!$ || stage === 0) return;
+        const isMobile = window.innerWidth <= 768;
 
-        // ЭТАП 1: jQuery UI Draggable (Захват пакетов из "потока")
-        if (stage === 1) {
+        // ЭТАП 1: jQuery UI Draggable (Захват пакетов из "потока") — только на десктопе
+        if (stage === 1 && !isMobile) {
             $(".packet-data").draggable({
                 revert: "invalid", // Возвращается на место, если не в порту
                 containment: "#capture-zone"
@@ -90,6 +103,8 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
     );
 
     // ЭКРАН 1-2: ИГРОВОЕ ПОЛЕ
+    const isMobile = window.innerWidth <= 768;
+    
     return (
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* ИНДИКАТОР ЭТАПОВ */}
@@ -105,68 +120,68 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
 
             {showHint && (
                 <div style={{ background: '#000', border: '1px solid #f7b500', padding: '10px 16px', margin: '0 20px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
-                    {stage === 1 && 'Перетащите зелёные блоки данных в зону захвата. Пропустите серые — это шум.'}
+                    {stage === 1 && (isMobile ? 'Нажмите на зелёные блоки данных, чтобы захватить их. Серые — шум, не нажимайте.' : 'Перетащите зелёные блоки данных в зону захвата. Пропустите серые — это шум.')}
                     {stage === 2 && 'Настройте КРАСНЫЙ канал на минимум (~10), ЗЕЛЁНЫЙ на ~160. Синий не важен. Скрытый слой появится при правильных настройках.'}
                 </div>
             )}
 
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px', padding: '20px', minHeight: 0 }}>
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 350px', gap: '20px', padding: '20px', minHeight: 0 }}>
                 {/* ЛЕВАЯ ПАНЕЛЬ: ИГРОВОЕ ПОЛЕ */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {/* ЭТАП 1: ЗАХВАТ ПАКЕТОВ */}
                     {stage === 1 && (
-                        <div id="capture-zone" style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', minHeight: '400px' }}>
-                            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                        <div id="capture-zone" style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', minHeight: isMobile ? '300px' : '400px' }}>
+                            <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '40px' }}>
                                 <h4 style={{ color: '#4d94ff', marginBottom: '10px' }}>ПЕРЕХВАТ ПАКЕТОВ</h4>
-                                <p style={{ color: '#666', fontSize: '12px' }}>Перетащите плавающие блоки данных в порт приемника</p>
+                                <p style={{ color: '#666', fontSize: '12px' }}>{isMobile ? 'Нажмите на блоки данных для захвата' : 'Перетащите плавающие блоки данных в порт приемника'}</p>
                             </div>
                             
-                            <div style={{ display: 'flex', gap: '40px' }}>
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} className="packet-data" style={{ padding: '20px', background: '#111', border: '1px solid #4d94ff', cursor: 'grab', zIndex: 10, textAlign: 'center' }}>
-                                        <Cpu size={24} color="#4d94ff" style={{ marginBottom: '10px' }} />
-                                        <div style={{ fontSize: '10px', color: '#4d94ff' }}>METADATA_#0{i}</div>
-                                    </div>
-                                ))}
-                            </div>
+                            {/* Мобильная панель пакетов сверху */}
+                            {isMobile && (
+                                <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                    {[1, 2, 3].map(i => (
+                                        <div 
+                                            key={i} 
+                                            className="packet-data" 
+                                            onClick={() => handlePacketTap(`packet-${i}`)}
+                                            style={{ 
+                                                padding: '16px', 
+                                                background: capturedPackets.includes(`packet-${i}`) ? '#1a3a1a' : '#111', 
+                                                border: `2px solid ${capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff'}`, 
+                                                cursor: 'pointer', 
+                                                zIndex: 10, 
+                                                textAlign: 'center',
+                                                opacity: capturedPackets.includes(`packet-${i}`) ? 0.5 : 1,
+                                                transition: 'all 0.3s'
+                                            }}
+                                        >
+                                            <Cpu size={24} color={capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff'} style={{ marginBottom: '8px' }} />
+                                            <div style={{ fontSize: '10px', color: capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff' }}>
+                                                {capturedPackets.includes(`packet-${i}`) ? '✓ ЗАХВАЧЕН' : `METADATA_#0${i}`}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
 
-                            <div id="input-port" style={{ marginTop: '40px', padding: '40px', border: '3px dashed #4d94ff', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(77, 148, 255, 0.05)' }}>
+                            {/* Десктопная версия — перетаскивание */}
+                            {!isMobile && (
+                                <div style={{ display: 'flex', gap: '40px' }}>
+                                    {[1, 2, 3].map(i => (
+                                        <div key={i} className="packet-data" style={{ padding: '20px', background: '#111', border: '1px solid #4d94ff', cursor: 'grab', zIndex: 10, textAlign: 'center' }}>
+                                            <Cpu size={24} color="#4d94ff" style={{ marginBottom: '10px' }} />
+                                            <div style={{ fontSize: '10px', color: '#4d94ff' }}>METADATA_#0{i}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div id="input-port" style={{ marginTop: isMobile ? '20px' : '40px', padding: isMobile ? '24px' : '40px', border: '3px dashed #4d94ff', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(77, 148, 255, 0.05)', width: isMobile ? '80%' : 'auto' }}>
                                 <div style={{ textAlign: 'center' }}>
                                     <Zap size={32} color="#4d94ff" style={{ marginBottom: '10px' }} />
                                     <div style={{ fontSize: '12px', color: '#4d94ff', fontWeight: 'bold' }}>INPUT_PORT</div>
+                                    <div style={{ fontSize: '10px', color: '#666', marginTop: '4px' }}>{capturedCount}/3 захвачено</div>
                                 </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* ЭТАП 2: ФИЛЬТРАЦИЯ И ГЛИЧИ */}
-                    {stage === 2 && (
-                        <div style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <div style={{ position: 'relative', width: '100%', maxWidth: '500px', height: '400px', border: '2px solid #222', padding: '10px' }}>
-                                <div style={{
-                                    width: '100%', height: '100%',
-                                    backgroundImage: 'url("https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?q=80&w=1000")',
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
-                                    transition: '0.3s filter',
-                                    filter: `saturate(${filters.red}%) hue-rotate(${filters.green}deg) brightness(${filters.blue / 100}) contrast(1.2)`
-                                }}></div>
-                                
-                                <AnimatePresence>
-                                    {isFound && (
-                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', width: '100%', pointerEvents: 'none' }}>
-                                            <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#00ff41', textShadow: '0 0 30px #00ff41', letterSpacing: '12px', fontFamily: 'monospace' }}>
-                                                VOULT_7
-                                            </div>
-                                            <div style={{ background: '#000', border: '1px solid #00ff41', padding: '10px', display: 'inline-block', marginTop: '15px' }}>
-                                                <span style={{ color: '#00ff41', fontSize: '12px', letterSpacing: '2px' }}>DECRYPTED_KEY: 88-12-P</span>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                            <div style={{ marginTop: '15px', color: '#666', fontSize: '12px', letterSpacing: '2px' }}>
-                                {isFound ? ">> УЛИКА ПОДТВЕРЖДЕНА" : ">> ИДЕТ SPECTRAL_SCANNING..."}
                             </div>
                         </div>
                     )}
