@@ -72,6 +72,30 @@ function App() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [regSuccess, setRegSuccess] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [fakeNotifications, setFakeNotifications] = useState([]);
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const FAKE_NOTIFS = [
+      { icon: '🔒', title: 'SYSTEM ALERT', text: 'Обнаружена подозрительная активность в сегменте B-7', color: '#ff4d4d' },
+      { icon: '📡', title: 'NET MONITOR', text: 'Шифрованный трафик на порту 443 — источник: 192.168.7.42', color: '#f7b500' },
+      { icon: '🛡️', title: 'FIREWALL', text: 'Заблокирована попытка SQL-инъекции с IP 10.0.0.55', color: '#4d94ff' },
+      { icon: '⚠️', title: 'INTRUSION DETECT', text: 'Неудачная попытка доступа: пароль "admin123"', color: '#ff4d4d' },
+      { icon: '🔍', title: 'SCANNER', text: 'Завершено сканирование портов — 3 уязвимости', color: '#f7b500' },
+      { icon: '💡', title: 'SHADOW SIGNAL', text: 'Обнаружен слабый сигнал на частоте 104.4 MHz...', color: '#00ff41' },
+      { icon: '🔐', title: 'CRYPTO MODULE', text: 'AES-256 шифрование активно — канал защищён', color: '#00ff41' },
+      { icon: '📡', title: 'DEAD DROP', text: 'Получен новый пакет данных от агента MAX', color: '#f7b500' },
+    ];
+    const interval = setInterval(() => {
+      const notif = FAKE_NOTIFS[Math.floor(Math.random() * FAKE_NOTIFS.length)];
+      const id = Date.now();
+      setFakeNotifications(prev => [...prev.slice(-2), { ...notif, id }]);
+      setTimeout(() => {
+        setFakeNotifications(prev => prev.filter(n => n.id !== id));
+      }, 5000);
+    }, 12000 + Math.random() * 8000);
+    return () => clearInterval(interval);
+  }, [isLoggedIn]);
 
   const BOOT_SEQUENCE = [
     { text: '> CYBER-SHIELD OS v1.0.5', delay: 200 },
@@ -843,31 +867,6 @@ function App() {
   );
 
   if (showIntro) return <IntroStory onStart={() => setShowIntro(false)} />;
-
-  // Fake system notifications for vibe
-  const [fakeNotifications, setFakeNotifications] = useState([]);
-  const FAKE_NOTIFS = [
-    { icon: '🔒', title: 'SYSTEM ALERT', text: 'Обнаружена подозрительная активность в сегменте B-7', color: '#ff4d4d' },
-    { icon: '📡', title: 'NET MONITOR', text: 'Шифрованный трафик на порту 443 — источник: 192.168.7.42', color: '#f7b500' },
-    { icon: '🛡️', title: 'FIREWALL', text: 'Заблокирована попытка SQL-инъекции с IP 10.0.0.55', color: '#4d94ff' },
-    { icon: '⚠️', title: 'INTRUSION DETECT', text: 'Неудачная попытка доступа: пароль "admin123"', color: '#ff4d4d' },
-    { icon: '🔍', title: 'SCANNER', text: 'Завершено сканирование портов — 3 уязвимости', color: '#f7b500' },
-    { icon: '💡', title: 'SHADOW SIGNAL', text: 'Обнаружен слабый сигнал на частоте 104.4 MHz...', color: '#00ff41' },
-    { icon: '🔐', title: 'CRYPTO MODULE', text: 'AES-256 шифрование активно — канал защищён', color: '#00ff41' },
-    { icon: '📡', title: 'DEAD DROP', text: 'Получен новый пакет данных от агента MAX', color: '#f7b500' },
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const notif = FAKE_NOTIFS[Math.floor(Math.random() * FAKE_NOTIFS.length)];
-      const id = Date.now();
-      setFakeNotifications(prev => [...prev.slice(-2), { ...notif, id }]);
-      setTimeout(() => {
-        setFakeNotifications(prev => prev.filter(n => n.id !== id));
-      }, 5000);
-    }, 12000 + Math.random() * 8000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="os-wrapper">
