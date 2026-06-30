@@ -100,8 +100,8 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
 
                 <AnimatePresence>
                     {showHint && (
-                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} 
-                            style={{ position: 'absolute', right: '50px', top: '10px', width: '280px', background: '#1a1a00', border: '1px solid #f7b500', padding: '15px', color: '#f7b500', fontSize: '11px', zIndex: 100, lineHeight: '1.5' }}>
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} 
+                            style={{ position: 'absolute', right: '10px', top: '50px', width: '260px', background: '#1a1a00', border: '1px solid #f7b500', padding: '12px', color: '#f7b500', fontSize: '11px', zIndex: 100, lineHeight: '1.5' }}>
                             <b>ПОДСКАЗКА:</b><br/>
                             {stage === 1 && 'Ищите число, которое выделяется зелёным цветом среди серых логов. Оно появляется и исчезает — будьте внимательны.'}
                             {stage === 2 && 'Настройте ползунок так, чтобы амплитуда волны была максимальной. Частота около 74 на слайдере.'}

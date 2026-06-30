@@ -206,20 +206,45 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
                         </div>
 
                         {stage === 2 && (
-                            <div style={{ background: '#000', padding: '20px', border: '1px solid #222', marginBottom: '20px' }}>
-                                <div style={{ color: '#4d94ff', fontSize: '12px', fontWeight: 'bold', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ background: '#000', padding: '16px', border: '1px solid #222', marginBottom: '16px' }}>
+                                <div style={{ color: '#4d94ff', fontSize: '12px', fontWeight: 'bold', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <Eye size={14} /> RGB_SPECTRUM_OS:
                                 </div>
                                 
                                 {["red", "green", "blue"].map(color => (
-                                    <div key={color} style={{ marginBottom: '20px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
+                                    <div key={color} style={{ marginBottom: '16px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '11px' }}>
                                             <span style={{ color: '#666', textTransform: 'uppercase' }}>{color} channel</span>
                                             <span style={{ color: '#4d94ff', fontWeight: 'bold' }}>{filters[color]}%</span>
                                         </div>
-                                        <div id={`s-${color}`} style={{ height: '8px', background: '#222', borderRadius: '4px' }}></div>
+                                        <input 
+                                            type="range" 
+                                            min="0" 
+                                            max="200" 
+                                            value={filters[color]} 
+                                            onChange={(e) => setFilters(prev => ({ ...prev, [color]: parseInt(e.target.value) }))}
+                                            style={{ width: '100%', accentColor: color === 'red' ? '#ff4d4d' : color === 'green' ? '#00ff41' : '#4d94ff', height: '8px' }}
+                                        />
                                     </div>
                                 ))}
+
+                                {/* Image preview with CSS filters */}
+                                <div style={{ 
+                                    width: '100%', height: '120px', 
+                                    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+                                    border: '1px solid #333', marginTop: '12px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    filter: `saturate(${filters.red / 100}) hue-rotate(${filters.green * 1.8}deg) brightness(${filters.blue / 100})`,
+                                    transition: 'filter 0.3s',
+                                    position: 'relative', overflow: 'hidden'
+                                }}>
+                                    <div style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0.3,
+                                        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(77,148,255,0.1) 2px, rgba(77,148,255,0.1) 4px)'
+                                    }} />
+                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#4d94ff', zIndex: 1, fontFamily: 'monospace' }}>
+                                        ENCRYPTED_DATA
+                                    </div>
+                                </div>
                             </div>
                         )}
 

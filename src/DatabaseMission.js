@@ -195,18 +195,23 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
             {/* МОДАЛЬНОЕ ОКНО ПОДСКАЗОК */}
             <AnimatePresence>
                 {showHint && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div className="window" style={{ maxWidth: '600px', padding: '40px' }}>
-                            <h2 style={{ color: '#00ff41', marginBottom: '20px' }}>СПРАВОЧНИК ОПЕРАТОРОВ</h2>
-                            <div style={{ display: 'grid', gap: '15px' }}>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+                        onClick={() => setShowHint(false)}>
+                        <div className="window" style={{ maxWidth: '500px', width: '100%', padding: '20px', maxHeight: '80vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                <h2 style={{ color: '#00ff41', fontSize: '16px', margin: 0 }}>СПРАВОЧНИК SQL</h2>
+                                <button onClick={() => setShowHint(false)} style={{ background: '#222', border: 'none', color: '#fff', width: '32px', height: '32px', fontSize: '18px', cursor: 'pointer', borderRadius: '4px' }}>×</button>
+                            </div>
+                            <div style={{ display: 'grid', gap: '10px' }}>
                                 {Object.entries(SQL_DICTIONARY).map(([key, val]) => (
-                                    <div key={key} style={{ display: 'flex', gap: '15px', borderBottom: '1px solid #222', paddingBottom: '10px' }}>
-                                        <b style={{ color: '#00ff41', minWidth: '100px' }}>{key}</b>
-                                        <span style={{ color: '#aaa', fontSize: '14px' }}>{val}</span>
+                                    <div key={key} style={{ display: 'flex', gap: '12px', borderBottom: '1px solid #222', paddingBottom: '10px', alignItems: 'flex-start' }}>
+                                        <b style={{ color: '#00ff41', minWidth: '90px', fontSize: '12px' }}>{key}</b>
+                                        <span style={{ color: '#aaa', fontSize: '12px' }}>{val}</span>
                                     </div>
                                 ))}
                             </div>
-                            <button className="btn-main" style={{ marginTop: '30px' }} onClick={() => setShowHint(false)}>ЗАКРЫТЬ СПРАВОЧНИК</button>
+                            <button className="btn-main" style={{ marginTop: '20px', width: '100%' }} onClick={() => setShowHint(false)}>ЗАКРЫТЬ</button>
                         </div>
                     </motion.div>
                 )}
