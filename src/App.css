@@ -5146,80 +5146,167 @@ nav button:hover .nav-shortcut {
   .friends-panel { width: 320px; right: 10px; }
 }
 
+/* =========================================
+   MOBILE: 768px и меньше
+   ========================================= */
 @media (max-width: 768px) {
   .os-wrapper { flex-direction: column; }
+  
+  /* Sidebar → horizontal nav */
   .sidebar {
     width: 100%;
     height: auto;
-    flex-direction: row;
+    flex-direction: column;
     border-right: none;
     border-bottom: 1px solid var(--surface-light);
-    padding: 10px;
-    overflow-x: auto;
+    padding: 8px 12px;
+    gap: 0;
   }
-  .sidebar .brand { margin-bottom: 0; font-size: 16px; }
-  nav { flex-direction: row; gap: 4px; flex-grow: 0; }
-  nav button { padding: 8px 12px; font-size: 10px; }
-  .user-info { display: none; }
-  .main-content { height: calc(100vh - 60px); }
-  .top-bar { height: 50px; padding: 0 15px; font-size: 12px; }
-  .view-area { padding: 15px; }
-  .missions-grid { grid-template-columns: 1fr; }
-  .login-box { width: 95%; max-width: 100%; max-height: 95vh; overflow-y: auto; }
-  .login-container { padding: 10px; }
-  .login-form-grid-2 { grid-template-columns: 1fr; gap: 0; }
-  .login-logo-section { flex-direction: column; text-align: center; padding: 20px; }
-  .login-title { text-align: center; font-size: 24px; }
-  .login-subtitle { text-align: center; }
+  .glitch-logo-container { margin-bottom: 8px; }
+  .brand { margin-bottom: 0 !important; font-size: 14px !important; }
+  nav { flex-direction: row; gap: 2px; flex-grow: 0; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
+  nav button { padding: 8px 10px; font-size: 10px; white-space: nowrap; gap: 6px; }
+  .nav-shortcut { display: none; }
+  .about-btn { padding: 8px 10px; font-size: 10px; }
+  .user-info { 
+    flex-direction: row; gap: 8px; padding: 8px 0 0; 
+    border-top: none; border-top: 1px solid #222; margin-top: 4px;
+  }
+  .main-content { height: calc(100vh - auto); }
+  .top-bar { height: 44px; padding: 0 12px; font-size: 11px; }
+  .view-area { padding: 12px; }
+  
+  /* Login — full screen mobile */
+  .login-container { padding: 0; align-items: stretch; justify-content: flex-start; }
+  .login-box { 
+    width: 100%; max-width: 100%; max-height: 100vh; 
+    border: none; border-radius: 0; 
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+  .login-scanlines { display: none; }
+  .login-corner { display: none; }
+  .login-status-bar { padding: 8px 16px; font-size: 9px; }
+  .login-logo-section { 
+    flex-direction: column; text-align: center; 
+    padding: 24px 20px 12px; gap: 12px; 
+  }
+  .login-logo-icon { width: 50px; height: 50px; }
+  .login-logo-icon svg { width: 28px; height: 28px; }
+  .login-title { text-align: center; font-size: 22px; letter-spacing: 3px; }
+  .login-subtitle { text-align: center; font-size: 9px; }
   .login-version { text-align: center; }
-  .login-tabs { margin: 0 20px 14px; }
-  .login-input-section { padding: 0 20px; margin-bottom: 10px; }
-  .login-btn { margin: 0 20px 12px; width: calc(100% - 40px); }
-  .login-divider { padding: 0 20px; margin-bottom: 12px; }
-  .login-footer { padding: 12px; gap: 16px; }
-  .login-corner { width: 30px; height: 30px; }
-  .login-corner-tl { top: 10px; left: 10px; }
-  .login-corner-tr { top: 10px; right: 10px; }
-  .login-corner-bl { bottom: 10px; left: 10px; }
-  .login-corner-br { bottom: 10px; right: 10px; }
-  .duel-select, .duel-ready-screen, .duel-countdown, .duel-result { min-width: auto; width: 100%; padding: 20px; }
-  .duel-ready-players { flex-direction: column; gap: 15px; }
-  .duel-scores { flex-direction: column; gap: 15px; }
-  .friends-panel { width: 100%; right: 0; bottom: 0; height: 70vh; }
-  .friends-toggle { bottom: 10px; right: 10px; width: 48px; height: 48px; }
+  .login-tabs { margin: 0 20px 12px; }
+  .login-tab { padding: 12px; font-size: 12px; }
+  .login-divider { padding: 0 20px; margin-bottom: 14px; }
+  .login-form-grid { padding: 0; }
+  .login-form-grid-2 { grid-template-columns: 1fr; }
+  .login-input-section { padding: 0 20px; margin-bottom: 12px; }
+  .login-input-label { font-size: 10px; margin-bottom: 6px; }
+  .login-input-wrapper { min-height: 48px; }
+  .login-input { font-size: 16px; padding: 14px 0; } /* 16px чтобы iOS не зуммил */
+  .login-input-icon { padding: 0 14px; }
+  .login-input-eye { padding: 0 14px; }
+  .login-input-clear { padding: 0 14px; font-size: 22px; }
+  .login-error { font-size: 11px; padding: 0 20px; margin-top: 4px; }
+  .login-error-box { margin: 0 20px 12px; padding: 10px 14px; font-size: 11px; }
+  .login-btn { 
+    margin: 4px 20px 14px; width: calc(100% - 40px); 
+    padding: 16px; font-size: 13px; min-height: 52px;
+  }
+  .login-footer { padding: 12px 20px; gap: 16px; }
+  .login-footer-item { font-size: 9px; }
+  .login-reg-success { padding: 30px 20px; }
+  .login-reg-success-text { font-size: 16px; }
+
+  /* Main app mobile */
+  .missions-grid { grid-template-columns: 1fr; }
+  .mission-card { padding: 20px; min-height: auto; }
+  .window { padding: 16px; }
+  .live-feed { position: static; width: 100%; max-height: 250px; margin-top: 12px; }
   .academy-grid { grid-template-columns: 1fr; }
-  .academy-card { flex-direction: column; text-align: center; }
-  .academy-card-icon { margin: 0 auto; }
-  .live-feed { position: static; width: 100%; max-height: 200px; margin-top: 16px; }
-  .window { padding: 20px; }
-  .mail-sidebar { height: 150px; }
-  .terminal-container { margin-top: 20px !important; }
-  .profile-stats { margin-top: 12px; }
+  .academy-card { flex-direction: column; text-align: center; padding: 16px; }
+  .academy-card-icon { margin: 0 auto 8px; }
+  
+  /* Detective layout → stacked */
+  .detective-layout { grid-template-columns: 1fr !important; }
+  .firewall-layout { grid-template-columns: 1fr !important; }
+  .phishing-content { grid-template-columns: 1fr !important; height: auto !important; }
+  
+  /* Modal */
+  .modal-box { padding: 28px; max-width: 90%; }
+  .modal-icon { font-size: 32px; }
+  .modal-title { font-size: 14px; }
+  .modal-text { font-size: 12px; }
+  .modal-btn { padding: 14px; font-size: 12px; }
+  
+  /* Mission win */
+  .mission-win { padding: 30px 16px; }
+  .mission-win-title { font-size: 22px; }
+  .mission-stats { grid-template-columns: 1fr 1fr !important; gap: 10px; }
+  .mission-clue { padding: 14px; }
+  
+  /* Duel & friends */
+  .friends-panel { width: 100%; right: 0; bottom: 0; height: 70vh; }
+  .friends-toggle { bottom: 10px; right: 10px; width: 52px; height: 52px; }
+  .friends-chat-panel { width: 100%; height: 100vh; }
+  
+  /* Terminal */
+  .terminal-container { margin-top: 16px !important; }
+  .terminal-log { font-size: 11px; }
+  .terminal-input-line { padding: 10px 12px; }
+  
+  /* Stats */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-detail-row { font-size: 10px; }
+  
+  /* Profile */
+  .profile-stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* =========================================
+   MOBILE: 480px и меньше (телефоны)
+   ========================================= */
 @media (max-width: 480px) {
-  .sidebar { padding: 8px; }
-  .sidebar .brand { font-size: 14px; }
-  nav button { padding: 6px 8px; font-size: 9px; }
-  .top-bar { font-size: 10px; }
-  .login-box { width: 100%; max-height: 100vh; border: none; border-radius: 0; }
-  .login-title { font-size: 20px; letter-spacing: 2px; }
-  .login-subtitle { font-size: 8px; }
-  .login-input { font-size: 14px; padding: 10px 0; }
-  .login-btn { font-size: 11px; padding: 12px; }
-  .login-tabs { margin: 0 16px 12px; }
-  .login-input-section { padding: 0 16px; margin-bottom: 8px; }
-  .login-input-label { font-size: 8px; }
-  .login-btn { margin: 0 16px 10px; width: calc(100% - 32px); }
+  .sidebar { padding: 6px 8px; }
+  .brand { font-size: 12px !important; }
+  nav button { padding: 6px 8px; font-size: 9px; gap: 4px; }
+  .top-bar { font-size: 10px; height: 40px; padding: 0 10px; }
+  .view-area { padding: 10px; }
+  
+  .login-box { width: 100%; }
+  .login-status-bar { padding: 6px 12px; font-size: 8px; }
+  .login-logo-section { padding: 20px 16px 10px; }
+  .login-logo-icon { width: 44px; height: 44px; }
+  .login-logo-icon svg { width: 24px; height: 24px; }
+  .login-title { font-size: 18px; letter-spacing: 2px; }
+  .login-subtitle { font-size: 8px; letter-spacing: 1px; }
+  .login-tabs { margin: 0 16px 10px; }
+  .login-tab { padding: 10px; font-size: 11px; }
   .login-divider { padding: 0 16px; margin-bottom: 10px; }
-  .login-footer { padding: 10px; gap: 12px; font-size: 8px; }
-  .btn-main { padding: 12px; font-size: 12px; }
-  .mission-card { padding: 16px; min-height: 160px; }
-  .mission-card h3 { font-size: 12px; }
-  .mission-desc { font-size: 10px; }
-  .btn-action { padding: 8px 12px; font-size: 10px; }
-  .glitch-logo { font-size: 16px; }
-  .friends-chat-panel { width: 100%; height: 100vh; }
+  .login-input-section { padding: 0 16px; margin-bottom: 10px; }
+  .login-input-label { font-size: 9px; }
+  .login-input { font-size: 16px; padding: 12px 0; }
+  .login-btn { margin: 4px 16px 10px; width: calc(100% - 32px); padding: 14px; font-size: 12px; }
+  .login-footer { padding: 10px 16px; gap: 10px; }
+  
+  .mission-card { padding: 16px; }
+  .mission-card h3 { font-size: 13px; }
+  .mission-desc { font-size: 11px; }
+  .btn-action { padding: 10px; font-size: 11px; }
+  .btn-main { padding: 14px; font-size: 13px; }
+  
+  .window { padding: 14px; }
+  .panel-header { font-size: 10px; padding: 8px 12px; }
+  
+  .mission-win { padding: 24px 12px; }
+  .mission-win-title { font-size: 18px; }
+  .mission-win-subtitle { font-size: 12px; }
+  
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1px; }
+  .stats-card { padding: 12px; }
+  .stats-card-value { font-size: 16px; }
+  
+  .glitch-logo { font-size: 14px; }
 }
 
 /* Стили для кроссбраузерности */
