@@ -7,7 +7,8 @@ import {
 
 const CaseFiles = ({ unlockedClues = [] }) => {
     const [selectedDoc, setSelectedDoc] = useState(null);
-    const [viewMode, setViewMode] = useState('board');
+    const isMobile = window.innerWidth <= 768;
+    const [viewMode, setViewMode] = useState(isMobile ? 'list' : 'board');
 
     const DOCUMENTS = {
         1: { title: "ПРОФИЛЬ: Shadow_Walker", date: "10.05", text: "Я нашел этот ник в логах входа. Кто-то заходил под ним ровно в 3:00 ночи. Пароль был изменен внешним скриптом. Это не человек, это алгоритм.", mission: "Миссия 1: Пароли" },

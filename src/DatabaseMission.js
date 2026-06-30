@@ -62,8 +62,8 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
     };
 
     if (showIntro) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #0a0a1a 0%, #050505 100%)' }}>
-            <Database size={80} color="#4d94ff" />
+        <div className="window animate-fade mission-intro" style={{ textAlign: 'center', padding: '40px 16px', background: 'radial-gradient(circle, #0a0a1a 0%, #050505 100%)' }}>
+            <div className="mission-intro-icon"><Database size={72} color="#4d94ff" /></div>
             <h1 className="glitch-text" style={{ color: '#4d94ff', marginTop: '20px' }}>ВЗЛОМ БАЗЫ ДАННЫХ</h1>
             <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
                 <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
@@ -109,14 +109,14 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '20px', padding: '10px' }}>
             
             {/* ШАПКА С ТЕКУЩЕЙ ЗАДАЧЕЙ */}
-            <div className="window" style={{ background: '#0a1a0a', border: '1px solid #00ff41', padding: '20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <div style={{ background: '#00ff41', color: '#000', padding: '5px 10px', fontWeight: 'bold', borderRadius: '4px' }}>ЦЕЛЬ {taskStep}</div>
-                    <div style={{ color: '#00ff41', fontSize: '18px', letterSpacing: '1px', fontWeight: 'bold' }}>{TASKS[taskStep].text}</div>
+            <div className="window" style={{ background: '#0a1a0a', border: '1px solid #00ff41', padding: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                    <div style={{ background: '#00ff41', color: '#000', padding: '4px 8px', fontWeight: 'bold', borderRadius: '4px', fontSize: '12px' }}>ЦЕЛЬ {taskStep}</div>
+                    <div style={{ color: '#00ff41', fontSize: '13px', letterSpacing: '1px', fontWeight: 'bold' }}>{TASKS[taskStep].text}</div>
                 </div>
             </div>
 
-            <div className="database-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '20px', flex: 1, minHeight: 0 }}>
+            <div className="database-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 400px', gap: '16px', flex: 1, minHeight: 0 }}>
                 
                 {/* ЛЕВАЯ ПАНЕЛЬ: КОНСОЛЬ */}
                 <div className="window" style={{ display: 'flex', flexDirection: 'column' }}>
@@ -129,7 +129,7 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
 
                     <div style={{ flex: 1, padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         {/* Поле ввода запроса */}
-                        <div style={{ background: '#000', border: '1px solid #333', minHeight: '100px', padding: '20px', display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                        <div style={{ background: '#000', border: '1px solid #333', minHeight: '80px', padding: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                             <span style={{ color: '#444' }}>SQL {'>'}</span>
                             {query.map((frag, i) => (
                                 <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} key={i} style={{ color: '#00ff41', background: '#0a1a0a', padding: '5px 10px', border: '1px solid #00ff41' }}>{frag}</motion.span>
@@ -170,7 +170,7 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
                 {/* ПРАВАЯ ПАНЕЛЬ: КОНСТРУКТОР */}
                 <div className="window" style={{ display: 'flex', flexDirection: 'column' }}>
                     <div className="panel-header"><Filter size={14} /> ДОСТУПНЫЕ ОПЕРАТОРЫ</div>
-                    <div style={{ padding: '20px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                    <div style={{ padding: '16px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                         {SQL_FRAGMENTS.map(frag => (
                             <button key={frag} className="btn-action" onClick={() => setQuery([...query, frag])} style={{ fontSize: '13px' }}>{frag}</button>
                         ))}

@@ -103,12 +103,10 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
     );
 
     // ЭКРАН 1-2: ИГРОВОЕ ПОЛЕ
-    const isMobile = window.innerWidth <= 768;
-    
     return (
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* ИНДИКАТОР ЭТАПОВ */}
-            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <span><Activity size={14} /> {stage === 1 ? "PACKET_SNIFFER_ACTIVE" : "SPECTRAL_RECOVERY_MODE"}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}>
@@ -119,64 +117,50 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
             </div>
 
             {showHint && (
-                <div style={{ background: '#000', border: '1px solid #f7b500', padding: '10px 16px', margin: '0 20px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
-                    {stage === 1 && (isMobile ? 'Нажмите на зелёные блоки данных, чтобы захватить их. Серые — шум, не нажимайте.' : 'Перетащите зелёные блоки данных в зону захвата. Пропустите серые — это шум.')}
+                <div style={{ background: '#000', border: '1px solid #f7b500', padding: '10px 16px', margin: '0 12px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
+                    {stage === 1 && ('Нажмите на зелёные блоки данных, чтобы захватить их. Серые — шум, не нажимайте.')}
                     {stage === 2 && 'Настройте КРАСНЫЙ канал на минимум (~10), ЗЕЛЁНЫЙ на ~160. Синий не важен. Скрытый слой появится при правильных настройках.'}
                 </div>
             )}
 
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 350px', gap: '20px', padding: '20px', minHeight: 0 }}>
+            <div className="metadata-grid" style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 350px', gap: '16px', padding: '16px', minHeight: 0 }}>
                 {/* ЛЕВАЯ ПАНЕЛЬ: ИГРОВОЕ ПОЛЕ */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
                     {/* ЭТАП 1: ЗАХВАТ ПАКЕТОВ */}
                     {stage === 1 && (
-                        <div id="capture-zone" style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', minHeight: isMobile ? '300px' : '400px' }}>
-                            <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '40px' }}>
+                        <div id="capture-zone" style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', minHeight: '280px' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                                 <h4 style={{ color: '#4d94ff', marginBottom: '10px' }}>ПЕРЕХВАТ ПАКЕТОВ</h4>
-                                <p style={{ color: '#666', fontSize: '12px' }}>{isMobile ? 'Нажмите на блоки данных для захвата' : 'Перетащите плавающие блоки данных в порт приемника'}</p>
+                                <p style={{ color: '#666', fontSize: '12px' }}>Нажмите на блоки данных для захвата</p>
                             </div>
                             
-                            {/* Мобильная панель пакетов сверху */}
-                            {isMobile && (
-                                <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                                    {[1, 2, 3].map(i => (
-                                        <div 
-                                            key={i} 
-                                            className="packet-data" 
-                                            onClick={() => handlePacketTap(`packet-${i}`)}
-                                            style={{ 
-                                                padding: '16px', 
-                                                background: capturedPackets.includes(`packet-${i}`) ? '#1a3a1a' : '#111', 
-                                                border: `2px solid ${capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff'}`, 
-                                                cursor: 'pointer', 
-                                                zIndex: 10, 
-                                                textAlign: 'center',
-                                                opacity: capturedPackets.includes(`packet-${i}`) ? 0.5 : 1,
-                                                transition: 'all 0.3s'
-                                            }}
-                                        >
-                                            <Cpu size={24} color={capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff'} style={{ marginBottom: '8px' }} />
-                                            <div style={{ fontSize: '10px', color: capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff' }}>
-                                                {capturedPackets.includes(`packet-${i}`) ? '✓ ЗАХВАЧЕН' : `METADATA_#0${i}`}
-                                            </div>
+                            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                {[1, 2, 3].map(i => (
+                                    <div 
+                                        key={i} 
+                                        className="packet-data" 
+                                        onClick={() => handlePacketTap(`packet-${i}`)}
+                                        style={{ 
+                                            padding: '16px', 
+                                            background: capturedPackets.includes(`packet-${i}`) ? '#1a3a1a' : '#111', 
+                                            border: `2px solid ${capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff'}`, 
+                                            cursor: 'pointer', 
+                                            zIndex: 10, 
+                                            textAlign: 'center',
+                                            opacity: capturedPackets.includes(`packet-${i}`) ? 0.5 : 1,
+                                            transition: 'all 0.3s',
+                                            minWidth: '90px'
+                                        }}
+                                    >
+                                        <Cpu size={24} color={capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff'} style={{ marginBottom: '8px' }} />
+                                        <div style={{ fontSize: '10px', color: capturedPackets.includes(`packet-${i}`) ? '#00ff41' : '#4d94ff' }}>
+                                            {capturedPackets.includes(`packet-${i}`) ? '✓ ЗАХВАЧЕН' : `METADATA_#0${i}`}
                                         </div>
-                                    ))}
-                                </div>
-                            )}
+                                    </div>
+                                ))}
+                            </div>
 
-                            {/* Десктопная версия — перетаскивание */}
-                            {!isMobile && (
-                                <div style={{ display: 'flex', gap: '40px' }}>
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className="packet-data" style={{ padding: '20px', background: '#111', border: '1px solid #4d94ff', cursor: 'grab', zIndex: 10, textAlign: 'center' }}>
-                                            <Cpu size={24} color="#4d94ff" style={{ marginBottom: '10px' }} />
-                                            <div style={{ fontSize: '10px', color: '#4d94ff' }}>METADATA_#0{i}</div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            <div id="input-port" style={{ marginTop: isMobile ? '20px' : '40px', padding: isMobile ? '24px' : '40px', border: '3px dashed #4d94ff', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(77, 148, 255, 0.05)', width: isMobile ? '80%' : 'auto' }}>
+                            <div id="input-port" style={{ padding: '24px', border: '3px dashed #4d94ff', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(77, 148, 255, 0.05)', width: '80%' }}>
                                 <div style={{ textAlign: 'center' }}>
                                     <Zap size={32} color="#4d94ff" style={{ marginBottom: '10px' }} />
                                     <div style={{ fontSize: '12px', color: '#4d94ff', fontWeight: 'bold' }}>INPUT_PORT</div>
@@ -188,15 +172,15 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
                 </div>
 
                 {/* ПРАВАЯ ПАНЕЛЬ: ИНСТРУМЕНТЫ */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div style={{ background: '#111', border: '1px solid #222', padding: '20px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', paddingBottom: '15px', borderBottom: '1px solid #222' }}>
-                            <Settings size={20} color="#4d94ff" />
-                            <span style={{ color: '#4d94ff', fontWeight: 'bold', fontSize: '14px' }}>АНАЛИЗАТОР</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
+                    <div style={{ background: '#111', border: '1px solid #222', padding: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid #222' }}>
+                            <Settings size={18} color="#4d94ff" />
+                            <span style={{ color: '#4d94ff', fontWeight: 'bold', fontSize: '13px' }}>АНАЛИЗАТОР</span>
                         </div>
 
-                        <div style={{ marginBottom: '20px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
+                        <div style={{ marginBottom: '16px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '11px' }}>
                                 <span style={{ color: '#666' }}>System Readiness</span>
                                 <span style={{ color: '#4d94ff', fontWeight: 'bold' }}>{stage === 1 ? Math.round((capturedCount/3)*100) : 100}%</span>
                             </div>
@@ -206,14 +190,14 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
                         </div>
 
                         {stage === 2 && (
-                            <div style={{ background: '#000', padding: '16px', border: '1px solid #222', marginBottom: '16px' }}>
-                                <div style={{ color: '#4d94ff', fontSize: '12px', fontWeight: 'bold', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ background: '#000', padding: '14px', border: '1px solid #222', marginBottom: '12px' }}>
+                                <div style={{ color: '#4d94ff', fontSize: '11px', fontWeight: 'bold', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <Eye size={14} /> RGB_SPECTRUM_OS:
                                 </div>
                                 
                                 {["red", "green", "blue"].map(color => (
-                                    <div key={color} style={{ marginBottom: '16px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '11px' }}>
+                                    <div key={color} style={{ marginBottom: '12px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '10px' }}>
                                             <span style={{ color: '#666', textTransform: 'uppercase' }}>{color} channel</span>
                                             <span style={{ color: '#4d94ff', fontWeight: 'bold' }}>{filters[color]}%</span>
                                         </div>
@@ -230,9 +214,9 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
 
                                 {/* Image preview with CSS filters */}
                                 <div style={{ 
-                                    width: '100%', height: '120px', 
+                                    width: '100%', height: '100px', 
                                     background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-                                    border: '1px solid #333', marginTop: '12px',
+                                    border: '1px solid #333', marginTop: '10px',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     filter: `saturate(${filters.red / 100}) hue-rotate(${filters.green * 1.8}deg) brightness(${filters.blue / 100})`,
                                     transition: 'filter 0.3s',
@@ -241,7 +225,7 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
                                     <div style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0.3,
                                         background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(77,148,255,0.1) 2px, rgba(77,148,255,0.1) 4px)'
                                     }} />
-                                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#4d94ff', zIndex: 1, fontFamily: 'monospace' }}>
+                                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#4d94ff', zIndex: 1, fontFamily: 'monospace' }}>
                                         ENCRYPTED_DATA
                                     </div>
                                 </div>
@@ -249,7 +233,7 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
                         )}
 
                         {isFound && (
-                            <button className="btn-huge" style={{ width: '100%', marginBottom: '10px' }} onClick={() => setStage(3)}>
+                            <button className="btn-huge" style={{ width: '100%', marginBottom: '8px' }} onClick={() => setStage(3)}>
                                 <CheckCircle2 size={16} style={{ marginRight: '8px' }} /> ИЗВЛЕЧЬ ДАННЫЕ
                             </button>
                         )}

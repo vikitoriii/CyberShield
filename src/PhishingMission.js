@@ -161,12 +161,12 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
 
   return (
     <div className="phishing-container">
-      <div className="phishing-header">
-        <div className="title-group">
+      <div className="phishing-header" style={{ flexWrap: 'wrap', gap: '8px' }}>
+        <div className="title-group" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Search size={20} color="#00ff41" />
-          <h3>TRAFFIC_ANALYZER: {processedIds.length}/{emails.length}</h3>
+          <h3 style={{ fontSize: '12px', margin: 0 }}>TRAFFIC_ANALYZER: {processedIds.length}/{emails.length}</h3>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
             <HelpCircle size={14} /> ПОДСКАЗКА
           </button>
@@ -248,7 +248,7 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
       </div>
 
       {processedIds.length === emails.length && (
-        <button className="btn-huge finish-btn animate-fade" onClick={finishMission}>
+        <button className="btn-huge finish-btn animate-fade" onClick={finishMission} style={{ padding: '14px', fontSize: '12px' }}>
           ЗАВЕРШИТЬ МИССИЮ
         </button>
       )}

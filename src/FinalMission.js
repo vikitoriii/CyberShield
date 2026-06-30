@@ -120,8 +120,8 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
 
     // ЭКРАН 0: ВСТУПЛЕНИЕ
     if (stage === 0) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #1a0a0a 0%, #050505 100%)' }}>
-            <Shield size={80} color="#ff4d4d" />
+        <div className="window animate-fade mission-intro" style={{ textAlign: 'center', padding: '40px 16px', background: 'radial-gradient(circle, #1a0a0a 0%, #050505 100%)' }}>
+            <div className="mission-intro-icon"><Shield size={72} color="#ff4d4d" /></div>
             <h1 className="glitch-text" style={{ color: '#ff4d4d', marginTop: '20px' }}>ФИНАЛЬНАЯ ОПЕРАЦИЯ</h1>
             <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
                 <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
@@ -145,7 +145,7 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     // ЭКРАН 1: ХРОНОЛОГИЯ
     if (stage === 1) return (
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <span><Terminal size={14} /> ХРОНОЛОГИЯ</span>
                 <span style={{ color: '#f7b500' }}>{timeline.length}/{TIMELINE_EVENTS.length}</span>
             </div>
@@ -188,13 +188,13 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     // ЭКРАН 2: СБОР ДОКАЗАТЕЛЬСТВ
     if (stage === 2) return (
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <span><FileText size={14} /> ДОКАЗАТЕЛЬСТВА</span>
                 <span style={{ color: '#f7b500' }}>ВЫБРАНО: {selectedEvidence.filter(id => EVIDENCE_OPTIONS.find(e => e.id === id)?.correct).length}</span>
             </div>
             <div style={{ flex: 1, padding: '30px', overflowY: 'auto' }}>
                 <p style={{ color: '#888', marginBottom: '20px' }}>Выберите <b style={{ color: '#00ff41' }}>настоящие улики</b> (9 штук):</p>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div className="final-evidence-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                     {EVIDENCE_OPTIONS.map(evidence => (
                         <motion.div key={evidence.id} whileHover={{ scale: 1.02 }} onClick={() => handleEvidenceSelect(evidence)}
                             style={{ padding: '12px', cursor: 'pointer',
@@ -222,7 +222,7 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     // ЭКРАН 3: ДЕШИФРОВКА КОДОВОГО ИМЕНИ
     if (stage === 3) return (
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <span><Lock size={14} /> ДЕШИФРОВКА</span>
                 <span style={{ color: health > 50 ? '#00ff41' : '#ff4d4d' }}>HEALTH: {health}%</span>
             </div>
@@ -233,9 +233,9 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
                         <h2 style={{ color: '#f7b500', marginBottom: '10px' }}>КОДОВОЕ ИМЯ</h2>
                         <p style={{ color: '#888', marginBottom: '30px' }}>Зашифрованное имя агента: найдите его настоящую личность</p>
                         
-                        <div style={{ background: '#000', padding: '25px', border: '1px dashed #f7b500', marginBottom: '20px' }}>
+                        <div style={{ background: '#000', padding: '20px', border: '1px dashed #f7b500', marginBottom: '20px' }}>
                             <div style={{ fontSize: '10px', color: '#444', marginBottom: '10px' }}>ENCRYPTED_IDENTITY:</div>
-                            <div style={{ fontSize: '24px', color: '#f7b500', fontFamily: 'monospace', letterSpacing: '4px' }}>
+                            <div style={{ fontSize: '20px', color: '#f7b500', fontFamily: 'monospace', letterSpacing: '3px', wordBreak: 'break-all' }}>
                                 {cipherTarget.split('').map((c) => {
                                     if (c === '_') return '_';
                                     return String.fromCharCode(((c.charCodeAt(0) - 65 - 3 + 26) % 26) + 65);
@@ -250,6 +250,7 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
 
                         <input type="text" value={cipherInput} onChange={(e) => setCipherInput(e.target.value)}
                             placeholder="Введите расшифрованное имя..."
+                            className="cipher-input"
                             style={{ width: '100%', background: '#000', border: '2px solid #333', color: '#00ff41',
                                 padding: '15px', fontSize: '18px', fontFamily: 'monospace', outline: 'none', marginBottom: '15px' }}
                             onKeyDown={(e) => e.key === 'Enter' && handleCipherCheck()} />
@@ -274,7 +275,7 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     // ЭКРАН 4: ДОПРОС
     if (stage === 4) return (
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <span><Eye size={14} /> ДОПРОС</span>
                 <span style={{ color: health > 50 ? '#00ff41' : '#ff4d4d' }}>HEALTH: {health}% | ВОПРОС: {interrogationStep + 1}/{INTERROGATION_QUESTIONS.length}</span>
             </div>
@@ -286,6 +287,7 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
                         
                         <input type="text" value={interrogationAnswer} onChange={(e) => setInterrogationAnswer(e.target.value)}
                             placeholder="Введите ответ..."
+                            className="interrogation-input"
                             style={{ width: '100%', background: '#000', border: `2px solid ${interrogationCorrect ? '#00ff41' : '#333'}`,
                                 color: interrogationCorrect ? '#00ff41' : '#fff', padding: '15px', fontSize: '16px', outline: 'none', marginBottom: '15px' }}
                             onKeyDown={(e) => e.key === 'Enter' && handleInterrogationAnswer()}
@@ -323,13 +325,13 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
 
     // ЭКРАН 5: ФИНАЛЬНОЕ РЕШЕНИЕ
     if (stage === 5) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #1a0a0a 0%, #050505 100%)' }}>
-            <Target size={80} color="#ff4d4d" />
+        <div className="window animate-fade mission-intro" style={{ textAlign: 'center', padding: '40px 16px', background: 'radial-gradient(circle, #1a0a0a 0%, #050505 100%)' }}>
+            <div className="mission-intro-icon"><Target size={72} color="#ff4d4d" /></div>
             <h2 style={{ color: '#ff4d4d', marginTop: '20px', marginBottom: '10px' }}>ФИНАЛЬНОЕ РЕШЕНИЕ</h2>
             <p style={{ color: '#888', marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
                 Доказательства собраны. Допрос пройден. Как поступить с Shadow_Walker?
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', maxWidth: '900px', margin: '0 auto' }}>
+            <div className="final-choices-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', maxWidth: '900px', margin: '0 auto', padding: '0 12px' }}>
                 {FINAL_CHOICES.map(choice => (
                     <motion.div key={choice.id} whileHover={{ scale: 1.05, y: -5 }} onClick={() => handleFinalChoice(choice)}
                         style={{ background: '#111', border: '1px solid #222', padding: '30px', cursor: 'pointer', textAlign: 'center' }}>
@@ -351,7 +353,7 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
                 </div>
             </motion.div>
             <h1 className="glitch-text mission-win-title" style={{ color: '#00ff41' }}>МИССИЯ ВЫПОЛНЕНА</h1>
-            <p className="mission-win-subtitle">{finalChoice?.result}</p>
+            <p className="mission-win-subtitle" style={{ padding: '0 12px' }}>{finalChoice?.result}</p>
             
             <div className="mission-stats">
                 <div className="mission-stat">

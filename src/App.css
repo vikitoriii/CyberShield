@@ -906,7 +906,7 @@ nav button:hover .nav-shortcut {
   display: grid;
   grid-template-columns: 350px 1fr;
   gap: 25px;
-  height: 600px;
+  min-height: 500px;
 }
 
 .mail-sidebar {
@@ -5532,11 +5532,14 @@ nav button:hover .nav-shortcut {
   
   /* Phishing mobile */
   .phishing-container { gap: 10px; }
-  .phishing-content { grid-template-columns: 1fr !important; height: auto !important; }
-  .mail-sidebar { height: 120px; }
+  .phishing-content { grid-template-columns: 1fr !important; height: auto !important; display: flex !important; flex-direction: column !important; }
+  .mail-sidebar { height: 150px; order: 1; }
+  .mail-details-area { order: 2; min-height: 300px; }
+  .phishing-header { flex-wrap: wrap; gap: 8px; }
+  .filter-pills { flex-wrap: wrap; }
   .detail-view { padding: 16px !important; }
-  .mail-body { font-size: 13px; padding: 16px; }
-  .action-buttons { gap: 10px; }
+  .mail-body { font-size: 13px; padding: 12px; }
+  .action-buttons { gap: 10px; grid-template-columns: 1fr !important; }
   .btn-phish, .btn-safe-action { padding: 14px; font-size: 12px; }
   
   /* Database mobile */
@@ -5557,15 +5560,24 @@ nav button:hover .nav-shortcut {
   
   /* Portal mission mobile */
   .portal-grid { grid-template-columns: 1fr !important; }
+  .portal-grid > div:first-child { max-height: 160px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px; }
+  .portal-grid > div:first-child > div { flex: 0 0 auto; min-width: auto; padding: 8px 12px !important; margin-bottom: 0 !important; font-size: 10px !important; }
   
   /* Sniffer mission mobile */
   .sniffer-grid { grid-template-columns: 1fr !important; }
+  .sniffer-grid .sniffer-keyboard { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
+  .sniffer-grid .sniffer-keyboard button { height: 36px !important; font-size: 14px !important; }
   
   /* Social mission mobile */
   .social-layout { grid-template-columns: 1fr !important; }
+  .social-layout > div:first-child { max-height: 50vh; }
   
   /* Database mission mobile */
   .database-layout { grid-template-columns: 1fr !important; }
+  
+  /* FinalMission mobile */
+  .final-choices-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+  .final-evidence-grid { grid-template-columns: 1fr !important; }
   
   /* Window */
   .window { padding: 14px; }
@@ -5630,6 +5642,13 @@ nav button:hover .nav-shortcut {
   .friends-panel { width: 100%; right: 0; bottom: 56px; height: 60vh; border-radius: 0; }
   .friends-toggle { bottom: 66px; right: 10px; width: 48px; height: 48px; }
   
+  /* Chat toggle mobile */
+  .chat-toggle { bottom: 66px; right: 10px; width: 48px; height: 48px; }
+  
+  /* Achievement toast mobile */
+  .achievement-toast-container { top: 50px; right: 10px; left: 10px; }
+  .achievement-toast { min-width: auto; width: 100%; }
+  
   /* Daily challenge */
   .daily-challenge { margin-top: 12px; }
   
@@ -5684,6 +5703,61 @@ nav button:hover .nav-shortcut {
   .stats-card-value { font-size: 16px; }
   
   .glitch-logo { font-size: 14px; }
+  
+  /* Mission intro mobile */
+  .mission-intro { padding: 30px 16px !important; }
+  .mission-intro-icon svg { width: 48px !important; height: 48px !important; }
+  .mission-intro-title { font-size: 20px !important; }
+  .mission-intro-card { padding: 16px !important; }
+  .mission-intro-text { font-size: 13px !important; }
+  .mission-intro-hint { font-size: 12px !important; padding: 0 16px; }
+  
+  /* Mission win mobile */
+  .mission-win-icon svg { width: 48px !important; height: 48px !important; }
+  .mission-win-title { font-size: 18px !important; }
+  .mission-win-subtitle { font-size: 12px !important; }
+  .mission-stats { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+  .mission-stat { padding: 12px !important; }
+  .mission-stat-value { font-size: 18px !important; }
+  .mission-clue { padding: 12px !important; }
+  .mission-clue-text { font-size: 11px !important; }
+  
+  /* Firewall mission mobile */
+  .firewall-stage-grid { padding: 10px !important; }
+  .firewall-matrix { grid-template-columns: repeat(4, 1fr) !important; gap: 4px !important; }
+  .firewall-matrix > div { height: 48px !important; font-size: 12px !important; }
+  
+  /* Phishing mobile detail */
+  .detail-view { padding: 12px !important; }
+  .mail-body { font-size: 12px !important; padding: 12px !important; }
+  .analysis-box { padding: 12px !important; }
+  
+  /* Mission stage bar mobile */
+  .mission-stage-bar { gap: 4px !important; padding: 8px !important; flex-wrap: wrap; justify-content: center; }
+  .mission-stage-item { font-size: 9px !important; gap: 4px !important; }
+  
+  /* Evidence checkboxes mobile */
+  .final-evidence-grid > div { padding: 10px !important; }
+  .final-evidence-grid > div > div > span { font-size: 11px !important; }
+  
+  /* Final choices mobile */
+  .final-choices-grid > div { padding: 20px !important; }
+  .final-choices-grid > div > div:first-child { font-size: 28px !important; }
+  
+  /* Action buttons mobile */
+  .action-buttons { grid-template-columns: 1fr !important; gap: 10px !important; }
+  
+  /* Password mission mobile */
+  .hack-input { font-size: 16px !important; padding: 14px !important; }
+  
+  /* Login form mobile */
+  .login-form-grid-2 { grid-template-columns: 1fr !important; }
+  
+  /* Interrogation input mobile */
+  .interrogation-input { font-size: 14px !important; padding: 12px !important; }
+  
+  /* Cipher input mobile */
+  .cipher-input { font-size: 16px !important; padding: 12px !important; }
 }
 
 /* Стили для кроссбраузерности */
@@ -5717,8 +5791,9 @@ select { font-family: inherit; background: #000; color: #eee; border: 1px solid 
    ========================================= */
 .notification-container {
   position: fixed;
-  top: 80px;
-  right: 20px;
+  top: 50px;
+  right: 10px;
+  left: 10px;
   z-index: 10000;
   display: flex;
   flex-direction: column;

@@ -141,8 +141,8 @@ const PortalMission = ({ username, currentPoints, onComplete }) => {
     const canFinish = evidenceCount >= 6;
 
     if (stage === 0) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #0a1a0a 0%, #050505 100%)' }}>
-            <Globe size={80} color="#4d94ff" />
+        <div className="window animate-fade mission-intro" style={{ textAlign: 'center', padding: '40px 16px', background: 'radial-gradient(circle, #0a1a0a 0%, #050505 100%)' }}>
+            <div className="mission-intro-icon"><Globe size={72} color="#4d94ff" /></div>
             <h1 className="glitch-text" style={{ color: '#4d94ff', marginTop: '20px' }}>СКРЫТЫЙ ПОРТАЛ</h1>
             <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
                 <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
@@ -223,7 +223,7 @@ const PortalMission = ({ username, currentPoints, onComplete }) => {
     );
 
     if (stage === 2) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', maxWidth: '500px', margin: '0 auto' }}>
+        <div className="window animate-fade" style={{ textAlign: 'center', padding: '40px 16px', maxWidth: '500px', margin: '0 auto' }}>
             <Lock size={60} color="#4d94ff" />
             <h2 style={{ color: '#4d94ff', marginTop: '20px', marginBottom: '10px' }}>АВТОРИЗАЦИЯ</h2>
             <p style={{ color: '#888', marginBottom: '30px' }}>Введите пароль для доступа</p>
@@ -257,8 +257,8 @@ const PortalMission = ({ username, currentPoints, onComplete }) => {
                 <span style={{ color: evidenceCount >= 6 ? '#00ff41' : '#f7b500' }}>УЛИКИ: {evidenceCount}/6 {canFinish && '- ВСЕ СОБРАНЫ'}</span>
             </div>
 
-            <div className="portal-grid" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '20px', flex: 1, minHeight: 0 }}>
-                <div style={{ background: '#0a0a0a', border: '1px solid #222', padding: '10px', overflowY: 'auto' }}>
+            <div className="portal-grid" style={{ display: 'grid', gridTemplateColumns: '220px 1fr', gap: '16px', flex: 1, minHeight: 0 }}>
+                <div style={{ background: '#0a0a0a', border: '1px solid #222', padding: '8px', overflowY: 'auto' }}>
                     {ADMIN_TABS.map(tab => (
                         <div key={tab.id} onClick={() => { setSelectedTab(tab); setActivePuzzle(tab.puzzle); setShowHint(false); setHintLevel(0); }}
                             style={{ padding: '12px 15px', cursor: 'pointer', marginBottom: '5px',
@@ -305,8 +305,8 @@ const PortalMission = ({ username, currentPoints, onComplete }) => {
                             )}
 
                             {(selectedTab.id === 'users' || selectedTab.id === 'logs' || selectedTab.id === 'finance' || selectedTab.id === 'messages') && (
-                                <div style={{ marginBottom: '20px' }}>
-                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', fontFamily: 'monospace' }}>
+                                <div style={{ marginBottom: '20px', overflowX: 'auto' }}>
+                                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', fontFamily: 'monospace', minWidth: '300px' }}>
                                         <thead>
                                             <tr style={{ borderBottom: '1px solid #333', textAlign: 'left' }}>
                                                 {Object.keys(selectedTab.data[0]).map(key => (
@@ -388,10 +388,10 @@ const PortalMission = ({ username, currentPoints, onComplete }) => {
                                     <p style={{ color: '#888', fontSize: '11px', marginBottom: '15px' }}>
                                         Соберите числа 1-8 по порядку. Кликайте по числу рядом с пустой ячейкой для обмена.
                                     </p>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 60px)', gap: '6px', justifyContent: 'center' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 56px)', gap: '6px', justifyContent: 'center' }}>
                                         {matrixPuzzle.map((num, idx) => (
                                             <motion.div key={idx} whileTap={{ scale: 0.9 }} onClick={() => handleMatrixSwap(idx)}
-                                                style={{ width: '60px', height: '60px', background: num === 0 ? '#1a1a1a' : '#000', border: '2px solid #333',
+                                                style={{ width: '56px', height: '56px', background: num === 0 ? '#1a1a1a' : '#000', border: '2px solid #333',
                                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                     cursor: 'pointer', fontSize: '18px', fontWeight: 'bold', color: num === 0 ? 'transparent' : '#00ff41' }}>
                                                 {num === 0 ? '' : num}

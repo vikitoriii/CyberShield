@@ -71,8 +71,8 @@ const SnifferMission = ({ username, currentPoints, onComplete }) => {
 
     // ЭКРАН 0: ВСТУПЛЕНИЕ
     if (stage === 0) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #1a0a0a 0%, #050505 100%)' }}>
-            <Lock size={80} color="#ff4d4d" />
+        <div className="window animate-fade mission-intro" style={{ textAlign: 'center', padding: '40px 16px', background: 'radial-gradient(circle, #1a0a0a 0%, #050505 100%)' }}>
+            <div className="mission-intro-icon"><Lock size={72} color="#ff4d4d" /></div>
             <h1 className="glitch-text" style={{ color: '#ff4d4d', marginTop: '20px' }}>ВЗЛОМ СЕЙФА</h1>
             <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
                 <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
@@ -108,23 +108,23 @@ const SnifferMission = ({ username, currentPoints, onComplete }) => {
                 <span style={{ color: attemptsLeft <= 3 ? '#ff4d4d' : '#00ff41' }}>ОСТАЛОСЬ: {attemptsLeft}</span>
             </div>
 
-            <div className="sniffer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px', flex: 1, minHeight: 0 }}>
+            <div className="sniffer-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '16px', flex: 1, minHeight: 0 }}>
                 {/* Левая: история попыток */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {/* Поле ввода */}
                     <div style={{ background: '#000', padding: '30px', border: '1px solid #222', textAlign: 'center' }}>
                         <div style={{ fontSize: '10px', color: '#444', marginBottom: '15px', letterSpacing: '2px' }}>ВВЕДИТЕ КОД</div>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '20px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
                             {Array.from({ length: CODE_LENGTH }).map((_, i) => (
                                 <motion.div 
                                     key={i} 
                                     initial={currentGuess[i] !== undefined ? { scale: 0.5 } : {}}
                                     animate={currentGuess[i] !== undefined ? { scale: 1 } : {}}
                                     style={{ 
-                                        width: '60px', height: '70px', 
+                                        width: '56px', height: '64px', 
                                         background: '#111', border: '2px solid #333',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: '28px', fontWeight: 'bold', color: '#fff'
+                                        fontSize: '26px', fontWeight: 'bold', color: '#fff'
                                     }}
                                 >
                                     {currentGuess[i] !== undefined ? currentGuess[i] : ''}
@@ -197,17 +197,17 @@ const SnifferMission = ({ username, currentPoints, onComplete }) => {
                 {/* Правая: клавиатура + подсказка */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                     {/* Клавиатура */}
-                    <div style={{ background: '#111', padding: '20px', border: '1px solid #222' }}>
-                        <div style={{ fontSize: '10px', color: '#444', marginBottom: '15px', letterSpacing: '1px' }}>КЛАВИАТУРА</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+                    <div style={{ background: '#111', padding: '16px', border: '1px solid #222' }}>
+                        <div style={{ fontSize: '10px', color: '#444', marginBottom: '12px', letterSpacing: '1px' }}>КЛАВИАТУРА</div>
+                        <div className="sniffer-keyboard" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(digit => (
                                 <motion.button 
                                     key={digit}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={() => handleDigit(digit)}
                                     style={{ 
-                                        height: '50px', background: '#222', border: '1px solid #333',
-                                        color: '#fff', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer'
+                                        height: '44px', background: '#222', border: '1px solid #333',
+                                        color: '#fff', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer'
                                     }}
                                 >
                                     {digit}

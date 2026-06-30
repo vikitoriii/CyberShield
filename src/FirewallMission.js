@@ -112,8 +112,8 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
 
                 {/* ЭТАП 1: ТЕРМИНАЛ */}
                 {stage === 1 && (
-                    <div className="firewall-stage-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '20px', width: '100%' }}>
-                        <div style={{ background: '#000', padding: '15px', border: '1px solid #222', height: '250px', overflow: 'auto', fontFamily: 'monospace', fontSize: '12px', color: '#333' }}>
+                    <div className="firewall-stage-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '16px', width: '100%' }}>
+                        <div style={{ background: '#000', padding: '12px', border: '1px solid #222', height: '250px', overflow: 'auto', fontFamily: 'monospace', fontSize: '11px', color: '#333' }}>
                             {logs.map((l, i) => <div key={i} style={{ color: l.includes(targetCode) ? '#00ff41' : 'inherit', marginBottom: '2px' }}>{l}</div>)}
                         </div>
                         <div className="window" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -147,20 +147,20 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
 
                 {/* ЭТАП 3: МАТРИЦА (ЯДРО) */}
                 {stage === 3 && (
-                    <div style={{ textAlign: 'center' }}>
+                    <div style={{ textAlign: 'center', padding: '16px' }}>
                         <Lock size={40} color="#ff4d4d" style={{ marginBottom: '20px' }} />
-                        <h2 style={{ marginBottom: '30px' }}>ИНЪЕКЦИЯ КЛЮЧА В ЯДРО</h2>
-                        <div className="firewall-matrix" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 80px)', gap: '8px', background: '#0a0a0a', padding: '15px', border: '1px solid #333', justifyContent: 'center' }}>
+                        <h2 style={{ marginBottom: '30px', fontSize: '16px' }}>ИНЪЕКЦИЯ КЛЮЧА В ЯДРО</h2>
+                        <div className="firewall-matrix" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 70px)', gap: '6px', background: '#0a0a0a', padding: '12px', border: '1px solid #333', justifyContent: 'center' }}>
                             {Array.from({ length: 16 }).map((_, i) => (
                                 <motion.div key={i} whileTap={{ scale: 0.9 }} onClick={() => handleMatrixClick(i + 1)}
-                                    style={{ height: '70px', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                    style={{ height: '60px', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                                     background: matrixClicks.includes(i + 1) ? '#00ff41' : '#000',
-                                    color: matrixClicks.includes(i + 1) ? '#000' : '#444', fontSize: '16px', fontWeight: 'bold' }}>
+                                    color: matrixClicks.includes(i + 1) ? '#000' : '#444', fontSize: '14px', fontWeight: 'bold' }}>
                                     {i + 1}
                                 </motion.div>
                             ))}
                         </div>
-                        <p style={{ marginTop: '20px', color: '#444' }}>Введите 4-значную комбинацию для взлома.</p>
+                        <p style={{ marginTop: '20px', color: '#444', fontSize: '12px' }}>Введите 4-значную комбинацию для взлома.</p>
                     </div>
                 )}
 

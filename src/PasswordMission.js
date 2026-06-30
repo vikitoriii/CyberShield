@@ -107,8 +107,8 @@ const PasswordMission = ({ username, currentPoints, onComplete }) => {
     </div>
   );
 
-  return (
-    <div className="detective-layout">
+    return (
+      <div className="detective-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px' }}>
       <div className="mission-main-panel window">
         <div className="panel-header">
           <Terminal size={18} />

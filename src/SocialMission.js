@@ -82,8 +82,8 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
 
     // 1. ПРИВЕТСТВИЕ
     if (step === 0) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #0a1a0a 0%, #050505 100%)' }}>
-            <MessageSquare size={80} color="#00ff41" />
+        <div className="window animate-fade mission-intro" style={{ textAlign: 'center', padding: '40px 16px', background: 'radial-gradient(circle, #0a1a0a 0%, #050505 100%)' }}>
+            <div className="mission-intro-icon"><MessageSquare size={72} color="#00ff41" /></div>
             <h1 className="glitch-text" style={{ color: '#00ff41', marginTop: '20px' }}>ПСИХОЛОГИЧЕСКИЙ АНАЛИЗ</h1>
             <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
                 <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
@@ -140,7 +140,7 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
 
     // 3. ГЕЙМПЛЕЙ
     return (
-        <div className="social-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '20px', height: '100%', padding: '10px' }}>
+        <div className="social-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 450px', gap: '16px', height: '100%', padding: '10px' }}>
             
             {/* ЧАТ */}
             <div className="window" style={{ display: 'flex', flexDirection: 'column', background: '#050505', border: '1px solid #222' }}>
@@ -176,7 +176,7 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
                                 <div style={{ fontSize: '11px', color: isUser ? '#4d94ff' : '#00ff41', marginBottom: '8px', fontWeight: 'bold', letterSpacing: '1px' }}>
                                     {msg.sender}
                                 </div>
-                                <div style={{ fontSize: '15px', color: '#eee', lineHeight: '1.6' }}>{msg.text}</div>
+                                <div style={{ fontSize: '14px', color: '#eee', lineHeight: '1.6' }}>{msg.text}</div>
                                 {analyzedIds.includes(msg.id) && msg.type === 'THREAT' && (
                                     <ShieldCheck size={20} color="#00ff41" style={{ position: 'absolute', top: '-10px', right: '-10px', background: '#000', borderRadius: '50%' }} />
                                 )}

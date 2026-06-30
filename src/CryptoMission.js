@@ -91,7 +91,7 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
                 {stage === 1 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ textAlign: 'center', width: '100%', maxWidth: '600px' }}>
                         <h2 style={{ color: '#00ff41', marginBottom: '40px' }}>ЭТАП 1: ЗАХВАТ ЧАСТОТЫ</h2>
-                        <div style={{ height: '150px', background: '#000', border: '1px solid #222', marginBottom: '30px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ height: '120px', background: '#000', border: '1px solid #222', marginBottom: '20px', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                              {/* Имитация осциллографа */}
                              <motion.div 
                                 animate={{ height: [20, 100, 40, 120, 20] }} 
@@ -118,9 +118,9 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
                 {stage === 2 && (
                     <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} style={{ textAlign: 'center', width: '100%', maxWidth: '600px' }}>
                         <h2 style={{ color: '#00ff41', marginBottom: '20px' }}>ЭТАП 2: ДЕШИФРОВКА</h2>
-                        <div style={{ background: '#000', padding: '30px', border: '1px dashed #00ff41', marginBottom: '30px' }}>
+                        <div style={{ background: '#000', padding: '20px', border: '1px dashed #00ff41', marginBottom: '20px' }}>
                             <div style={{ fontSize: '10px', color: '#444', textAlign: 'left', marginBottom: '10px' }}>ENCRYPTED_DATA_STREAM:</div>
-                            <div style={{ fontSize: '28px', color: '#fff', letterSpacing: '4px', fontFamily: 'monospace' }}>
+                            <div style={{ fontSize: '20px', color: '#fff', letterSpacing: '3px', fontFamily: 'monospace', wordBreak: 'break-all' }}>
                                 {decrypt(encryptedText, shift)}
                             </div>
                         </div>
@@ -141,17 +141,17 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
                         <h2 style={{ color: '#00ff41', marginBottom: '10px' }}>ЭТАП 3: ОПРЕДЕЛЕНИЕ ЦЕЛИ</h2>
                         <p style={{ color: '#666', marginBottom: '20px' }}>Получено сообщение: "MAX IS IN SECTOR SEVEN". Выберите цель на сетке.</p>
                         
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 100px)', gap: '10px', background: '#111', padding: '20px', border: '1px solid #333' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 90px)', gap: '8px', background: '#111', padding: '16px', border: '1px solid #333', justifyContent: 'center' }}>
                             {[1,2,3,4,5,6,7,8,9].map(num => (
                                 <div 
                                     key={num}
                                     onClick={() => setSelectedSector(num)}
                                     style={{ 
-                                        height: '100px', border: '1px solid #222', display: 'flex', alignItems: 'center', 
+                                        height: '90px', border: '1px solid #222', display: 'flex', alignItems: 'center', 
                                         justifyContent: 'center', cursor: 'pointer',
                                         background: selectedSector === num ? (num === 7 ? '#00ff41' : '#ff4d4d') : '#000',
                                         color: selectedSector === num ? '#000' : '#444',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold', fontSize: '14px'
                                     }}
                                 >
                                     SEC_{num}
