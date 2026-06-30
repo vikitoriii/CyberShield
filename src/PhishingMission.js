@@ -1,25 +1,97 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, AlertCircle, Info, CheckCircle } from 'lucide-react';
+import { Search, AlertCircle, Info, CheckCircle, CheckCircle2, HelpCircle } from 'lucide-react';
 
 const PhishingMission = ({ username, currentPoints, onComplete }) => {
   const [selectedMail, setSelectedMail] = useState(null);
   const [processedIds, setProcessedIds] = useState([]);
   const [results, setResults] = useState({});
-  const [filter, setFilter] = useState('all'); // Смена логики: all, unread, completed
+  const [filter, setFilter] = useState('all');
   const [isFinished, setIsFinished] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+  const [showHint, setShowHint] = useState(false);
 
   const emails = [
-    { id: 1, sender: "no-reply@paypaI.com", subject: "Your account is limited", type: "phishing", text: "Ваш аккаунт PayPal был временно ограничен. Пожалуйста, войдите в систему, чтобы подтвердить свои данные.", analysis: "ОМОГРАФ: В адресе вместо маленькой 'l' (L) использована большая 'I' (i). Визуально это почти не отличить: paypaI vs paypal." },
-    { id: 2, sender: "hr-portal@megacorp.ru", subject: "Обновление страховки", type: "safe", text: "Коллеги, до конца недели нужно заполнить данные для полиса ДМС на внутреннем портале.", analysis: "БЕЗОПАСНО: Внутренний корпоративный домен, нет подозрительных внешних ссылок." },
-    { id: 3, sender: "delivery@fedex-courier.net", subject: "Parcel tracking #99201", type: "phishing", text: "Ваша посылка задерживается на таможне. Скачайте 'invoice.zip' для оплаты пошлины.", analysis: "ВРЕДОНОСНОЕ ПО: Архивы (.zip, .rar) от неизвестных отправителей — это 99% вирусы. Домен .net вместо официального .com." },
-    { id: 4, sender: "support@steampowered.com", subject: "Password reset request", type: "safe", text: "Был запрошен сброс пароля для вашего аккаунта. Если вы этого не делали, просто удалите письмо.", analysis: "БЕЗОПАСНО: Официальный домен Steam. Письмо не требует вводить данные, а дает инструкции по безопасности." },
-    { id: 5, sender: "it-service@googIe.support", subject: "Unauthorized login attempt", type: "phishing", text: "Обнаружена попытка входа из КНДР. Нажмите 'Это не я', чтобы заблокировать доступ.", analysis: "ПСИХОЛОГИЯ: Вас пугают 'входом из КНДР', чтобы вы в панике нажали на кнопку. В домене googIe — снова заглавная 'i' вместо 'l'." },
-    { id: 6, sender: "newsletter@medium.com", subject: "Top stories for you", type: "safe", text: "Вот подборка статей, которые могут вам понравиться на этой неделе.", analysis: "БЕЗОПАСНО: Обычная рассылка. Ссылки ведут на официальные статьи Medium." },
-    { id: 7, sender: "admin@gos-uslugi.online", subject: "Вам положена выплата", type: "phishing", text: "В соответствии с указом №124, вам начислена социальная выплата в размере 15 400 руб. Укажите карту для зачисления.", analysis: "ГОС-ФИШИНГ: Госуслуги никогда не используют домен .online. Официальный домен — gosuslugi.ru. Обещание внезапных денег — признак мошенников." },
-    { id: 8, sender: "noreply@github.com", subject: "Security vulnerability in your repo", type: "safe", text: "Мы обнаружили уязвимость в одной из ваших библиотек. Посмотрите Dependabot alert.", analysis: "БЕЗОПАСНО: Реальное техническое уведомление от GitHub для разработчиков." },
-    { id: 9, sender: "ceo@ваша-компания.ru", subject: "Срочный перевод (Конфиденциально)", type: "phishing", text: "Привет, я на встрече, не могу говорить. Срочно оплати этот счет, я пришлю детали позже. Это очень важно для сделки.", analysis: "CEO-FRAUD: Подделка под начальника. Используется авторитет и срочность. Проверяйте реальный адрес отправителя, даже если имя совпадает." },
-    { id: 10, sender: "info@nalog.gov.ru", subject: "Задолженность по налогам", type: "safe", text: "У вас имеется неоплаченная задолженность по транспортному налогу. Подробности в личном кабинете налогоплательщика.", analysis: "БЕЗОПАСНО: Домен .gov.ru принадлежит государственным органам. Письмо не просит карту, а отправляет в личный кабинет." }
+    {
+      id: 1,
+      sender: "no-reply@paypaI.com",
+      subject: "Ваш аккаунт ограничен",
+      type: "phishing",
+      text: "Ваш аккаунт PayPal был временно ограничен из-за подозрительной активности. Подтвердите данные для восстановления доступа.",
+      analysis: "ОМОГРАФ: В адресе вместо маленькой 'l' использована большая 'I'. paypaI.com вместо paypal.com. Визуально почти неотличимо!"
+    },
+    {
+      id: 2,
+      sender: "hr@nasha-firma.by",
+      subject: "Заполните данные для ДМС",
+      type: "safe",
+      text: "Коллеги, до конца недели нужно заполнить данные для полиса ДМС на внутреннем портале. Ссылка: intranet.nasha-firma.by/dms",
+      analysis: "БЕЗОПАСНО: Корпоративный домен .by, внутренняя ссылка на интранет. Письмо от HR — нормальная рабочая ситуация."
+    },
+    {
+      id: 3,
+      sender: "delivery@fedex-courier.net",
+      subject: "Посылка задержана на таможне",
+      type: "phishing",
+      text: "Ваша посылка задерживается на таможне. Скачайте invoice.zip для оплаты пошлины и получения посылки.",
+      analysis: "ШКОДНОСТЬ: Архив .zip от неизвестного отправителя — это вирус в 99% случаев. Настоящий FedEx не отправляет .zip файлы."
+    },
+    {
+      id: 4,
+      sender: "support@steampowered.com",
+      subject: "Запрос на сброс пароля",
+      type: "safe",
+      text: "Был запрошен сброс пароля для вашего аккаунта Steam. Если вы этого не делали, просто удалите это письмо.",
+      analysis: "БЕЗОПАСНО: Официальный домен Steam. Письмо не просит ввести данные, а просто информирует. Это правильно."
+    },
+    {
+      id: 5,
+      sender: "it-service@googIe.support",
+      subject: "Попытка входа из Северной Кореи",
+      type: "phishing",
+      text: "Обнаружена попытка входа в ваш аккаунт из Северной Кореи. Нажмите 'Это не я' для блокировки доступа.",
+      analysis: "ПСИХОЛОГИЯ: Вас пугают 'входом из КНДР', чтобы вы в панике нажали кнопку. В домене googIe — заглавная 'i' вместо 'l'."
+    },
+    {
+      id: 6,
+      sender: "newsletter@onliner.by",
+      subject: "Лучшие статьи недели",
+      type: "safe",
+      text: "Вот подборка статей, которые могут вам понравиться на этой неделе. Технологии, авто, недвижимость.",
+      analysis: "БЕЗОПАСНО: Обычная рассылка от крупнейшего белорусского портала. Ссылки ведут на реальные статьи."
+    },
+    {
+      id: 7,
+      sender: "admin@gosuslugi.by",
+      subject: "Вам положена выплата 450 BYN",
+      type: "phishing",
+      text: "Согласно постановлению №124, вам начислена социальная выплата в размере 450 BYN. Укажите карту для зачисления.",
+      analysis: "ФИШИНГ: Госуслуги НИКОГДА не рассылают письма с обещаниями денег. Официальный сайт — gosuslugi.by, но он не рассылает такие письма."
+    },
+    {
+      id: 8,
+      sender: "noreply@github.com",
+      subject: "Уязвимость в вашем репозитории",
+      type: "safe",
+      text: "Мы обнаружили уязвимость в одной из ваших библиотек. Посмотрите Dependabot alert в настройках репозитория.",
+      analysis: "БЕЗОПАСНО: Реальное техническое уведомление от GitHub. Никаких ссылок на внешние ресурсы — всё в داخلнем интерфейсе."
+    },
+    {
+      id: 9,
+      sender: "ceo@nasha-firma.by",
+      subject: "Срочный перевод (Конфиденциально)",
+      type: "phishing",
+      text: "Привет, я на встрече, не могу говорить. Срочно оплати этот счёт, я пришлю детали позже. Это очень важно для сделки.",
+      analysis: "CEO-FRAUD: Подделка под начальника. Используется авторитет и срочность. Реальный CEO никогда не просит оплатить счёт по письму."
+    },
+    {
+      id: 10,
+      sender: "info@nalog.gov.by",
+      subject: "Задолженность по налогам",
+      type: "safe",
+      text: "У вас имеется неоплаченная задолженность по транспортному налогу. Подробности в личном кабинете налогоплательщика.",
+      analysis: "БЕЗОПАСНО: Домен .gov.by — официальный государственный домен. Письмо не просит карту, а направляет в личный кабинет."
+    }
   ];
 
   const handleAction = (isPhishingClaim) => {
@@ -32,23 +104,58 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
 
   const finishMission = () => {
     const correctCount = Object.values(results).filter(r => r === 'correct').length;
-    const reward = correctCount * 100;
     setIsFinished(true);
-    onComplete(currentPoints + reward);
+    onComplete(currentPoints + correctCount * 100);
   };
 
-  // НОВАЯ ЛОГИКА ФИЛЬТРАЦИИ
   const filteredEmails = emails.filter(e => {
     if (filter === 'unread') return !processedIds.includes(e.id);
     if (filter === 'completed') return processedIds.includes(e.id);
-    return true; // all
+    return true;
   });
 
   if (isFinished) return (
-    <div className="window success-screen animate-fade">
-      <div className="glitch-text">DATA CLEANSED</div>
-      <p>Вы проанализировали {emails.length} объектов. Правильных диагнозов: {Object.values(results).filter(r => r === 'correct').length}</p>
-      <button className="btn-huge" onClick={() => onComplete(currentPoints)}>ВЕРНУТЬСЯ В ШТАБ</button>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="win-box animate-fade">
+      <CheckCircle2 size={80} color="#00ff41" style={{ margin: '0 auto 20px' }} />
+      <div className="glitch-text">ДАННЫЕ ОЧИЩЕНЫ</div>
+      <p style={{ color: '#888', marginBottom: '20px' }}>Вы проанализировали {emails.length} писем. Правильных: {Object.values(results).filter(r => r === 'correct').length}</p>
+      <div style={{ background: '#000', border: '1px solid #00ff41', padding: '15px', marginBottom: '20px', textAlign: 'left' }}>
+        <div style={{ color: '#00ff41', fontSize: '10px', letterSpacing: '2px', marginBottom: '8px' }}>УЛИКА #2:</div>
+        <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>
+          Одно из писем содержало гомограф — кириллическую 'о' вместо латинской. 
+          Адрес отправителя: <b style={{ color: '#ff4d4d' }}>no-reply@paypaI.com</b>. 
+          Это указывает на <b style={{ color: '#ff4d4d' }}>внутреннего агента</b> компании Neocorp.
+        </p>
+      </div>
+      <button className="btn-huge" onClick={() => onComplete(currentPoints)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+    </motion.div>
+  );
+
+  if (showIntro) return (
+    <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #1a1a0a 0%, #050505 100%)' }}>
+      <Search size={80} color="#f7b500" />
+      <h1 className="glitch-text" style={{ color: '#f7b500', marginTop: '20px' }}>ДЕТЕКТИВ ФИШИНГА</h1>
+      <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
+        <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
+          <div style={{ color: '#f7b500', fontSize: '11px', letterSpacing: '2px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertCircle size={14} /> МИССИЯ 2
+          </div>
+          <p style={{ color: '#ccc', fontSize: '14px', lineHeight: '1.7', margin: 0 }}>
+            На корпоративную почту сотрудников Neocorp пришли подозрительные письма. 
+            Среди них <b style={{ color: '#00ff41' }}>настоящие уведомления</b> 
+            и <b style={{ color: '#ff4d4d' }}>фишинговые атаки</b>. 
+            По данным разведки, атака связана с внутренним агентом — 
+            используйте навыки из <b style={{ color: '#00ff41' }}>Академии</b> для анализа.
+          </p>
+        </div>
+        <div style={{ background: '#000', border: '1px solid #222', padding: '15px' }}>
+          <p style={{ color: '#888', fontSize: '12px', margin: 0 }}>
+            ⚠️ Обращайте внимание на домены отправителей, подозрительные ссылки и архивы. 
+            Кириллические буквы могут маскироваться под латинские!
+          </p>
+        </div>
+      </div>
+      <button className="btn-main" onClick={() => setShowIntro(false)}>НАЧАТЬ АНАЛИЗ</button>
     </div>
   );
 
@@ -59,12 +166,28 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
           <Search size={20} color="#00ff41" />
           <h3>TRAFFIC_ANALYZER: {processedIds.length}/{emails.length}</h3>
         </div>
-        <div className="filter-pills">
-          <button onClick={() => setFilter('all')} className={filter === 'all' ? 'active' : ''}>ВСЕ</button>
-          <button onClick={() => setFilter('unread')} className={filter === 'unread' ? 'active' : ''}>НОВЫЕ</button>
-          <button onClick={() => setFilter('completed')} className={filter === 'completed' ? 'active' : ''}>АНАЛИЗ</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
+            <HelpCircle size={14} /> ПОДСКАЗКА
+          </button>
+          <div className="filter-pills">
+            <button onClick={() => setFilter('all')} className={filter === 'all' ? 'active' : ''}>ВСЕ</button>
+            <button onClick={() => setFilter('unread')} className={filter === 'unread' ? 'active' : ''}>НОВЫЕ</button>
+            <button onClick={() => setFilter('completed')} className={filter === 'completed' ? 'active' : ''}>АНАЛИЗ</button>
+          </div>
         </div>
       </div>
+
+      {showHint && (
+        <div style={{ background: '#000', border: '1px solid #f7b500', padding: '12px 16px', marginBottom: '16px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+          <HelpCircle size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
+          <div>
+            <b>Как отличить фишинг:</b> Проверяйте домен отправителя (опечатки, подмена букв), 
+            ссылки ведут на подозрительные сайты? Просьбы о паролях/кодах — всегда фишинг. 
+            Срочность + страх = признак атаки. Настоящие сервисы не просят данные по email.
+          </div>
+        </div>
+      )}
 
       <div className="phishing-content">
         <div className="mail-sidebar window">
@@ -117,7 +240,7 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
             ) : (
               <div className="empty-view">
                 <div className="radar"></div>
-                <p>ВЫБЕРИТЕ ОБЪЕКТ ДЛЯ ЗАПУСКА СКАНЕРА</p>
+                <p>ВЫБЕРИТЕ ПИСЬМО ДЛЯ АНАЛИЗА</p>
               </div>
             )}
           </AnimatePresence>

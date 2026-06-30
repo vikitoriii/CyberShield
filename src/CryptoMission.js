@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Radio, Zap, Activity, CheckCircle2, ShieldAlert, Target, Terminal, ChevronRight, Lock } from 'lucide-react';
+import { Radio, Zap, Activity, CheckCircle2, ShieldAlert, Target, Terminal, ChevronRight, Lock, HelpCircle } from 'lucide-react';
 
 const CryptoMission = ({ username, currentPoints, onComplete }) => {
     const [stage, setStage] = useState(0); // 0: Intro, 1: Signal, 2: Decrypt, 3: Map, 4: Win
@@ -8,11 +8,12 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
     const [shift, setShift] = useState(0);
     const [selectedSector, setSelectedSector] = useState(null);
     const [xpEarned, setXpEarned] = useState(0);
+    const [showHint, setShowHint] = useState(false);
 
     // Данные для этапов
     const TARGET_FREQ = 104; // Целевая частота (104.4 MHz)
     const TARGET_SHIFT = 13; // Ключ сдвига ROT13
-    const encryptedText = "ZNX VF VA FRPGBE FRIRA"; // "MAX IS IN SECTOR SEVEN"
+    const encryptedText = "ZNK VF VA FRPGBE FRIRA"; // "MAX IS IN SECTOR SEVEN"
     
     // Функция сдвига для этапа 2
     const decrypt = (text, s) => {
@@ -31,13 +32,23 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
 
     // Вводный экран
     if (stage === 0) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '50px' }}>
-            <Radio size={60} color="#00ff41" />
-            <h1 className="glitch-text" style={{color: '#00ff41'}}>ОПЕРАЦИЯ: ТИХИЙ ОМУТ</h1>
-            <p style={{maxWidth: '600px', margin: '20px auto', color: '#ccc', fontSize: '18px', lineHeight: '1.6'}}>
-                Агент, мы обнаружили скрытую передачу данных. Похоже, Макс пытается выйти на связь, но сигнал глушат. 
-                <br/><br/>
-                Вам предстоит: <b>перехватить</b> волну, <b>взломать</b> шифр и <b>указать</b> местоположение цели.
+        <div className="window animate-fade mission-intro">
+            <div className="mission-intro-icon">
+                <Radio size={72} color="#f7b500" />
+            </div>
+            <h1 className="glitch-text mission-intro-title" style={{ color: '#f7b500' }}>КРИПТОГРАФИЯ</h1>
+            <div className="mission-intro-card">
+                <div className="mission-intro-label" style={{ color: '#f7b500' }}>
+                    МИССИЯ 06
+                </div>
+                <p className="mission-intro-text">
+                    Агент, мы обнаружили скрытую передачу данных на частоте <b style={{ color: '#f7b500' }}>104.4 MHz</b>. 
+                    Похоже, Макс пытается выйти на связь, но сигнал глушат. 
+                    Сообщение зашифровано классическим шифром — нужно найти ключ.
+                </p>
+            </div>
+            <p className="mission-intro-hint">
+                Вам предстоит: <b>перехватить</b> волну на нужной частоте, <b>взломать</b> шифр Цезаря и <b>указать</b> местоположение цели.
             </p>
             <button className="btn-main" onClick={() => setStage(1)}>НАЧАТЬ ПЕРЕХВАТ</button>
         </div>
@@ -47,17 +58,32 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             
             {/* ИНДИКАТОР ЭТАПОВ */}
-            <div className="panel-header" style={{ display: 'flex', justifyContent: 'center', gap: '40px', background: '#0a0a0a' }}>
-                <div style={{ color: stage >= 1 ? '#00ff41' : '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '1px solid', textAlign: 'center', fontSize: '12px' }}>1</div> СИГНАЛ
+            <div className="mission-stage-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '40px' }}>
+                    <div className={`mission-stage-item ${stage >= 1 ? 'active' : 'pending'}`}>
+                        <span>[1] СИГНАЛ</span>
+                    </div>
+                    <div className={`mission-stage-item ${stage >= 2 ? 'active' : 'pending'}`}>
+                        <span>[2] ВЗЛОМ</span>
+                    </div>
+                    <div className={`mission-stage-item ${stage >= 3 ? 'active' : 'pending'}`}>
+                        <span>[3] АНАЛИЗ</span>
+                    </div>
                 </div>
-                <div style={{ color: stage >= 2 ? '#00ff41' : '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '1px solid', textAlign: 'center', fontSize: '12px' }}>2</div> ВЗЛОМ
-                </div>
-                <div style={{ color: stage >= 3 ? '#00ff41' : '#333', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: '1px solid', textAlign: 'center', fontSize: '12px' }}>3</div> АНАЛИЗ
-                </div>
+                {stage > 0 && stage < 4 && (
+                    <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
+                        <HelpCircle size={14} /> ПОДСКАЗКА
+                    </button>
+                )}
             </div>
+
+            {showHint && stage > 0 && stage < 4 && (
+                <div style={{ background: '#000', border: '1px solid #f7b500', padding: '14px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5', textAlign: 'center' }}>
+                    {stage === 1 && 'Настройте тюнер на частоту ~22 на слайдере. Это соответствует 104.4 MHz. Ищите момент, когда амплитуда максимальна.'}
+                    {stage === 2 && 'Это шифр Цезаря (ROT13). Каждая буква сдвинута на 13 позиций. Попробуйте сдвиг 13 — это универсальный ключ ROT13.'}
+                    {stage === 3 && 'Расшифрованное сообщение указывает на СЕКТОР 7. Выберите ячейку SEC_7 на сетке.'}
+                </div>
+            )}
 
             <div style={{ flex: 1, padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 
@@ -72,7 +98,7 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
                                 transition={{ repeat: Infinity, duration: 1 }}
                                 style={{ width: '2px', background: '#00ff41', margin: '0 5px', opacity: Math.abs(frequency - 104) < 5 ? 1 : 0.2 }} 
                              />
-                             <div style={{ fontSize: '32px', color: '#00ff41', fontFamily: 'monospace', z_index: 2 }}>
+                             <div style={{ fontSize: '32px', color: '#00ff41', fontFamily: 'monospace', zIndex: 2 }}>
                                 {100 + (frequency/5).toFixed(1)} MHz
                              </div>
                         </div>
@@ -144,15 +170,23 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
 
                 {/* ФИНАЛ: ПОБЕДА */}
                 {stage === 4 && (
-                    <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} style={{ textAlign: 'center' }}>
-                        <CheckCircle2 size={80} color="#00ff41" />
-                        <h1 style={{ color: '#00ff41', marginTop: '20px' }}>МИССИЯ ВЫПОЛНЕНА</h1>
-                        <p style={{ color: '#eee', fontSize: '18px' }}>Вы успешно перехватили и расшифровали сигнал Макса.</p>
-                        <div style={{ marginTop: '20px', padding: '20px', background: '#0a1a0a', border: '1px solid #00ff41' }}>
-                            <p style={{ margin: 0, color: '#00ff41' }}>НОВАЯ УЛИКА ДОБАВЛЕНА НА ДОСКУ: #6</p>
+                    <div className="mission-win">
+                        <div className="mission-win-icon">
+                            <CheckCircle2 size={72} color="#00ff41" />
                         </div>
-                        <button className="btn-huge ready" style={{ marginTop: '30px' }} onClick={handleFinish}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
-                    </motion.div>
+                        <h1 className="glitch-text mission-win-title" style={{ color: '#00ff41' }}>МИССИЯ ВЫПОЛНЕНА</h1>
+                        <p className="mission-win-subtitle">
+                            Мы расшифровали сообщение Макса: <b style={{ color: '#00ff41' }}>MAX_ALIVE_2024!!!</b> — он жив!
+                        </p>
+                        <div className="mission-clue">
+                            <div className="mission-clue-label" style={{ color: '#00ff41' }}>УЛИКА #6</div>
+                            <p className="mission-clue-text">
+                                Сообщение Макса зашифровано в повреждённом секторе памяти. 
+                                Он жив и пытается выйти на связь!
+                            </p>
+                        </div>
+                        <button className="btn-huge" onClick={handleFinish}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+                    </div>
                 )}
             </div>
 

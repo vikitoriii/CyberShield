@@ -49,14 +49,24 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
     };
 
     if (stage === 0) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '50px', background: 'radial-gradient(circle, #0a110a 0%, #050505 100%)' }}>
-            <Cpu size={80} color="#00ff41" />
-            <h1 className="glitch-text" style={{ color: '#00ff41', marginTop: '20px' }}>ПРОТОКОЛ: ОВЕРРАЙД</h1>
-            <p style={{ maxWidth: '600px', margin: '30px auto', color: '#888', fontSize: '18px', lineHeight: '1.6' }}>
-                Макс оставил пакет данных в защищенном хранилище. <br/>
-                Система Neocorp обнаружила утечку и активировала 3 уровня защиты. 
-                <br/><br/>
-                <b>Миссия:</b> Перехватить код, синхронизировать частоту и взломать ядро безопасности.
+        <div className="window animate-fade mission-intro">
+            <div className="mission-intro-icon">
+                <Cpu size={72} color="#00ff41" />
+            </div>
+            <h1 className="glitch-text mission-intro-title" style={{ color: '#00ff41' }}>СЕТЕВОЙ ЭКРАН</h1>
+            <div className="mission-intro-card">
+                <div className="mission-intro-label" style={{ color: '#00ff41' }}>
+                    МИССИЯ 03
+                </div>
+                <p className="mission-intro-text">
+                    Макс оставил пакет данных в защищенном хранилище в <b style={{ color: '#00ff41' }}>Секторе 7</b> — 
+                    старом здании Neocorp. Система обнаружила утечку и активировала <b style={{ color: '#ff4d4d' }}>3 уровня защиты</b>: 
+                    портовую фильтрацию, частотную синхронизацию и матричный замок.
+                </p>
+            </div>
+            <p className="mission-intro-hint">
+                Перехватите код, синхронизируйте частоту и взломайте ядро безопасности. 
+                Используйте <b style={{ color: '#f7b500' }}>подсказки</b> на каждом этапе.
             </p>
             <button className="btn-main" onClick={() => setStage(1)}>НАЧАТЬ ПРОНИКНОВЕНИЕ</button>
         </div>
@@ -66,11 +76,19 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%', border: '1px solid #333' }}>
             
             {/* ИНДИКАТОР ЭТАПОВ */}
-            <div className="panel-header" style={{ display: 'flex', justifyContent: 'center', gap: '40px', background: '#0a0a0a', padding: '15px' }}>
-                <span style={{ color: stage >= 1 ? '#00ff41' : '#222' }}>[1] ПОРТ</span>
-                <span style={{ color: stage >= 2 ? '#00ff41' : '#222' }}>[2] СИГНАЛ</span>
-                <span style={{ color: stage >= 3 ? '#00ff41' : '#222' }}>[3] ЯДРО</span>
-                <div style={{ marginLeft: 'auto', color: '#ff4d4d' }}>HEALTH: {health}%</div>
+            <div className="mission-stage-bar">
+                <div className={`mission-stage-item ${stage >= 1 ? 'active' : 'pending'}`}>
+                    <span>[1] ПОРТ</span>
+                </div>
+                <div className={`mission-stage-item ${stage >= 2 ? 'active' : 'pending'}`}>
+                    <span>[2] СИГНАЛ</span>
+                </div>
+                <div className={`mission-stage-item ${stage >= 3 ? 'active' : 'pending'}`}>
+                    <span>[3] ЯДРО</span>
+                </div>
+                <div style={{ marginLeft: 'auto', color: '#ff4d4d', fontSize: '11px', letterSpacing: '1px', fontWeight: 600 }}>
+                    HEALTH: {health}%
+                </div>
             </div>
 
             <div style={{ flex: 1, padding: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
@@ -83,11 +101,11 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
                 <AnimatePresence>
                     {showHint && (
                         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} 
-                            style={{ position: 'absolute', right: '50px', top: '10px', width: '250px', background: '#1a1a00', border: '1px solid #f7b500', padding: '15px', color: '#f7b500', fontSize: '12px', zIndex: 100 }}>
-                            <b>ДЕШИФРОВКА ПОДСКАЗКИ:</b><br/>
-                            {stage === 1 && `Ищите зеленое число в терминале слева (напр: ${targetCode})`}
-                            {stage === 2 && `Установите ползунок на частоту ${TARGET_FREQ} MHz`}
-                            {stage === 3 && `Нажмите кнопки в порядке: Верхний ряд (3-я), Второй ряд (4-я), Нижний ряд (2-я), Третий ряд (1-я)`}
+                            style={{ position: 'absolute', right: '50px', top: '10px', width: '280px', background: '#1a1a00', border: '1px solid #f7b500', padding: '15px', color: '#f7b500', fontSize: '11px', zIndex: 100, lineHeight: '1.5' }}>
+                            <b>ПОДСКАЗКА:</b><br/>
+                            {stage === 1 && 'Ищите число, которое выделяется зелёным цветом среди серых логов. Оно появляется и исчезает — будьте внимательны.'}
+                            {stage === 2 && 'Настройте ползунок так, чтобы амплитуда волны была максимальной. Частота около 74 на слайдере.'}
+                            {stage === 3 && 'Последовательность: 2 → 7 → 13 → 8. Нажимайте по порядку, при ошибке начинайте заново.'}
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -148,12 +166,23 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
 
                 {/* ФИНАЛ */}
                 {stage === 4 && (
-                    <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} style={{ textAlign: 'center' }}>
-                        <CheckCircle2 size={100} color="#00ff41" style={{ margin: '0 auto' }} />
-                        <h1 className="glitch-text" style={{ color: '#00ff41', margin: '30px 0' }}>ДОСТУП ПОЛУЧЕН</h1>
-                        <p style={{ fontSize: '18px', color: '#eee' }}>Защита Neocorp пала. Улика #3 успешно извлечена.</p>
-                        <button className="btn-huge ready" style={{ marginTop: '40px', padding: '20px 60px' }} onClick={() => onComplete(currentPoints + 3000)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
-                    </motion.div>
+                    <div className="mission-win">
+                        <div className="mission-win-icon">
+                            <CheckCircle2 size={72} color="#00ff41" />
+                        </div>
+                        <h1 className="glitch-text mission-win-title" style={{ color: '#00ff41' }}>ДОСТУП ПОЛУЧЕН</h1>
+                        <p className="mission-win-subtitle">
+                            Мы пробили файрвол и нашли сервер в <b style={{ color: '#4d94ff' }}>Секторе 7</b> — старом здании Neocorp.
+                        </p>
+                        <div className="mission-clue">
+                            <div className="mission-clue-label" style={{ color: '#00ff41' }}>УЛИКА #3</div>
+                            <p className="mission-clue-text">
+                                Сигнал прыгал по прокси-серверам. Точка выхода: <b style={{ color: '#4d94ff' }}>Сектор 7</b>. 
+                                Похоже, это старое здание Neocorp.
+                            </p>
+                        </div>
+                        <button className="btn-huge" onClick={() => onComplete(currentPoints + 3000)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+                    </div>
                 )}
 
             </div>

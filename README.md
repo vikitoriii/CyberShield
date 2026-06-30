@@ -1,70 +1,118 @@
-# Getting Started with Create React App
+# CYBER-SHIELD
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Операционная система кибербезопасности** — обучающая интерактивная платформа.
 
-## Available Scripts
+## Описание
 
-In the project directory, you can run:
+CYBER-SHIELD — это симуляция операционной системы для расследования киберпреступлений. Пользователь выступает в роли агента, который должен проникнуть в корпоративную сеть Neocorp и раскрыть заговор.
 
-### `npm start`
+## Возможности
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **10 миссий** с уникальными головоломками
+- **Система рангов** (Стажёр → Аналитик → Детектив → Легенда)
+- **Дуэли 1v1** — три типа мини-игр с друзьями
+- **Приватный чат** между агентами
+- **Система друзей** — добавление, общение, вызовы
+- **Ежедневные задания** с бонусами
+- **Академия** — 9 интерактивных уроков по кибербезопасности
+- **Доска улик** — сюжетная лента с элементами расследования
+- **Рейтинг** агентов
+- **Терминал** с командами
+- **Live Activity Feed** — уведомления в реальном времени
+- **Celebration Effects** — анимации при завершении миссий
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Технологии
 
-### `npm test`
+- **React** — клиентская часть
+- **Supabase** — серверная часть (БД + Auth + Realtime + Edge Functions)
+- **Framer Motion** — анимации
+- **Lucide React** — иконки
+- **CSS** — стилизация (адаптивный дизайн)
+- **Bootstrap** + **jQuery** — дополнительные компоненты
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Структура проекта
 
-### `npm run build`
+```
+src/
+├── App.js              — главный компонент
+├── App.css             — стили
+├── supabaseClient.js   — подключение к Supabase
+│
+├── Миссии/
+│   ├── PasswordMission.js    — Стойкость пароля
+│   ├── PhishingMission.js    — Детектор фишинга
+│   ├── FirewallMission.js    — Сетевой экран
+│   ├── DatabaseMission.js    — База данных
+│   ├── SocialMission.js      — Соц. инженерия
+│   ├── CryptoMission.js      — Криптография
+│   ├── MetadataMission.js    — Цифровой след
+│   ├── SnifferMission.js     — Взлом сейфа
+│   ├── PortalMission.js      — Скрытый портал
+│   └── FinalMission.js       — Финальная операция
+│
+├── Компоненты/
+│   ├── Academy.js            — Интерактивные уроки
+│   ├── AgentDuel.js          — Система дуэлей
+│   ├── FriendsSystem.js      — Друзья и чат
+│   ├── Leaderboard.js        — Рейтинг
+│   ├── CaseFiles.js          — Доска улик
+│   ├── LiveFeed.js           — Лента активности
+│   ├── DailyChallenge.js     — Ежедневные задания
+│   ├── ProfileStats.js       — Статистика профиля
+│   ├── AchievementToast.js   — Уведомления достижений
+│   ├── Celebration.js        — Анимация победы
+│   ├── GlitchLogo.js         — Глитч-эффект логотипа
+│   ├── ParticleBackground.js — Фоновые частицы
+│   └── LoginParticles.js     — Частицы на экране входа
+│
+└── Supabase/
+    └── functions/
+        └── validate-mission/
+            └── index.ts      — серверная валидация миссий
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Установка
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+# Клонирование
+git clone https://github.com/username/cybershield.git
+cd cybershield
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Установка зависимостей
+npm install
 
-### `npm run eject`
+# Настройка переменных окружения
+# Создайте .env файл:
+REACT_APP_SUPABASE_URL=ваш_url
+REACT_APP_SUPABASE_ANON_KEY=ваш_ключ
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Запуск
+npm start
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Деплой Supabase Edge Functions
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+# Установка Supabase CLI
+npm install -g supabase
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# Авторизация
+supabase login
 
-## Learn More
+# Привязка проекта
+supabase link --project-ref ваш_project_ref
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Деплой функции
+supabase functions deploy validate-mission
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Хостинг
 
-### Code Splitting
+Бесплатные варианты:
+- **Vercel** — подключение к GitHub, автоматический деплой
+- **Netlify** — аналогично Vercel
+- **GitHub Pages** — через `npm run build`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Лицензия
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+MIT License

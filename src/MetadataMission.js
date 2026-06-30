@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Search, ShieldAlert, Zap, Cpu, Terminal, 
-    AlertTriangle, Eye, Settings, Lock, CheckCircle2, RotateCcw, Activity, Move
+    AlertTriangle, Eye, Settings, Lock, CheckCircle2, RotateCcw, Activity, Move, Camera, HelpCircle
 } from 'lucide-react';
 
 const MetadataMission = ({ username, currentPoints, onComplete }) => {
@@ -10,6 +10,7 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
     const [capturedCount, setCapturedCount] = useState(0);
     const [filters, setFilters] = useState({ red: 100, green: 100, blue: 100 });
     const [isFound, setIsFound] = useState(false);
+    const [showHint, setShowHint] = useState(false);
 
     // Идеальные настройки для проявления шифра
     const TARGET = { red: 10, green: 160, blue: 60 };
@@ -62,161 +63,160 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
         }
     }, [filters, stage]);
 
+    // ЭКРАН 0: ВСТУПЛЕНИЕ
     if (stage === 0) return (
-        <div className="container py-5">
-            <div className="row justify-content-center">
-                <div className="col-md-8 text-center bg-black border border-success p-5 shadow-lg rounded">
-                    <ShieldAlert size={80} color="#00ff41" className="mb-4 animate-pulse" />
-                    <h1 className="text-success glitch-text mb-4">ОБЪЕКТ #07: ЦИФРОВАЯ ФОРЕНЗИКА</h1>
-                    <p className="text-light fs-5 mb-4">
-                        Мы получили зашифрованный снимок из Сектора 7. Файл поврежден и содержит «шумовую завесу». 
-                        Вам нужно перехватить пакеты восстановления и настроить частотные фильтры, чтобы увидеть скрытый слой.
-                    </p>
-                    <button className="btn btn-success btn-lg px-5" onClick={() => setStage(1)}>ИНИЦИИРОВАТЬ ЗАХВАТ</button>
-                </div>
+        <div className="window animate-fade mission-intro">
+            <div className="mission-intro-icon">
+                <ShieldAlert size={72} color="#00ff41" />
             </div>
+            <h1 className="glitch-text mission-intro-title" style={{ color: '#00ff41' }}>ЦИФРОВАЯ ФОРЕНЗИКА</h1>
+            <div className="mission-intro-card">
+                <div className="mission-intro-label" style={{ color: '#00ff41' }}>
+                    МИССИЯ 07
+                </div>
+                <p className="mission-intro-text">
+                    Мы получили зашифрованный снимок из <b style={{ color: '#00ff41' }}>Сектора 7</b>. 
+                    Файл поврежден и содержит «шумовую завесу». 
+                    По координатам из предыдущих миссий это <b style={{ color: '#f7b500' }}>бункер под Эйфелевой башней</b> — 
+                    вам нужно восстановить скрытый слой данных.
+                </p>
+            </div>
+            <p className="mission-intro-hint">
+                Перехватите пакеты восстановления и настройте частотные фильтры RGB-спектра, 
+                чтобы увидеть скрытые координаты.
+            </p>
+            <button className="btn-main" onClick={() => setStage(1)}>ИНИЦИИРОВАТЬ ЗАХВАТ</button>
         </div>
     );
 
+    // ЭКРАН 1-2: ИГРОВОЕ ПОЛЕ
     return (
-        <div className="container-fluid p-3 text-light" style={{ minHeight: '85vh', background: '#050505' }}>
-            <div className="row h-100 g-4">
-                
+        <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            {/* ИНДИКАТОР ЭТАПОВ */}
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span><Activity size={14} /> {stage === 1 ? "PACKET_SNIFFER_ACTIVE" : "SPECTRAL_RECOVERY_MODE"}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}>
+                        <HelpCircle size={14} /> ПОДСКАЗКА
+                    </button>
+                    <span style={{ color: '#4d94ff' }}>ENCRYPTED_DATA_07</span>
+                </div>
+            </div>
+
+            {showHint && (
+                <div style={{ background: '#000', border: '1px solid #f7b500', padding: '10px 16px', margin: '0 20px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
+                    {stage === 1 && 'Перетащите зелёные блоки данных в зону захвата. Пропустите серые — это шум.'}
+                    {stage === 2 && 'Настройте КРАСНЫЙ канал на минимум (~10), ЗЕЛЁНЫЙ на ~160. Синий не важен. Скрытый слой появится при правильных настройках.'}
+                </div>
+            )}
+
+            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px', padding: '20px', minHeight: 0 }}>
                 {/* ЛЕВАЯ ПАНЕЛЬ: ИГРОВОЕ ПОЛЕ */}
-                <div className="col-lg-8">
-                    <div className="card h-100 bg-dark border-secondary border-opacity-25 overflow-hidden shadow">
-                        <div className="card-header bg-black border-secondary border-opacity-50 d-flex justify-content-between align-items-center py-3">
-                            <span className="text-success small fw-bold tracking-widest">
-                                <Activity size={14} className="me-2 text-danger" /> 
-                                {stage === 1 ? "PACKET_SNIFFER_ACTIVE" : "SPECTRAL_RECOVERY_MODE"}
-                            </span>
-                            <span className="badge border border-success text-success px-3">ENCRYPTED_DATA_07</span>
-                        </div>
-
-                        {/* ЭТАП 1: ЗАХВАТ ПАКЕТОВ */}
-                        {stage === 1 && (
-                            <div id="capture-zone" className="card-body d-flex flex-column align-items-center justify-content-center position-relative" style={{ minHeight: '500px', background: 'radial-gradient(circle, #0a110a 0%, #000 100%)' }}>
-                                <div className="text-center mb-5">
-                                    <h4 className="text-success">ПЕРЕХВАТ ПАКЕТОВ</h4>
-                                    <p className="text-muted small">Перетащите плавающие блоки данных в порт приемника</p>
-                                </div>
-                                
-                                {/* Поток мусора (анимация) */}
-                                <div className="position-absolute w-100 h-100 overflow-hidden" style={{ opacity: 0.1, pointerEvents: 'none' }}>
-                                    {Array.from({length: 20}).map((_, i) => (
-                                        <div key={i} className="text-success small position-absolute" style={{ left: `${Math.random()*100}%`, top: `${Math.random()*100}%` }}>010110</div>
-                                    ))}
-                                </div>
-
-                                <div className="d-flex gap-5">
-                                    {[1, 2, 3].map(i => (
-                                        <div key={i} className="packet-data p-3 bg-dark border border-success rounded text-success shadow-sm" style={{ cursor: 'grab', zIndex: 10 }}>
-                                            <Cpu size={24} className="mb-2" /><br/>
-                                            <span style={{fontSize: '9px'}}>METADATA_#0{i}</span>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <div id="input-port" className="mt-5 p-5 border-4 border-dashed border-success rounded-circle d-flex align-items-center justify-content-center" style={{ width: '180px', height: '180px', background: 'rgba(0,255,65,0.05)' }}>
-                                    <div className="text-center">
-                                        <Zap size={32} color="#00ff41" className="mb-2" />
-                                        <div className="small fw-bold text-success">INPUT_PORT</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {/* ЭТАП 1: ЗАХВАТ ПАКЕТОВ */}
+                    {stage === 1 && (
+                        <div id="capture-zone" style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', minHeight: '400px' }}>
+                            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                                <h4 style={{ color: '#4d94ff', marginBottom: '10px' }}>ПЕРЕХВАТ ПАКЕТОВ</h4>
+                                <p style={{ color: '#666', fontSize: '12px' }}>Перетащите плавающие блоки данных в порт приемника</p>
+                            </div>
+                            
+                            <div style={{ display: 'flex', gap: '40px' }}>
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="packet-data" style={{ padding: '20px', background: '#111', border: '1px solid #4d94ff', cursor: 'grab', zIndex: 10, textAlign: 'center' }}>
+                                        <Cpu size={24} color="#4d94ff" style={{ marginBottom: '10px' }} />
+                                        <div style={{ fontSize: '10px', color: '#4d94ff' }}>METADATA_#0{i}</div>
                                     </div>
-                                </div>
+                                ))}
                             </div>
-                        )}
 
-                        {/* ЭТАП 2: ФИЛЬТРАЦИЯ И ГЛИЧИ */}
-                        {stage === 2 && (
-                            <div className="card-body d-flex flex-column align-items-center justify-content-center bg-black">
-                                <div className="position-relative" style={{ width: '100%', maxWidth: '500px', height: '500px', border: '2px solid #1a1a1a', padding: '10px' }}>
-                                    {/* Глитч-эффект на картинке */}
-                                    <div style={{
-                                        width: '100%', height: '100%',
-                                        backgroundImage: 'url("https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?q=80&w=1000")',
-                                        backgroundSize: 'cover',
-                                        backgroundPosition: 'center',
-                                        transition: '0.3s filter',
-                                        filter: `saturate(${filters.red}%) hue-rotate(${filters.green}deg) brightness(${filters.blue / 100}) contrast(1.2)`
-                                    }}></div>
-                                    
-                                    {/* Скрытый слой */}
-                                    <AnimatePresence>
-                                        {isFound && (
-                                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="position-absolute top-50 start-50 translate-middle text-center w-100" style={{ pointerEvents: 'none' }}>
-                                                <div className="display-1 fw-bold text-success" style={{ textShadow: '0 0 30px #00ff41', letterSpacing: '12px', fontFamily: 'monospace' }}>
-                                                    VOULT_7
-                                                </div>
-                                                <div className="bg-black border border-success p-2 d-inline-block mt-3">
-                                                    <span className="text-success small tracking-widest">DECRYPTED_KEY: 88-12-P</span>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-                                <div className="mt-3 text-muted small tracking-widest animate-pulse">
-                                    {isFound ? ">> УЛИКА ПОДТВЕРЖДЕНА" : ">> ИДЕТ SPECTRAL_SCANNING..."}
+                            <div id="input-port" style={{ marginTop: '40px', padding: '40px', border: '3px dashed #4d94ff', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(77, 148, 255, 0.05)' }}>
+                                <div style={{ textAlign: 'center' }}>
+                                    <Zap size={32} color="#4d94ff" style={{ marginBottom: '10px' }} />
+                                    <div style={{ fontSize: '12px', color: '#4d94ff', fontWeight: 'bold' }}>INPUT_PORT</div>
                                 </div>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
+
+                    {/* ЭТАП 2: ФИЛЬТРАЦИЯ И ГЛИЧИ */}
+                    {stage === 2 && (
+                        <div style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ position: 'relative', width: '100%', maxWidth: '500px', height: '400px', border: '2px solid #222', padding: '10px' }}>
+                                <div style={{
+                                    width: '100%', height: '100%',
+                                    backgroundImage: 'url("https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?q=80&w=1000")',
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    transition: '0.3s filter',
+                                    filter: `saturate(${filters.red}%) hue-rotate(${filters.green}deg) brightness(${filters.blue / 100}) contrast(1.2)`
+                                }}></div>
+                                
+                                <AnimatePresence>
+                                    {isFound && (
+                                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', width: '100%', pointerEvents: 'none' }}>
+                                            <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#00ff41', textShadow: '0 0 30px #00ff41', letterSpacing: '12px', fontFamily: 'monospace' }}>
+                                                VOULT_7
+                                            </div>
+                                            <div style={{ background: '#000', border: '1px solid #00ff41', padding: '10px', display: 'inline-block', marginTop: '15px' }}>
+                                                <span style={{ color: '#00ff41', fontSize: '12px', letterSpacing: '2px' }}>DECRYPTED_KEY: 88-12-P</span>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                            <div style={{ marginTop: '15px', color: '#666', fontSize: '12px', letterSpacing: '2px' }}>
+                                {isFound ? ">> УЛИКА ПОДТВЕРЖДЕНА" : ">> ИДЕТ SPECTRAL_SCANNING..."}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* ПРАВАЯ ПАНЕЛЬ: ИНСТРУМЕНТЫ */}
-                <div className="col-lg-4">
-                    <div className="card h-100 bg-dark border-secondary border-opacity-25 p-4 shadow">
-                        <div className="d-flex align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
-                            <Settings className="text-success me-3" size={24} />
-                            <h4 className="text-success m-0 fw-bold">АНАЛИЗАТОР</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div style={{ background: '#111', border: '1px solid #222', padding: '20px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', paddingBottom: '15px', borderBottom: '1px solid #222' }}>
+                            <Settings size={20} color="#4d94ff" />
+                            <span style={{ color: '#4d94ff', fontWeight: 'bold', fontSize: '14px' }}>АНАЛИЗАТОР</span>
                         </div>
 
-                        {/* Статус-бар */}
-                        <div className="mb-4">
-                            <div className="d-flex justify-content-between mb-1 small">
-                                <span className="text-muted uppercase tracking-tighter">System Readiness</span>
-                                <span className="text-success fw-bold">{stage === 1 ? Math.round((capturedCount/3)*100) : 100}%</span>
+                        <div style={{ marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
+                                <span style={{ color: '#666' }}>System Readiness</span>
+                                <span style={{ color: '#4d94ff', fontWeight: 'bold' }}>{stage === 1 ? Math.round((capturedCount/3)*100) : 100}%</span>
                             </div>
-                            <div className="progress bg-black" style={{ height: '6px' }}>
-                                <div className="progress-bar bg-success progress-bar-striped progress-bar-animated" 
-                                     style={{ width: `${stage === 1 ? (capturedCount/3)*100 : 100}%` }}></div>
+                            <div style={{ height: '6px', background: '#222', borderRadius: '3px', overflow: 'hidden' }}>
+                                <div style={{ height: '100%', background: '#4d94ff', width: `${stage === 1 ? (capturedCount/3)*100 : 100}%`, transition: '0.3s' }}></div>
                             </div>
                         </div>
 
-                        {/* Блок управления спектром */}
                         {stage === 2 && (
-                            <div className="bg-black p-4 border border-secondary border-opacity-50 rounded shadow-inner mb-4">
-                                <h6 className="text-info mb-4 d-flex align-items-center small fw-bold">
-                                    <Eye size={14} className="me-2"/> RGB_SPECTRUM_OS:
-                                </h6>
+                            <div style={{ background: '#000', padding: '20px', border: '1px solid #222', marginBottom: '20px' }}>
+                                <div style={{ color: '#4d94ff', fontSize: '12px', fontWeight: 'bold', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Eye size={14} /> RGB_SPECTRUM_OS:
+                                </div>
                                 
                                 {["red", "green", "blue"].map(color => (
-                                    <div key={color} className="mb-4">
-                                        <div className="d-flex justify-content-between small mb-2">
-                                            <span className="text-uppercase text-muted" style={{fontSize: '10px'}}>{color} spectral channel</span>
-                                            <span className="text-success fw-bold">{filters[color]}%</span>
+                                    <div key={color} style={{ marginBottom: '20px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
+                                            <span style={{ color: '#666', textTransform: 'uppercase' }}>{color} channel</span>
+                                            <span style={{ color: '#4d94ff', fontWeight: 'bold' }}>{filters[color]}%</span>
                                         </div>
-                                        <div id={`s-${color}`} className="custom-slider"></div>
+                                        <div id={`s-${color}`} style={{ height: '8px', background: '#222', borderRadius: '4px' }}></div>
                                     </div>
                                 ))}
-                                
-                                <div className="mt-4 p-3 bg-dark border-start border-3 border-info rounded-end text-info small" style={{ fontSize: '11px', lineHeight: '1.4' }}>
-                                    <AlertTriangle size={14} className="mb-2"/><br/>
-                                    <b>LOGS_HINT:</b> Обнаружена аномалия в <b>Зеленом</b> спектре (уровень 160%). <b>Красный</b> канал перегружен мусором — уменьшите до минимума.
-                                </div>
                             </div>
                         )}
 
-                        <div className="mt-auto">
-                            {isFound && (
-                                <button className="btn btn-success btn-lg w-100 shadow-lg py-3 fw-bold mb-3 border-0" onClick={() => setStage(3)}>
-                                    <CheckCircle2 size={20} className="me-2"/> ИЗВЛЕЧЬ ДАННЫЕ
-                                </button>
-                            )}
-                            
-                            <button className="btn btn-outline-danger btn-sm w-100 opacity-50 hover-opacity-100" onClick={() => setStage(1)}>
-                                <RotateCcw size={14} className="me-2"/> ПЕРЕЗАПУСК СИСТЕМЫ
+                        {isFound && (
+                            <button className="btn-huge" style={{ width: '100%', marginBottom: '10px' }} onClick={() => setStage(3)}>
+                                <CheckCircle2 size={16} style={{ marginRight: '8px' }} /> ИЗВЛЕЧЬ ДАННЫЕ
                             </button>
-                        </div>
+                        )}
+                        
+                        <button className="btn-action" style={{ width: '100%', color: '#ff4d4d', borderColor: '#ff4d4d' }} onClick={() => setStage(1)}>
+                            <RotateCcw size={14} style={{ marginRight: '8px' }} /> ПЕРЕЗАПУСК
+                        </button>
                     </div>
                 </div>
             </div>
@@ -225,15 +225,22 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
             <AnimatePresence>
                 {stage === 3 && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.98)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-                        <div className="card bg-black border-success border-2 p-5 text-center shadow-lg" style={{ maxWidth: '600px' }}>
-                            <div className="mb-4 d-inline-block p-4 rounded-circle border border-success border-opacity-25 shadow-inner">
-                                <Lock size={80} color="#00ff41" />
+                        <div className="mission-win" style={{ maxWidth: '600px' }}>
+                            <div className="mission-win-icon">
+                                <Lock size={72} color="#00ff41" />
                             </div>
-                            <h2 className="text-success glitch-text mb-3 display-6 fw-bold">ДОСТУП К АРХИВУ ПОЛУЧЕН</h2>
-                            <p className="text-muted fs-6 mb-4 px-3" style={{ lineHeight: '1.6' }}>
-                                Анализ метаданных и спектра завершен. Мы нашли скрытую метку: <b>VOULT_7</b>. Это подтверждает координаты подземного бункера. Улика №7 добавлена на вашу доску.
+                            <h1 className="glitch-text mission-win-title" style={{ color: '#00ff41' }}>ДОСТУП К АРХИВУ ПОЛУЧЕН</h1>
+                            <p className="mission-win-subtitle">
+                                Мы нашли GPS-координаты: <b style={{ color: '#00ff41' }}>48.8584, 2.2945</b> — бункер под Эйфелевой башней.
                             </p>
-                            <button className="btn btn-success btn-lg w-100 py-3 fw-bold" onClick={() => onComplete(currentPoints + 5000)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+                            <div className="mission-clue">
+                                <div className="mission-clue-label" style={{ color: '#00ff41' }}>УЛИКА #7</div>
+                                <p className="mission-clue-text">
+                                    Анализ фото подтвердил координаты: <b>48.8584, 2.2945</b>. Это бункер под Эйфелевой башней. 
+                                    Группа захвата готовится к вылету.
+                                </p>
+                            </div>
+                            <button className="btn-huge" onClick={() => onComplete(currentPoints + 5000)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
                         </div>
                     </motion.div>
                 )}

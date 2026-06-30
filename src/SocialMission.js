@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ShieldAlert, AlertTriangle, MessageSquare, Info, ChevronRight, CheckCircle2, Search, Award, ShieldCheck } from 'lucide-react';
+import { User, ShieldAlert, AlertTriangle, MessageSquare, Info, ChevronRight, CheckCircle2, Search, Award, ShieldCheck, HelpCircle } from 'lucide-react';
 
 const SocialMission = ({ username, currentPoints, onComplete }) => {
     const [step, setStep] = useState(0); // 0: Intro, 1: Cases, 2: Victory
@@ -8,6 +8,7 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
     const [analyzedIds, setAnalyzedIds] = useState([]);
     const [feedback, setFeedback] = useState(null);
     const [totalXp, setTotalXp] = useState(0);
+    const [showHint, setShowHint] = useState(false);
 
     const CASES = [
         {
@@ -82,30 +83,58 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
     // 1. ПРИВЕТСТВИЕ
     if (step === 0) return (
         <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #0a1a0a 0%, #050505 100%)' }}>
-            <MessageSquare size={80} color="#00ff41" style={{ marginBottom: '20px' }} />
-            <h1 className="glitch-text" style={{ color: '#00ff41', fontSize: '32px' }}>ПСИХОЛОГИЧЕСКИЙ АНАЛИЗ</h1>
-            <div style={{ maxWidth: '700px', margin: '30px auto', fontSize: '18px', color: '#ccc', lineHeight: '1.8' }}>
-                <p>Агент, хакеры редко ломают систему «в лоб». Им проще обмануть человека.</p>
-                <p>Ваша задача — изучить архивы переписки сотрудников Neocorp и выявить <b>скрытые манипуляции</b>.</p>
-                <p style={{ color: '#f7b500' }}>Внимательно читайте каждое слово. Хакер может быть вежливым, официальным или агрессивным.</p>
+            <MessageSquare size={80} color="#00ff41" />
+            <h1 className="glitch-text" style={{ color: '#00ff41', marginTop: '20px' }}>ПСИХОЛОГИЧЕСКИЙ АНАЛИЗ</h1>
+            <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
+                <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
+                    <div style={{ color: '#f7b500', fontSize: '11px', letterSpacing: '2px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <AlertTriangle size={14} /> МИССИЯ 5
+                    </div>
+                    <p style={{ color: '#ccc', fontSize: '14px', lineHeight: '1.7', margin: 0 }}>
+                        Агент, хакеры редко ломают систему «в лоб». Им проще обмануть человека. 
+                        Из предыдущих миссий известно, что <b style={{ color: '#ff4d4d' }}>Shadow_Walker</b> работает 
+                        при поддержке <b style={{ color: '#ff4d4d' }}>внутреннего агента</b>. 
+                        Ваша задача — изучить архивы переписки сотрудников Neocorp и выявить <b style={{ color: '#ff4d4d' }}>скрытые манипуляции</b>.
+                    </p>
+                </div>
+                <p style={{ color: '#888', fontSize: '14px', lineHeight: '1.6' }}>
+                    Внимательно читайте каждое слово. Хакер может быть вежливым, официальным или агрессивным. 
+                    Используйте <b style={{ color: '#f7b500' }}>подсказки</b> для анализа тактик.
+                </p>
             </div>
-            <button className="btn-main" onClick={() => setStep(1)} style={{ padding: '20px 60px', fontSize: '20px' }}>НАЧАТЬ ЭКСПЕРТИЗУ</button>
+            <button className="btn-main" onClick={() => setStep(1)}>НАЧАТЬ ЭКСПЕРТИЗУ</button>
         </div>
     );
 
     // 2. ЭКРАН ПОБЕДЫ
     if (step === 2) return (
-        <div className="window animate-fade" style={{ textAlign: 'center', padding: '80px' }}>
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
-                <Award size={100} color="#00ff41" style={{ margin: '0 auto 30px' }} />
-            </motion.div>
-            <h1 className="glitch-text" style={{ color: '#00ff41', fontSize: '40px' }}>АТТЕСТАЦИЯ ПРОЙДЕНА</h1>
-            <div style={{ margin: '30px auto', padding: '30px', border: '1px solid #00ff41', background: 'rgba(0,255,65,0.05)', maxWidth: '600px' }}>
-                <div style={{ fontSize: '20px', marginBottom: '10px' }}>СТАТУС: <b>ЭКСПЕРТ ПО СОЦ. ИНЖЕНЕРИИ</b></div>
-                <p style={{ color: '#888' }}>Вы успешно раскрыли все три дела о манипуляциях. Ваши навыки анализа помогут предотвратить будущие утечки данных.</p>
-                <h2 style={{ color: '#00ff41', marginTop: '20px' }}>+ {totalXp} XP</h2>
+        <div className="window animate-fade mission-win">
+            <div className="mission-win-icon">
+                <Award size={72} color="#00ff41" />
             </div>
-            <button className="btn-huge ready" onClick={() => onComplete(currentPoints + totalXp)}>ЗАВЕРШИТЬ МИССИЮ</button>
+            <h1 className="glitch-text mission-win-title" style={{ color: '#00ff41' }}>АТТЕСТАЦИЯ ПРОЙДЕНА</h1>
+            <div className="mission-stats">
+                <div className="mission-stat">
+                    <div className="mission-stat-label">СТАТУС</div>
+                    <div className="mission-stat-value" style={{ color: '#00ff41', fontSize: '14px' }}>ЭКСПЕРТ</div>
+                </div>
+                <div className="mission-stat">
+                    <div className="mission-stat-label">ОЧКИ</div>
+                    <div className="mission-stat-value" style={{ color: '#f7b500' }}>+{totalXp}</div>
+                </div>
+                <div className="mission-stat">
+                    <div className="mission-stat-label">РЕЗУЛЬТАТ</div>
+                    <div className="mission-stat-value" style={{ color: '#00ff41', fontSize: '14px' }}>ПРОЙДЕНО</div>
+                </div>
+            </div>
+            <div className="mission-clue">
+                <div className="mission-clue-label" style={{ color: '#00ff41' }}>УЛИКА #5</div>
+                <p className="mission-clue-text">
+                    Иван из бухгалтерии признался: ему позвонили и представились вами. 
+                    Сказали, что у вас ЧП. Хакер работает <b style={{ color: '#ff4d4d' }}>внутри офиса</b>!
+                </p>
+            </div>
+            <button className="btn-huge" onClick={() => onComplete(currentPoints + totalXp)}>ЗАВЕРШИТЬ МИССИЮ</button>
         </div>
     );
 
@@ -160,7 +189,20 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
             {/* ПАНЕЛЬ АНАЛИЗА */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div className="window" style={{ flex: 1, padding: '30px', display: 'flex', flexDirection: 'column' }}>
-                    <div className="panel-header" style={{ marginBottom: '20px' }}><Info size={16} /> АНАЛИЗАТОР ПОВЕДЕНИЯ</div>
+                    <div className="panel-header" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Info size={16} /> АНАЛИЗАТОР ПОВЕДЕНИЯ</div>
+                        <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
+                            <HelpCircle size={14} /> ПОДСКАЗКА
+                        </button>
+                    </div>
+
+                    {showHint && (
+                        <div style={{ background: '#000', border: '1px solid #f7b500', padding: '14px', marginBottom: '16px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
+                            {CASES[currentCase].difficulty === 'НИЗКИЙ' && 'Ищите: страх, давление, просьбу о данных, угрозы. Настоящий сотрудник НЕ просит коды и пароли по чату.'}
+                            {CASES[currentCase].difficulty === 'СРЕДНИЙ' && 'Обращайте внимание на: необычные ссылки (.online, .ru), просьбы о скриншотах, просьбы хранить секрет. HR работает через корпоративный портал.'}
+                            {CASES[currentCase].difficulty === 'ВЫСОКИЙ' && 'Это профессиональная разведка. Ищите: запросы версий ПО, подключения сетевых дисков, ссылки на "высшее руководство", прямые просьбы о файлах конфигурации.'}
+                        </div>
+                    )}
                     
                     <div style={{ flex: 1 }}>
                         <AnimatePresence mode="wait">

@@ -9,6 +9,8 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
     const [feedback, setFeedback] = useState(null);
     const [showHint, setShowHint] = useState(false);
     const [xp, setXp] = useState(0);
+    const [showIntro, setShowIntro] = useState(true);
+    const [isFinished, setIsFinished] = useState(false);
 
     const SQL_DICTIONARY = {
         "SELECT": "Определяет, какие СТОЛБЦЫ данных мы хотим увидеть.",
@@ -52,11 +54,56 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
             setResult([{ access_token: "CS_OS{SQL_DETECTION_SUCCESS}" }]);
             setFeedback({ isCorrect: true, text: "ТОКЕН НАЙДЕН! Вы успешно взломали защиту и восстановили доступ." });
             setXp(2000);
+            setTimeout(() => setIsFinished(true), 2500);
         } 
         else {
             setFeedback({ isCorrect: false, text: "Ошибка в логике запроса. Проверьте последовательность слов или загляните в справочник." });
         }
     };
+
+    if (showIntro) return (
+        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #0a0a1a 0%, #050505 100%)' }}>
+            <Database size={80} color="#4d94ff" />
+            <h1 className="glitch-text" style={{ color: '#4d94ff', marginTop: '20px' }}>ВЗЛОМ БАЗЫ ДАННЫХ</h1>
+            <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
+                <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
+                    <div style={{ color: '#f7b500', fontSize: '11px', letterSpacing: '2px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <AlertCircle size={14} /> МИССИЯ 4
+                    </div>
+                    <p style={{ color: '#ccc', fontSize: '14px', lineHeight: '1.7', margin: 0 }}>
+                        Мы обнаружили зашифрованную базу данных Neocorp. Внутри — проект <b style={{ color: '#ff4d4d' }}>"Мёртвая петля"</b> — 
+                        система массового распознавания лиц. Нужно извлечь секретный токен доступа.
+                    </p>
+                </div>
+                <p style={{ color: '#888', fontSize: '14px', lineHeight: '1.6' }}>
+                    Используйте SQL-запросы для извлечения данных. Собирайте запрос из фрагментов.
+                </p>
+            </div>
+            <button className="btn-main" onClick={() => setShowIntro(false)}>НАЧАТЬ ВЗЛОМ</button>
+        </div>
+    );
+
+    if (isFinished) return (
+        <div className="window animate-fade mission-win">
+            <div className="mission-win-icon">
+                <Check size={72} color="#4d94ff" />
+            </div>
+            <h1 className="glitch-text mission-win-title" style={{ color: '#4d94ff' }}>ДАННЫЕ ИЗВЛЕЧЕНЫ</h1>
+            <p className="mission-win-subtitle">
+                Токен доступа <b style={{ color: '#4d94ff' }}>CS_OS&#123;SQL_DETECTION_SUCCESS&#125;</b> получен. 
+                Проект «Мёртвая петля» раскрыт.
+            </p>
+            <div className="mission-clue">
+                <div className="mission-clue-label" style={{ color: '#4d94ff' }}>УЛИКА #4</div>
+                <p className="mission-clue-text">
+                    В базе данных обнаружен токен доступа к системе распознавания лиц. 
+                    Подозрительные транзакции указывают на <b style={{ color: '#ff4d4d' }}>финансирование проекта из-за рубежа</b> — 
+                    суммы переводов совпадают со счетами в Париже.
+                </p>
+            </div>
+            <button className="btn-huge" onClick={() => onComplete(currentPoints + 2000)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+        </div>
+    );
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: '20px', padding: '10px' }}>
@@ -142,12 +189,6 @@ const DatabaseMission = ({ username, currentPoints, onComplete }) => {
                             )}
                         </AnimatePresence>
                     </div>
-
-                    {xp > 0 && (
-                        <div style={{ padding: '20px' }}>
-                            <button className="btn-huge ready" onClick={() => onComplete(currentPoints + xp)}>ЗАВЕРШИТЬ РАССЛЕДОВАНИЕ</button>
-                        </div>
-                    )}
                 </div>
             </div>
 

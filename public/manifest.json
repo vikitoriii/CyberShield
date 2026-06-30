@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "CYBER-SHIELD",
+  "name": "CYBER-SHIELD — Операционная система кибербезопасности",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#050505",
+  "background_color": "#050505",
+  "description": "Обучающая платформа по кибербезопасности. Миссии, дуэли, Академия."
 }

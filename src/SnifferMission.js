@@ -1,211 +1,328 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-    Network, Filter, Search, ShieldAlert, CheckCircle2, 
-    Lock, Unlock, Eye, Database, Terminal, HelpCircle, 
-    Zap, Activity, ChevronRight, RotateCcw 
+    Lock, CheckCircle2, HelpCircle, AlertTriangle, 
+    Terminal, RotateCcw, Shield
 } from 'lucide-react';
 
 const SnifferMission = ({ username, currentPoints, onComplete }) => {
-    const [stage, setStage] = useState(0); // 0: Intro, 1: Capture, 2: Analyze, 3: Win
-    const [capturedPackets, setCapturedPackets] = useState([]);
-    const [protocolFilter, setProtocolFilter] = useState('ALL');
+    const [stage, setStage] = useState(0);
+    const [code, setCode] = useState([]);
+    const [attempts, setAttempts] = useState([]);
+    const [currentGuess, setCurrentGuess] = useState([]);
     const [showHint, setShowHint] = useState(false);
-    const [isSolved, setIsSolved] = useState(false);
-    const [liveStream, setLiveStream] = useState([]);
+    const [attemptsLeft, setAttemptsLeft] = useState(10);
+    const [gameWon, setGameWon] = useState(false);
 
-    // База данных трафика для анализа
-    const DUMP_DATA = [
-        { id: 101, proto: "TCP", src: "192.168.1.5", info: "SYN_ACK", data: "System handshake. Standard traffic." },
-        { id: 102, proto: "DNS", src: "8.8.8.8", info: "QUERY: google.com", data: "External domain resolution." },
-        { id: 103, proto: "HTTP", src: "172.16.0.12", info: "GET /index.html", data: "User browsing internal portal." },
-        { id: 104, proto: "UDP", src: "10.0.0.1", info: "TIME_SYNC", data: "Network time protocol update." },
-        { id: 105, proto: "HTTP", src: "172.16.0.45", info: "POST /admin_login", data: "CREDENTIALS_FOUND: user:admin | PASS: LOOP_BREAKER_2024" }, // ЦЕЛЬ
-        { id: 106, proto: "TCP", src: "192.168.1.10", info: "PUSH_DATA", data: "Encrypted file segment transmission." },
-        { id: 107, proto: "HTTP", src: "172.16.0.12", info: "GET /favicon.ico", data: "Image request." }
-    ];
+    const CODE_LENGTH = 4;
+    const MAX_ATTEMPTS = 10;
 
-    // Этап 1: Имитация живого потока пакетов
     useEffect(() => {
         if (stage === 1) {
-            const interval = setInterval(() => {
-                const randomPacket = {
-                    id: Math.random(),
-                    port: [80, 443, 22, 53][Math.floor(Math.random()*4)],
-                    ip: `172.16.0.${Math.floor(Math.random()*254)}`,
-                    isTarget: Math.random() > 0.8
-                };
-                setLiveStream(prev => [randomPacket, ...prev].slice(0, 8));
-            }, 1000);
-            return () => clearInterval(interval);
+            const newCode = Array.from({ length: CODE_LENGTH }, () => Math.floor(Math.random() * 10));
+            setCode(newCode);
+            setAttempts([]);
+            setCurrentGuess([]);
+            setAttemptsLeft(MAX_ATTEMPTS);
+            setGameWon(false);
         }
     }, [stage]);
 
-    // Этап 2: Инициализация JQuery UI Accordion (Requirement 9)
-    useEffect(() => {
-        const $ = window.$;
-        if (!$ || stage !== 2) return;
-
-        $("#packet-details").accordion({
-            header: ".accordion-trigger",
-            collapsible: true,
-            active: false,
-            heightStyle: "content"
-        });
-
-        return () => {
-            if ($("#packet-details").hasClass("ui-accordion")) {
-                $("#packet-details").accordion("destroy");
-            }
-        };
-    }, [stage, protocolFilter]);
-
-    const handleCapture = () => {
-        setCapturedPackets(DUMP_DATA);
-        setStage(2);
-    };
-
-    const handleExtract = (content) => {
-        if (content.includes("LOOP_BREAKER_2024")) {
-            setIsSolved(true);
-        } else {
-            alert("В этом пакете нет пароля. Ищите HTTP POST запрос.");
+    const handleDigit = (digit) => {
+        if (currentGuess.length < CODE_LENGTH && !gameWon) {
+            setCurrentGuess([...currentGuess, digit]);
         }
     };
 
+    const handleClear = () => {
+        setCurrentGuess([]);
+    };
+
+    const handleSubmit = () => {
+        if (currentGuess.length !== CODE_LENGTH) return;
+
+        const feedback = currentGuess.map((digit, i) => {
+            if (digit === code[i]) return 'correct';
+            if (code.includes(digit)) return 'present';
+            return 'absent';
+        });
+
+        const newAttempt = { guess: [...currentGuess], feedback };
+        const newAttempts = [...attempts, newAttempt];
+        setAttempts(newAttempts);
+        setCurrentGuess([]);
+        setAttemptsLeft(prev => prev - 1);
+
+        if (feedback.every(f => f === 'correct')) {
+            setGameWon(true);
+            setTimeout(() => setStage(2), 1500);
+        } else if (newAttempts.length >= MAX_ATTEMPTS) {
+            setTimeout(() => setStage(3), 1000);
+        }
+    };
+
+    const getFeedbackColor = (f) => {
+        switch(f) {
+            case 'correct': return '#00ff41';
+            case 'present': return '#f7b500';
+            default: return '#333';
+        }
+    };
+
+    // ЭКРАН 0: ВСТУПЛЕНИЕ
     if (stage === 0) return (
-        <div className="window animate-fade text-center p-5" style={{ background: 'radial-gradient(circle, #0a111a 0%, #050505 100%)' }}>
-            <Network size={80} color="#4d94ff" className="mb-4" />
-            <h1 className="glitch-text text-info">МИССИЯ #08: ПЕРЕХВАТ ПАКЕТОВ</h1>
-            <div className="container mt-4">
-                <div className="row justify-content-center">
-                    <div className="col-md-8 bg-dark p-4 border border-info rounded shadow-lg">
-                        <p className="text-light fs-5">Макс пытался передать пароль от зашифрованного архива через открытый HTTP-канал. Хакеры Neocorp перехватили его.</p>
-                        <p className="text-muted">Нам нужно подключиться к их сетевому узлу, перехватить дамп трафика и найти ту самую строку с паролем.</p>
-                        <button className="btn btn-outline-info btn-lg mt-3 px-5" onClick={() => setStage(1)}>ПОДКЛЮЧИТЬ СНИФФЕР</button>
+        <div className="window animate-fade" style={{ textAlign: 'center', padding: '60px', background: 'radial-gradient(circle, #1a0a0a 0%, #050505 100%)' }}>
+            <Lock size={80} color="#ff4d4d" />
+            <h1 className="glitch-text" style={{ color: '#ff4d4d', marginTop: '20px' }}>ВЗЛОМ СЕЙФА</h1>
+            <div style={{ maxWidth: '700px', margin: '30px auto', textAlign: 'left' }}>
+                <div style={{ background: '#000', border: '1px solid #222', padding: '20px', marginBottom: '20px' }}>
+                    <div style={{ color: '#f7b500', fontSize: '11px', letterSpacing: '2px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <AlertTriangle size={14} /> МИССИЯ 8
+                    </div>
+                    <p style={{ color: '#ccc', fontSize: '14px', lineHeight: '1.7', margin: 0 }}>
+                        По координатам из миссии 7 мы нашли серверную комнату Neocorp в <b style={{ color: '#00ff41' }}>Париже</b>. 
+                        Внутри — зашифрованный архив <b style={{ color: '#4d94ff' }}>"Чёрное зеркало"</b> Макса. 
+                        Но он защищён <b style={{ color: '#ff4d4d' }}>4-значным кодом</b>.
+                    </p>
+                </div>
+                <p style={{ color: '#888', fontSize: '14px', lineHeight: '1.6' }}>
+                    <b>Задача:</b> Взломать сейф и получить пароль <b style={{ color: '#00ff41' }}>LOOP_BREAKER_2024</b> — ключ к архиву Макса.
+                </p>
+                <p style={{ color: '#666', fontSize: '12px', marginTop: '15px' }}>
+                    После каждой попытки вы получите подсказку:
+                    <br/>
+                    <span style={{ color: '#00ff41' }}>●</span> Зелёная — цифра на своём месте<br/>
+                    <span style={{ color: '#f7b500' }}>●</span> Жёлтая — цифра есть, но не там<br/>
+                    <span style={{ color: '#333' }}>●</span> Серая — такой цифры нет
+                </p>
+            </div>
+            <button className="btn-main" onClick={() => setStage(1)}>НАЧАТЬ ВЗЛОМ</button>
+        </div>
+    );
+
+    // ЭКРАН 1: ИГРА
+    if (stage === 1) return (
+        <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span><Terminal size={14} /> ВЗЛОМ СЕЙФА — ПОПЫТКА {attempts.length + 1}/{MAX_ATTEMPTS}</span>
+                <span style={{ color: attemptsLeft <= 3 ? '#ff4d4d' : '#00ff41' }}>ОСТАЛОСЬ: {attemptsLeft}</span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '20px', flex: 1, minHeight: 0 }}>
+                {/* Левая: история попыток */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    {/* Поле ввода */}
+                    <div style={{ background: '#000', padding: '30px', border: '1px solid #222', textAlign: 'center' }}>
+                        <div style={{ fontSize: '10px', color: '#444', marginBottom: '15px', letterSpacing: '2px' }}>ВВЕДИТЕ КОД</div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '15px', marginBottom: '20px' }}>
+                            {Array.from({ length: CODE_LENGTH }).map((_, i) => (
+                                <motion.div 
+                                    key={i} 
+                                    initial={currentGuess[i] !== undefined ? { scale: 0.5 } : {}}
+                                    animate={currentGuess[i] !== undefined ? { scale: 1 } : {}}
+                                    style={{ 
+                                        width: '60px', height: '70px', 
+                                        background: '#111', border: '2px solid #333',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: '28px', fontWeight: 'bold', color: '#fff'
+                                    }}
+                                >
+                                    {currentGuess[i] !== undefined ? currentGuess[i] : ''}
+                                </motion.div>
+                            ))}
+                        </div>
+                        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                            <button className="btn-action" onClick={handleClear} style={{ color: '#ff4d4d', borderColor: '#ff4d4d' }}>
+                                <RotateCcw size={14} /> СТЕРЕТЬ
+                            </button>
+                            <button 
+                                className="btn-main" 
+                                onClick={handleSubmit} 
+                                disabled={currentGuess.length !== CODE_LENGTH}
+                                style={{ flex: 1, maxWidth: '200px', background: currentGuess.length === CODE_LENGTH ? '#00ff41' : '#333' }}
+                            >
+                                ПРОВЕРИТЬ
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* История попыток */}
+                    <div style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', padding: '15px', overflowY: 'auto' }}>
+                        <div style={{ fontSize: '10px', color: '#444', marginBottom: '15px', letterSpacing: '1px' }}>ИСТОРИЯ ПОПЫТОК</div>
+                        {attempts.length === 0 ? (
+                            <div style={{ textAlign: 'center', color: '#333', padding: '40px' }}>
+                                <Lock size={40} style={{ marginBottom: '10px', opacity: 0.3 }} />
+                                <div>Пока нет попыток</div>
+                            </div>
+                        ) : (
+                            attempts.map((attempt, idx) => (
+                                <motion.div 
+                                    key={idx} 
+                                    initial={{ opacity: 0, x: -20 }} 
+                                    animate={{ opacity: 1, x: 0 }}
+                                    style={{ 
+                                        display: 'flex', alignItems: 'center', gap: '15px', 
+                                        padding: '12px', marginBottom: '8px',
+                                        background: '#111', borderLeft: '3px solid #333'
+                                    }}
+                                >
+                                    <span style={{ color: '#444', fontSize: '10px', minWidth: '20px' }}>#{idx + 1}</span>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        {attempt.guess.map((d, i) => (
+                                            <div key={i} style={{ 
+                                                width: '35px', height: '40px', 
+                                                background: getFeedbackColor(attempt.feedback[i]) + '22',
+                                                border: `2px solid ${getFeedbackColor(attempt.feedback[i])}`,
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                fontSize: '16px', fontWeight: 'bold', color: getFeedbackColor(attempt.feedback[i])
+                                            }}>
+                                                {d}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '4px', marginLeft: 'auto' }}>
+                                        {attempt.feedback.map((f, i) => (
+                                            <div key={i} style={{ 
+                                                width: '10px', height: '10px', borderRadius: '50%',
+                                                background: getFeedbackColor(f)
+                                            }} />
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            ))
+                        )}
+                    </div>
+                </div>
+
+                {/* Правая: клавиатура + подсказка */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    {/* Клавиатура */}
+                    <div style={{ background: '#111', padding: '20px', border: '1px solid #222' }}>
+                        <div style={{ fontSize: '10px', color: '#444', marginBottom: '15px', letterSpacing: '1px' }}>КЛАВИАТУРА</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px' }}>
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(digit => (
+                                <motion.button 
+                                    key={digit}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => handleDigit(digit)}
+                                    style={{ 
+                                        height: '50px', background: '#222', border: '1px solid #333',
+                                        color: '#fff', fontSize: '18px', fontWeight: 'bold', cursor: 'pointer'
+                                    }}
+                                >
+                                    {digit}
+                                </motion.button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Статус */}
+                    <div style={{ background: '#0a0a0a', padding: '20px', border: '1px solid #222' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', textAlign: 'center' }}>
+                            <div>
+                                <div style={{ color: '#444', fontSize: '10px' }}>ПОПЫТОК</div>
+                                <div style={{ color: '#f7b500', fontSize: '24px', fontWeight: 'bold' }}>{attempts.length}</div>
+                            </div>
+                            <div>
+                                <div style={{ color: '#444', fontSize: '10px' }}>ОСТАЛОСЬ</div>
+                                <div style={{ color: attemptsLeft <= 3 ? '#ff4d4d' : '#00ff41', fontSize: '24px', fontWeight: 'bold' }}>{attemptsLeft}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Подсказка */}
+                    <div style={{ background: '#0a0a0a', padding: '15px', border: '1px solid #222' }}>
+                        <button onClick={() => setShowHint(!showHint)} className="lockdown-btn" style={{ marginBottom: showHint ? '10px' : 0 }}>
+                            <HelpCircle size={14} style={{ marginRight: '8px' }} />ПОДСКАЗКА
+                        </button>
+                        {showHint && (
+                            <div style={{ background: '#000', border: '1px solid #f7b500', padding: '12px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
+                                <b>Совет:</b> Используйте метод исключения. Если цифра серая — она не в коде вообще. 
+                                Если жёлтая — она есть, но попробуйте другой слот. Зелёная — оставьте на месте!
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Легенда */}
+                    <div style={{ background: '#0a0a0a', padding: '15px', border: '1px solid #222', fontSize: '11px' }}>
+                        <div style={{ color: '#444', marginBottom: '10px', letterSpacing: '1px' }}>ЛЕГЕНДА:</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#00ff41' }} />
+                            <span style={{ color: '#888' }}>На своём месте</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#f7b500' }} />
+                            <span style={{ color: '#888' }}>Есть, но не там</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#333' }} />
+                            <span style={{ color: '#888' }}>Нет в коде</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     );
 
+    // ЭКРАН 2: ПОБЕДА
+    if (stage === 2) return (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="window animate-fade mission-win">
+            <div className="mission-win-icon">
+                <CheckCircle2 size={72} color="#00ff41" />
+            </div>
+            <h1 className="glitch-text mission-win-title" style={{ color: '#00ff41' }}>СЕЙФ ВЗЛОМАН</h1>
+            
+            <div className="mission-stats">
+                <div className="mission-stat">
+                    <div className="mission-stat-label">КОД</div>
+                    <div className="mission-stat-value" style={{ color: '#00ff41', fontFamily: 'monospace' }}>{code.join('-')}</div>
+                </div>
+                <div className="mission-stat">
+                    <div className="mission-stat-label">ПОПЫТОК</div>
+                    <div className="mission-stat-value" style={{ color: '#f7b500' }}>{attempts.length}</div>
+                </div>
+                <div className="mission-stat">
+                    <div className="mission-stat-label">ОЧКИ</div>
+                    <div className="mission-stat-value" style={{ color: '#00ff41' }}>{(MAX_ATTEMPTS - attempts.length + 1) * 500}</div>
+                </div>
+            </div>
+
+            <div className="mission-clue">
+                <div className="mission-clue-label" style={{ color: '#00ff41' }}>УЛИКА #8: КЛЮЧ ОТ АРХИВА</div>
+                <div style={{ fontSize: '18px', color: '#fff', fontWeight: 'bold', letterSpacing: '3px', fontFamily: 'monospace', margin: '12px 0' }}>
+                    LOOP_BREAKER_2024
+                </div>
+                <p className="mission-clue-text">
+                    Хакеры использовали слабый 4-значный код. Избегайте простых паролей!
+                </p>
+            </div>
+
+            <button className="btn-huge" onClick={() => onComplete(currentPoints + (MAX_ATTEMPTS - attempts.length + 1) * 500 + 5000)}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+        </motion.div>
+    );
+
+    // ЭКРАН 3: ПОРАЖЕНИЕ
     return (
-        <div className="container-fluid p-3 text-light" style={{ height: '90vh' }}>
-            {/* ШАПКА ЭТАПОВ */}
-            <div className="row mb-3">
-                <div className="col-12 d-flex justify-content-center gap-4 border-bottom border-secondary pb-3">
-                    <span style={{ color: stage >= 1 ? '#4d94ff' : '#333' }}>[01] ПЕРЕХВАТ ЭФИРА</span>
-                    <ChevronRight size={16} className="text-secondary" />
-                    <span style={{ color: stage >= 2 ? '#4d94ff' : '#333' }}>[02] АНАЛИЗ ДАМПА</span>
-                </div>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="window animate-fade mission-win" style={{ borderColor: '#ff4d4d' }}>
+            <div className="mission-win-icon">
+                <AlertTriangle size={72} color="#ff4d4d" />
+            </div>
+            <h1 className="glitch-text mission-win-title" style={{ color: '#ff4d4d' }}>ПОПЫТКИ ИСЧЕРПАНЫ</h1>
+            
+            <p className="mission-win-subtitle">
+                Сейф остался закрыт. Правильный код был: <b style={{ color: '#ff4d4d', fontFamily: 'monospace' }}>{code.join('-')}</b>
+            </p>
+
+            <div className="mission-clue" style={{ borderColor: '#ff4d4d' }}>
+                <div className="mission-clue-label" style={{ color: '#ff4d4d' }}>ЧТО МЫ УЗНАЛИ</div>
+                <p className="mission-clue-text">
+                    Короткие коды из 4 цифр легко подобрать за несколько минут. 
+                    Используйте длинные пароли с буквами, цифрами и символами!
+                </p>
             </div>
 
-            <div className="row h-100 g-4">
-                {/* ЛЕВАЯ ПАНЕЛЬ (Инструменты) */}
-                <div className="col-lg-4">
-                    <div className="card h-100 bg-dark border-secondary p-4 position-relative">
-                        <h5 className="text-info mb-4 d-flex align-items-center gap-2">
-                            <Activity size={18} /> ПАНЕЛЬ УПРАВЛЕНИЯ
-                        </h5>
-
-                        {stage === 2 && (
-                            <div className="animate-fade">
-                                <label className="text-muted small mb-2">ФИЛЬТР ПРОТОКОЛА (Bootstrap):</label>
-                                <div className="btn-group w-100 mb-4 shadow-sm">
-                                    {['ALL', 'HTTP', 'TCP', 'DNS'].map(p => (
-                                        <button key={p} className={`btn btn-sm ${protocolFilter === p ? 'btn-info' : 'btn-outline-secondary'}`} onClick={() => setProtocolFilter(p)}>{p}</button>
-                                    ))}
-                                </div>
-                                <div className="p-3 bg-black border border-secondary rounded">
-                                    <p className="small text-muted m-0">Обнаружено пакетов: <b>{capturedPackets.length}</b></p>
-                                    <p className="small text-muted m-0">После фильтрации: <b>{capturedPackets.filter(p => protocolFilter === 'ALL' || p.proto === protocolFilter).length}</b></p>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* КНОПКА ПОДСКАЗКИ */}
-                        <div className="mt-auto">
-                            <button className="btn btn-outline-warning btn-sm w-100 mb-3" onClick={() => setShowHint(!showHint)}>
-                                <HelpCircle size={14} className="me-2" /> ПОМОЩЬ ДЕТЕКТИВА
-                            </button>
-                            <AnimatePresence>
-                                {showHint && (
-                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="alert alert-warning p-2 small" style={{ fontSize: '11px' }}>
-                                        <b>ИНСТРУКЦИЯ:</b> Хакеры часто используют незашифрованный <b>HTTP</b> для быстрой передачи. Ищите метод <b>POST</b> (отправка данных) от IP <b>172.16.0.45</b>.
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                </div>
-
-                {/* ПРАВАЯ ПАНЕЛЬ (Игровое поле) */}
-                <div className="col-lg-8">
-                    <div className="card h-100 bg-black border-info border-opacity-25 overflow-hidden shadow-lg">
-                        
-                        {/* ЭТАП 1: ЖИВОЙ ПЕРЕХВАТ */}
-                        {stage === 1 && (
-                            <div className="card-body d-flex flex-column align-items-center justify-content-center p-5">
-                                <div className="w-100 bg-dark p-3 border border-info mb-4" style={{ fontFamily: 'monospace', height: '300px', overflowY: 'hidden' }}>
-                                    {liveStream.map((p, i) => (
-                                        <div key={i} className="text-info small opacity-75">
-                                            {`[${new Date().toLocaleTimeString()}] INBOUND: IP_${p.ip} PORT_${p.port} ... OK`}
-                                        </div>
-                                    ))}
-                                    <div className="blink mt-2" style={{ color: '#4d94ff' }}>{'>'} SEARCHING_FOR_DATA_DUMP...</div>
-                                </div>
-                                <button className="btn btn-info btn-lg px-5 shadow" onClick={handleCapture}>ЗАХВАТИТЬ ПАКЕТЫ (DUMP)</button>
-                            </div>
-                        )}
-
-                        {/* ЭТАП 2: АНАЛИЗ (JQuery UI Accordion) */}
-                        {stage === 2 && (
-                            <div className="card-body p-0 d-flex flex-column">
-                                <div className="bg-dark p-3 border-bottom border-secondary text-info fw-bold">RAW_PACKET_STORAGE</div>
-                                <div id="packet-details" style={{ flex: 1, overflowY: 'auto' }}>
-                                    {capturedPackets.filter(p => protocolFilter === 'ALL' || p.proto === protocolFilter).map(p => (
-                                        <div key={p.id}>
-                                            <div className="accordion-trigger p-3 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center" style={{ cursor: 'pointer', background: '#0a0a0a' }}>
-                                                <div className="d-flex gap-3">
-                                                    <span className={`badge ${p.proto === 'HTTP' ? 'bg-danger' : 'bg-secondary'}`}>{p.proto}</span>
-                                                    <span className="small text-muted">{p.src}</span>
-                                                </div>
-                                                <span className="text-info small">{p.info}</span>
-                                            </div>
-                                            <div className="p-4 bg-black border-bottom border-secondary">
-                                                <div className="text-muted small mb-2 font-monospace">PAYLOAD_CONTENT:</div>
-                                                <div className="p-3 bg-dark border border-secondary text-info rounded" style={{ fontFamily: 'monospace', fontSize: '13px' }}>
-                                                    {p.data}
-                                                </div>
-                                                {p.proto === 'HTTP' && p.info.includes('POST') && (
-                                                    <button className="btn btn-sm btn-outline-info mt-3" onClick={() => handleExtract(p.data)}>ИЗВЛЕЧЬ ПАРОЛЬ</button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* ЭКРАН ПОБЕДЫ */}
-            <AnimatePresence>
-                {isSolved && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.98)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <div className="card bg-black border-info border-2 p-5 text-center shadow-lg" style={{ maxWidth: '600px' }}>
-                            <Unlock size={80} color="#4d94ff" className="mx-auto mb-4" />
-                            <h2 className="text-info glitch-text mb-3 display-6">ПАРОЛЬ ПОЛУЧЕН</h2>
-                            <p className="text-light fs-5 mb-4">
-                                Вы нашли скрытый ключ: <b>LOOP_BREAKER_2024</b>. Теперь мы можем открыть архив Макса и узнать, что он нашел в ядре Neocorp.
-                            </p>
-                            <button className="btn btn-info btn-lg w-100 py-3 fw-bold" onClick={() => onComplete(currentPoints + 5000)}>ЗАВЕРШИТЬ РАССЛЕДОВАНИЕ</button>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+            <button className="btn-huge" onClick={() => onComplete(currentPoints + 1000)} style={{ background: '#ff4d4d' }}>ВЕРНУТЬСЯ В ТЕРМИНАЛ</button>
+        </motion.div>
     );
 };
 
