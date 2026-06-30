@@ -5165,13 +5165,23 @@ nav button:hover .nav-shortcut {
   .top-bar { height: 50px; padding: 0 15px; font-size: 12px; }
   .view-area { padding: 15px; }
   .missions-grid { grid-template-columns: 1fr; }
-  .login-box { width: 90%; max-width: 420px; }
-  .login-container { padding: 20px; }
+  .login-box { width: 95%; max-width: 100%; max-height: 95vh; overflow-y: auto; }
+  .login-container { padding: 10px; }
+  .login-form-grid-2 { grid-template-columns: 1fr; gap: 0; }
+  .login-logo-section { flex-direction: column; text-align: center; padding: 20px; }
+  .login-title { text-align: center; font-size: 24px; }
+  .login-subtitle { text-align: center; }
+  .login-version { text-align: center; }
+  .login-tabs { margin: 0 20px 14px; }
+  .login-input-section { padding: 0 20px; margin-bottom: 10px; }
+  .login-btn { margin: 0 20px 12px; width: calc(100% - 40px); }
+  .login-divider { padding: 0 20px; margin-bottom: 12px; }
+  .login-footer { padding: 12px; gap: 16px; }
   .login-corner { width: 30px; height: 30px; }
-  .login-corner-tl { top: 15px; left: 15px; }
-  .login-corner-tr { top: 15px; right: 15px; }
-  .login-corner-bl { bottom: 15px; left: 15px; }
-  .login-corner-br { bottom: 15px; right: 15px; }
+  .login-corner-tl { top: 10px; left: 10px; }
+  .login-corner-tr { top: 10px; right: 10px; }
+  .login-corner-bl { bottom: 10px; left: 10px; }
+  .login-corner-br { bottom: 10px; right: 10px; }
   .duel-select, .duel-ready-screen, .duel-countdown, .duel-result { min-width: auto; width: 100%; padding: 20px; }
   .duel-ready-players { flex-direction: column; gap: 15px; }
   .duel-scores { flex-direction: column; gap: 15px; }
@@ -5192,10 +5202,17 @@ nav button:hover .nav-shortcut {
   .sidebar .brand { font-size: 14px; }
   nav button { padding: 6px 8px; font-size: 9px; }
   .top-bar { font-size: 10px; }
-  .login-title { font-size: 22px; letter-spacing: 3px; }
-  .login-subtitle { font-size: 9px; }
-  .login-input { font-size: 14px; }
-  .login-btn { font-size: 12px; padding: 14px; }
+  .login-box { width: 100%; max-height: 100vh; border: none; border-radius: 0; }
+  .login-title { font-size: 20px; letter-spacing: 2px; }
+  .login-subtitle { font-size: 8px; }
+  .login-input { font-size: 14px; padding: 10px 0; }
+  .login-btn { font-size: 11px; padding: 12px; }
+  .login-tabs { margin: 0 16px 12px; }
+  .login-input-section { padding: 0 16px; margin-bottom: 8px; }
+  .login-input-label { font-size: 8px; }
+  .login-btn { margin: 0 16px 10px; width: calc(100% - 32px); }
+  .login-divider { padding: 0 16px; margin-bottom: 10px; }
+  .login-footer { padding: 10px; gap: 12px; font-size: 8px; }
   .btn-main { padding: 12px; font-size: 12px; }
   .mission-card { padding: 16px; min-height: 160px; }
   .mission-card h3 { font-size: 12px; }
