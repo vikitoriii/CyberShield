@@ -212,23 +212,36 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
                                     </div>
                                 ))}
 
-                                {/* Image preview with CSS filters */}
+                                {/* Image preview - color changes with sliders */}
                                 <div style={{ 
                                     width: '100%', height: '100px', 
-                                    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-                                    border: '1px solid #333', marginTop: '10px',
+                                    background: `rgb(${Math.round(filters.red * 1.2)}, ${Math.round(filters.green * 0.8)}, ${Math.round(filters.blue * 0.6)})`,
+                                    border: `2px solid ${isFound ? '#00ff41' : '#333'}`, marginTop: '10px',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    filter: `saturate(${filters.red / 100}) hue-rotate(${filters.green * 1.8}deg) brightness(${filters.blue / 100})`,
-                                    transition: 'filter 0.3s',
+                                    transition: 'all 0.3s',
                                     position: 'relative', overflow: 'hidden'
                                 }}>
-                                    <div style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0.3,
-                                        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(77,148,255,0.1) 2px, rgba(77,148,255,0.1) 4px)'
+                                    <div style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0.2,
+                                        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.05) 2px, rgba(255,255,255,0.05) 4px)'
                                     }} />
-                                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#4d94ff', zIndex: 1, fontFamily: 'monospace' }}>
-                                        ENCRYPTED_DATA
-                                    </div>
+                                    {isFound ? (
+                                        <div style={{ zIndex: 1, textAlign: 'center' }}>
+                                            <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#00ff41', fontFamily: 'monospace', textShadow: '0 0 10px rgba(0,255,65,0.5)' }}>
+                                                48.8584, 2.2945
+                                            </div>
+                                            <div style={{ fontSize: '9px', color: '#00ff41', marginTop: '4px', letterSpacing: '1px' }}>СЕКТОР 7 — БУНКЕР</div>
+                                        </div>
+                                    ) : (
+                                        <div style={{ fontSize: '16px', fontWeight: 'bold', color: 'rgba(255,255,255,0.3)', zIndex: 1, fontFamily: 'monospace' }}>
+                                            ENCRYPTED_DATA
+                                        </div>
+                                    )}
                                 </div>
+                                {isFound && (
+                                    <div style={{ marginTop: '8px', padding: '6px 10px', background: 'rgba(0,255,65,0.08)', border: '1px solid rgba(0,255,65,0.3)', fontSize: '10px', color: '#00ff41', textAlign: 'center' }}>
+                                        СКРЫТЫЙ СЛОЙ ОБНАРУЖЕН — ДАННЫЕ ВОССТАНОВЛЕНЫ
+                                    </div>
+                                )}
                             </div>
                         )}
 

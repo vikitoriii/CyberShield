@@ -7,8 +7,18 @@ import {
 
 const CaseFiles = ({ unlockedClues = [] }) => {
     const [selectedDoc, setSelectedDoc] = useState(null);
-    const isMobile = window.innerWidth <= 768;
-    const [viewMode, setViewMode] = useState(isMobile ? 'list' : 'board');
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [viewMode, setViewMode] = useState(window.innerWidth <= 768 ? 'list' : 'board');
+
+    React.useEffect(() => {
+        const handleResize = () => {
+            const mobile = window.innerWidth <= 768;
+            setIsMobile(mobile);
+            if (mobile) setViewMode('list');
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const DOCUMENTS = {
         1: { title: "ПРОФИЛЬ: Shadow_Walker", date: "10.05", text: "Я нашел этот ник в логах входа. Кто-то заходил под ним ровно в 3:00 ночи. Пароль был изменен внешним скриптом. Это не человек, это алгоритм.", mission: "Миссия 1: Пароли" },
@@ -43,15 +53,17 @@ const CaseFiles = ({ unlockedClues = [] }) => {
                 <h1 className="glitch-text" style={{ color: '#00ff41', margin: 0, fontSize: '20px' }}>DOSSIER: CASE #992</h1>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <span style={{ color: '#444', fontSize: '11px' }}>{unlockedClues.length}/10</span>
-                    <div className="casefiles-view-toggle">
-                        <button className={viewMode === 'board' ? 'active' : ''} onClick={() => setViewMode('board')}>ДОСКА</button>
-                        <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}>СПИСОК</button>
-                    </div>
+                    {!isMobile && (
+                        <div className="casefiles-view-toggle">
+                            <button className={viewMode === 'board' ? 'active' : ''} onClick={() => setViewMode('board')}>ДОСКА</button>
+                            <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}>СПИСОК</button>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Board view */}
-            {viewMode === 'board' && (
+            {/* Board view - desktop only */}
+            {!isMobile && viewMode === 'board' && (
                 <div className="casefiles-board">
                     <div className="casefiles-cork-texture" />
                     {CLUES_CONFIG.map(clue => {
@@ -80,8 +92,8 @@ const CaseFiles = ({ unlockedClues = [] }) => {
                 </div>
             )}
 
-            {/* List view (mobile) */}
-            {viewMode === 'list' && (
+            {/* List view - always on mobile, toggle on desktop */}
+            {(isMobile || viewMode === 'list') && (
                 <div className="casefiles-list">
                     {CLUES_CONFIG.map(clue => {
                         const isUnlocked = unlockedClues.includes(clue.id);

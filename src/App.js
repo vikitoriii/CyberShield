@@ -844,6 +844,31 @@ function App() {
 
   if (showIntro) return <IntroStory onStart={() => setShowIntro(false)} />;
 
+  // Fake system notifications for vibe
+  const [fakeNotifications, setFakeNotifications] = useState([]);
+  const FAKE_NOTIFS = [
+    { icon: '🔒', title: 'SYSTEM ALERT', text: 'Обнаружена подозрительная активность в сегменте B-7', color: '#ff4d4d' },
+    { icon: '📡', title: 'NET MONITOR', text: 'Шифрованный трафик на порту 443 — источник: 192.168.7.42', color: '#f7b500' },
+    { icon: '🛡️', title: 'FIREWALL', text: 'Заблокирована попытка SQL-инъекции с IP 10.0.0.55', color: '#4d94ff' },
+    { icon: '⚠️', title: 'INTRUSION DETECT', text: 'Неудачная попытка доступа: пароль "admin123"', color: '#ff4d4d' },
+    { icon: '🔍', title: 'SCANNER', text: 'Завершено сканирование портов — 3 уязвимости', color: '#f7b500' },
+    { icon: '💡', title: 'SHADOW SIGNAL', text: 'Обнаружен слабый сигнал на частоте 104.4 MHz...', color: '#00ff41' },
+    { icon: '🔐', title: 'CRYPTO MODULE', text: 'AES-256 шифрование активно — канал защищён', color: '#00ff41' },
+    { icon: '📡', title: 'DEAD DROP', text: 'Получен новый пакет данных от агента MAX', color: '#f7b500' },
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const notif = FAKE_NOTIFS[Math.floor(Math.random() * FAKE_NOTIFS.length)];
+      const id = Date.now();
+      setFakeNotifications(prev => [...prev.slice(-2), { ...notif, id }]);
+      setTimeout(() => {
+        setFakeNotifications(prev => prev.filter(n => n.id !== id));
+      }, 5000);
+    }, 12000 + Math.random() * 8000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="os-wrapper">
       <ParticleBackground />
@@ -851,6 +876,31 @@ function App() {
       <Celebration active={celebrate} onComplete={() => setCelebrate(false)} />
       <AchievementToast achievement={achievement} onDone={() => setAchievement(null)} />
       <FriendsSystem username={username} points={points} />
+      
+      {/* Fake system notifications */}
+      <div style={{ position: 'fixed', top: '50px', right: '10px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '8px', pointerEvents: 'none', maxWidth: '320px' }}>
+        <AnimatePresence>
+          {fakeNotifications.map(n => (
+            <motion.div key={n.id}
+              initial={{ opacity: 0, x: 100, scale: 0.8 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 100, scale: 0.8 }}
+              transition={{ type: 'spring', damping: 15 }}
+              style={{
+                background: 'rgba(10,10,10,0.95)', border: `1px solid ${n.color}33`,
+                borderLeft: `3px solid ${n.color}`, padding: '10px 14px',
+                backdropFilter: 'blur(8px)', fontSize: '10px', fontFamily: 'monospace'
+              }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+                <span>{n.icon}</span>
+                <span style={{ color: n.color, fontWeight: 'bold', letterSpacing: '1px' }}>{n.title}</span>
+                <span style={{ marginLeft: 'auto', color: '#444', fontSize: '8px' }}>● LIVE</span>
+              </div>
+              <div style={{ color: '#888', lineHeight: '1.4' }}>{n.text}</div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
       {scanning && (
         <div className="scan-overlay">
           <div className="scan-line-anim" />
