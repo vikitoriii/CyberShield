@@ -1,168 +1,145 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    Lock, HelpCircle, X, Paperclip, 
-    MapPin, User, Cpu, Search, Fingerprint, Zap, Camera, FileText, Globe, ShieldCheck, MessageSquare
+    Lock, X, Paperclip, 
+    MapPin, User, Cpu, Search, Fingerprint, Zap, Camera, Globe, ShieldCheck, MessageSquare
 } from 'lucide-react';
 
 const CaseFiles = ({ unlockedClues = [] }) => {
     const [selectedDoc, setSelectedDoc] = useState(null);
+    const [viewMode, setViewMode] = useState('board');
 
-    // 1. БАЗА ДАННЫХ ВСЕХ 10 ДОКУМЕНТОВ (Сюжет игры)
     const DOCUMENTS = {
         1: { title: "ПРОФИЛЬ: Shadow_Walker", date: "10.05", text: "Я нашел этот ник в логах входа. Кто-то заходил под ним ровно в 3:00 ночи. Пароль был изменен внешним скриптом. Это не человек, это алгоритм.", mission: "Миссия 1: Пароли" },
         2: { title: "СКРИНШОТ: ПЕРЕХВАТ", date: "12.05", text: "Письмо выглядело идеально. Но адрес отправителя... там была кириллическая 'о' вместо латинской. Классический гомограф. Макс был прав — они бьют по невнимательности.", mission: "Миссия 2: Фишинг" },
-        3: { title: "ОТЧЕТ: МАГИСТРАЛЬ", date: "14.05", text: "Сигнал прыгает по прокси-серверам. Нам удалось пробить шлюз и восстановить частоту. Точка выхода: Сектор 7. Похоже, это старое здание Neocorp.", mission: "Миссия 3: Глубокий взлом" },
-        4: { title: "ФРАГМЕНТ: БД", date: "18.05", text: "Проект 'Мертвая петля' — это база данных лиц. Neocorp хочет объединить все камеры города в одну сеть. Это цифровой концлагерь.", mission: "Миссия 4: SQL Инъекция" },
-        5: { title: "ЛОГ: МАНИПУЛЯЦИЯ", date: "20.05", text: "Иван из бухгалтерии признался. Ему позвонили и представились МНОЙ. Сказали, что у меня ЧП. Социальная инженерия в чистом виде. Хакер работает внутри офиса!", mission: "Миссия 5: Соц. инженерия" },
+        3: { title: "ОТЧЕТ: МАГИСТРАЛЬ", date: "14.05", text: "Сигнал прыгает по прокси-серверам. Нам удалось пробить шлюз и восстановить частоту. Точка выхода: Сектор 7. Похоже, это старое здание Neocorp.", mission: "Миссия 3: Файрвол" },
+        4: { title: "ФРАГМЕНТ: БД", date: "18.05", text: "Проект 'Мёртвая петля' — это база данных лиц. Neocorp хочет объединить все камеры города в одну сеть. Это цифровой концлагерь.", mission: "Миссия 4: SQL" },
+        5: { title: "ЛОГ: МАНИПУЛЯЦИЯ", date: "20.05", text: "Иван из бухгалтерии признался. Ему позвонили и представились МНОЙ. Сказали, что у меня ЧП. Социальная инженерия в чистом виде. Хакер работает внутри офиса!", mission: "Миссия 5: Соц.инженерия" },
         6: { title: "ФРАГМЕНТ HEX-ДАМПА", date: "22.05", text: "Сообщение Макса: 'MAX_ALIVE_2024!!!'. Он жив! Сигнал был зашит в поврежденный сектор памяти, который мы восстановили.", mission: "Миссия 6: Криптография" },
-        7: { title: "GPS-КООРДИНАТЫ", date: "24.05", text: "Анализ фото подтвердил координаты: 48.8584, 2.2945. Это бункер под Эйфелевой башней. Группа захвата готовится к вылету.", mission: "Миссия 7: Метаданные" },
-       8: { 
-    title: "КЛЮЧ ОТ АРХИВА", 
-    date: "26.05", 
-    text: "Мы нашли серверную комнату Neocorp под Эйфелевой башней. Взломав 4-значный код сейфа, мыолучили пароль 'LOOP_BREAKER_2024' — ключ к зашифрованному архиву Макса 'Чёрное зеркало'.",
-    mission: "Миссия 8: Взлом сейфа" 
-},
-
-        9: { title: "ТЕНЕВЫЕ СОТРУДНИКИ", date: "28.05", text: "В скрытой админ-панели Neocorp найден список теневых агентов. Главный подозреваемый: Жан-Пьер Леруа, алиас Shadow_Walker, главный архитектор безопасности. Теперь у нас есть имя.", mission: "Миссия 9: Скрытый портал" },
-        10: { title: "ФИНАЛЬНАЯ ПОБЕДА", date: "01.06", text: "Все доказательства собраны. Shadow_Walker — Жан-Пьер Леруа — арестован. Проект 'Мёртвая петля' остановлен. Макс спасён. Justice served.", mission: "Миссия 10: Финал" },
+        7: { title: "GPS-КООРДИНАТЫ", date: "24.05", text: "Анализ фото подтвердил координаты: 48.8584, 2.2945. Это бункер под Эйфелевой башней. Группа захвата готовится к вылету.", mission: "Миссия 7: Форензика" },
+        8: { title: "КЛЮЧ ОТ АРХИВА", date: "26.05", text: "Мы нашли серверную комнату Neocorp под Эйфелевой башней. Взломав 4-значный код сейфа, мы получили пароль 'LOOP_BREAKER_2024' — ключ к архиву Макса 'Чёрное зеркало'.", mission: "Миссия 8: Сейф" },
+        9: { title: "ТЕНЕВЫЕ СОТРУДНИКИ", date: "28.05", text: "В скрытой админ-панели Neocorp найден список теневых агентов. Главный подозреваемый: Жан-Пьер Леруа, алиас Shadow_Walker, главный архитектор безопасности.", mission: "Миссия 9: Портал" },
+        10: { title: "ФИНАЛЬНАЯ ПОБЕДА", date: "01.06", text: "Все доказательства собраны. Shadow_Walker — Жан-Пьер Леруа — арестован. Проект 'Мёртвая петля' остановлен. Макс спасён.", mission: "Миссия 10: Финал" },
     };
 
-    // 2. КОНФИГУРАЦИЯ СЛОТОВ (Координаты для 10 карточек)
     const CLUES_CONFIG = [
         { id: 1, label: "КТО ОН?", icon: <User />, x: "8%", y: "15%", rotate: -5 },
         { id: 2, label: "УЛИКА: EMAIL", icon: <Search />, x: "26%", y: "10%", rotate: 3 },
         { id: 3, label: "ГДЕ ХАКЕР?", icon: <MapPin />, x: "44%", y: "15%", rotate: -2 },
-        { id: 4, label: "ПРОЕКТ: ПЕТЛЯ", icon: <Cpu />, x: "62%", y: "10%", rotate: 4 },
+        { id: 4, label: "ПРОЕКТ", icon: <Cpu />, x: "62%", y: "10%", rotate: 4 },
         { id: 5, label: "СВИДЕТЕЛЬ", icon: <MessageSquare />, x: "80%", y: "15%", rotate: -3 },
         { id: 6, label: "ШИФРОВКА", icon: <Fingerprint />, x: "8%", y: "55%", rotate: 2 },
-        { id: 7, label: "ГЕОЛОКАЦИЯ", icon: <Globe />, x: "26%", y: "60%", rotate: -4 },
-        { id: 8, label: "КОД ВИРУСА", icon: <Zap />, x: "44%", y: "55%", rotate: 6 },
-        { id: 9, label: "АДМИН-ВХОД", icon: <Camera />, x: "62%", y: "60%", rotate: -2 },
+        { id: 7, label: "GPS", icon: <Globe />, x: "26%", y: "60%", rotate: -4 },
+        { id: 8, label: "КОД", icon: <Zap />, x: "44%", y: "55%", rotate: 6 },
+        { id: 9, label: "ПОРТАЛ", icon: <Camera />, x: "62%", y: "60%", rotate: -2 },
         { id: 10, label: "ЛИЧНОСТЬ", icon: <ShieldCheck />, x: "80%", y: "55%", rotate: 5 },
     ];
 
     return (
-        <div style={{ 
-            padding: '20px', 
-            height: '100%', 
-            background: 'radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%)',
-            position: 'relative',
-            overflow: 'hidden',
-            border: '1px solid #222',
-            boxShadow: 'inset 0 0 50px #000'
-        }}>
-            {/* Текстура доски */}
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.05, pointerEvents: 'none', backgroundImage: 'url("https://www.transparenttextures.com/patterns/cork-board.png")' }} />
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', position: 'relative', zIndex: 2 }}>
-                <h1 className="glitch-text" style={{ color: '#00ff41', margin: 0, fontSize: '24px' }}>DOSSIER: CASE #992-MAX</h1>
-                <div style={{ color: '#444', fontSize: '12px' }}>СИНХРОНИЗАЦИЯ: {unlockedClues.length} / 10</div>
-            </div>
-
-            {/* СЕТКА УЛИК */}
-            <div style={{ position: 'relative', width: '100%', height: '85%' }}>
-                {CLUES_CONFIG.map(clue => {
-                    const isUnlocked = unlockedClues.includes(clue.id);
-                    return (
-                        <motion.div 
-                            key={clue.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            whileHover={isUnlocked ? { scale: 1.1, zIndex: 10 } : {}}
-                            onClick={() => isUnlocked && setSelectedDoc({ ...DOCUMENTS[clue.id], id: clue.id })}
-                            style={{
-                                position: 'absolute',
-                                left: clue.x,
-                                top: clue.y,
-                                rotate: `${clue.rotate}deg`,
-                                cursor: isUnlocked ? 'pointer' : 'default',
-                                width: '170px',
-                                background: isUnlocked ? '#eee' : '#111',
-                                padding: '10px 10px 25px 10px',
-                                boxShadow: isUnlocked ? '5px 5px 15px rgba(0,0,0,0.8)' : 'none',
-                                border: isUnlocked ? '1px solid #fff' : '1px solid #222',
-                                transition: 'background 0.3s'
-                            }}
-                        >
-                            <Paperclip size={16} style={{ position: 'absolute', top: '-8px', left: '50%', transform: 'translateX(-50%)', color: isUnlocked ? '#444' : '#222' }} />
-                            
-                            <div style={{ 
-                                width: '100%', 
-                                height: '110px', 
-                                background: isUnlocked ? '#000' : '#050505',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: isUnlocked ? '#00ff41' : '#1a1a1a'
-                            }}>
-                                {isUnlocked ? clue.icon : <Lock size={30} />}
-                            </div>
-
-                            <div style={{ 
-                                marginTop: '10px', 
-                                color: isUnlocked ? '#000' : '#222', 
-                                fontFamily: 'monospace',
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                                textAlign: 'center',
-                                textTransform: 'uppercase'
-                            }}>
-                                {isUnlocked ? clue.label : "LOCKED"}
-                            </div>
-
-                            {isUnlocked && (
-                                <div style={{ position: 'absolute', bottom: '5px', right: '8px', fontSize: '9px', color: '#888' }}>
-                                    #{clue.id}
-                                </div>
-                            )}
-                        </motion.div>
-                    );
-                })}
-            </div>
-
-            {/* ПРОГРЕСС-БАР ВНИЗУ */}
-            <div style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', width: '400px', zIndex: 2 }}>
-                <div style={{ height: '4px', background: '#111', borderRadius: '2px', overflow: 'hidden', border: '1px solid #222' }}>
-                    <motion.div animate={{ width: `${(unlockedClues.length / 10) * 100}%` }} style={{ height: '100%', background: '#00ff41', boxShadow: '0 0 10px #00ff41' }} />
+        <div className="casefiles-container">
+            {/* Header */}
+            <div className="casefiles-header">
+                <h1 className="glitch-text" style={{ color: '#00ff41', margin: 0, fontSize: '20px' }}>DOSSIER: CASE #992</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ color: '#444', fontSize: '11px' }}>{unlockedClues.length}/10</span>
+                    <div className="casefiles-view-toggle">
+                        <button className={viewMode === 'board' ? 'active' : ''} onClick={() => setViewMode('board')}>ДОСКА</button>
+                        <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}>СПИСОК</button>
+                    </div>
                 </div>
             </div>
 
-            {/* МОДАЛЬНОЕ ОКНО ДОКУМЕНТА */}
+            {/* Board view */}
+            {viewMode === 'board' && (
+                <div className="casefiles-board">
+                    <div className="casefiles-cork-texture" />
+                    {CLUES_CONFIG.map(clue => {
+                        const isUnlocked = unlockedClues.includes(clue.id);
+                        return (
+                            <motion.div 
+                                key={clue.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                whileHover={isUnlocked ? { scale: 1.08, zIndex: 10 } : {}}
+                                onClick={() => isUnlocked && setSelectedDoc({ ...DOCUMENTS[clue.id], id: clue.id })}
+                                className={`casefile-card ${isUnlocked ? 'unlocked' : 'locked'}`}
+                                style={{ left: clue.x, top: clue.y, rotate: `${clue.rotate}deg` }}
+                            >
+                                <Paperclip size={14} className="casefile-clip" />
+                                <div className="casefile-icon-area">
+                                    {isUnlocked ? clue.icon : <Lock size={24} />}
+                                </div>
+                                <div className="casefile-label">
+                                    {isUnlocked ? clue.label : "LOCKED"}
+                                </div>
+                                {isUnlocked && <div className="casefile-num">#{clue.id}</div>}
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* List view (mobile) */}
+            {viewMode === 'list' && (
+                <div className="casefiles-list">
+                    {CLUES_CONFIG.map(clue => {
+                        const isUnlocked = unlockedClues.includes(clue.id);
+                        return (
+                            <motion.div 
+                                key={clue.id}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: clue.id * 0.05 }}
+                                onClick={() => isUnlocked && setSelectedDoc({ ...DOCUMENTS[clue.id], id: clue.id })}
+                                className={`casefile-list-item ${isUnlocked ? 'unlocked' : 'locked'}`}
+                            >
+                                <div className="casefile-list-icon">
+                                    {isUnlocked ? clue.icon : <Lock size={16} />}
+                                </div>
+                                <div className="casefile-list-info">
+                                    <div className="casefile-list-title">УЛИКА #{clue.id}</div>
+                                    <div className="casefile-list-label">{isUnlocked ? clue.label : 'ЗАБЛОКИРОВАНО'}</div>
+                                </div>
+                                {isUnlocked && <div className="casefile-list-status">✓</div>}
+                            </motion.div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Progress bar */}
+            <div className="casefiles-progress">
+                <div className="casefiles-progress-bar">
+                    <motion.div animate={{ width: `${(unlockedClues.length / 10) * 100}%` }} className="casefiles-progress-fill" />
+                </div>
+            </div>
+
+            {/* Document modal */}
             <AnimatePresence>
                 {selectedDoc && (
                     <motion.div 
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         onClick={() => setSelectedDoc(null)}
-                        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        className="casefiles-modal-overlay"
                     >
                         <motion.div 
                             initial={{ scale: 0.5, rotate: 5 }} 
                             animate={{ scale: 1, rotate: 0 }} 
                             onClick={(e) => e.stopPropagation()}
-                            style={{ 
-                                width: '90%', maxWidth: '550px', background: '#fff', 
-                                padding: '40px', color: '#000', boxShadow: '0 0 60px rgba(0,0,0,1)',
-                                position: 'relative', border: '10px solid #fff'
-                            }}
+                            className="casefiles-modal"
                         >
-                            <div style={{ position: 'absolute', top: '10px', left: '15px', fontSize: '10px', color: '#bbb', fontFamily: 'monospace' }}>
+                            <div className="casefiles-modal-id">
                                 TOP_SECRET // ID: {selectedDoc.id} // {selectedDoc.mission}
                             </div>
-                            <button onClick={() => setSelectedDoc(null)} style={{ position: 'absolute', top: '10px', right: '15px', background: 'none', border: 'none', color: '#ccc', cursor: 'pointer' }}>
+                            <button onClick={() => setSelectedDoc(null)} className="casefiles-modal-close">
                                 <X size={20} />
                             </button>
-                            
-                            <h2 style={{ fontFamily: 'monospace', borderBottom: '2px solid #000', paddingBottom: '10px', marginTop: '10px', textTransform: 'uppercase' }}>
-                                {selectedDoc.title}
-                            </h2>
-                            <p style={{ marginTop: '20px', fontSize: '17px', lineHeight: '1.6', fontFamily: 'serif', whiteSpace: 'pre-wrap' }}>
-                                {selectedDoc.text}
-                            </p>
-                            <div style={{ marginTop: '30px', textAlign: 'right', fontStyle: 'italic', color: '#888', borderTop: '1px dashed #ccc', paddingTop: '10px' }}>
+                            <h2 className="casefiles-modal-title">{selectedDoc.title}</h2>
+                            <p className="casefiles-modal-text">{selectedDoc.text}</p>
+                            <div className="casefiles-modal-date">
                                 Зафиксировано: {selectedDoc.date}.2024
                             </div>
-                            <button className="btn-main" onClick={() => setSelectedDoc(null)} style={{ marginTop: '30px', width: '100%', background: '#000', color: '#00ff41' }}>
+                            <button className="btn-main" onClick={() => setSelectedDoc(null)} style={{ marginTop: '20px', width: '100%', background: '#000', color: '#00ff41' }}>
                                 ВЕРНУТЬ В АРХИВ
                             </button>
                         </motion.div>

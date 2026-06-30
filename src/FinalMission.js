@@ -18,24 +18,25 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     const [cipherSolved, setCipherSolved] = useState(false);
     const [health, setHealth] = useState(100);
     const [showHint, setShowHint] = useState(false);
+    const [hintLevel, setHintLevel] = useState(0);
 
     const TIMELINE_EVENTS = [
-        { date: "10.05", event: "Shadow_Walker впервые замечен", clue: "Вход в 3:00 ночи" },
-        { date: "12.05", event: "Фишинговая атака", clue: "Гомограф в домене" },
-        { date: "14.05", event: "Сервер в Секторе 7", clue: "Старое здание Neocorp" },
-        { date: "18.05", event: "Проект 'Мёртвая петля'", clue: "База данных лиц" },
-        { date: "20.05", event: "Социальная инженерия", clue: "Хакер внутри офиса" },
-        { date: "22.05", event: "Сообщение Макса", clue: "MAX_ALIVE_2024!!!" },
-        { date: "24.05", event: "GPS-координаты", clue: "Бункер под Эйфелевой" },
-        { date: "26.05", event: "Пароль из сейфа", clue: "LOOP_BREAKER_2024" },
-        { date: "28.05", event: "Имя подозреваемого", clue: "Jean-Pierre Leroy" }
+        { date: "10.05", event: "Shadow_Walker впервые замечен", clue: "Вход в систему в 3:00 ночи. Пароль изменён внешним скриптом.", details: "Лог показывает подключение с IP 192.168.7.42. Сессия длилась 22 минуты. Все действия были автоматизированы." },
+        { date: "12.05", event: "Фишинговая атака", clue: "Гомограф в домене: paypaI.com вместо paypal.com", details: "Рассылка на 200 сотрудников Neocorp. 3 человека ввели данные. Обнаружена кириллическая 'о' в адресе." },
+        { date: "14.05", event: "Сервер в Секторе 7", clue: "Старое здание Neocorp защищено файрволом", details: "Сигнал прыгал через 7 прокси-серверов. Точка выхода: здание в промзоне. 3 уровня защиты: порт, частота, матрица." },
+        { date: "18.05", event: "Проект Мёртвая петля", clue: "База данных массового распознавания лиц", details: "Содержит 2.4 млн записей. Камеры по всему Парижу подключены к единой сети. Neocorp финансировал проект из офшора." },
+        { date: "20.05", event: "Социальная инженерия", clue: "Хакер работает внутри офиса Neocorp", details: "Ивану позвонили и представились руководителем. Попросили срочно перевести данные. Звонок шёл с внутреннего номера." },
+        { date: "22.05", event: "Сообщение Макса", clue: "MAX_ALIVE_2024!!!", details: "Зашифровано шифром Цезаря (ROT13). Сигнал зашит в повреждённый сектор памяти. Макс жив!" },
+        { date: "24.05", event: "GPS-координаты", clue: "48.8584, 2.2945 — бункер под Эйфелевой", details: "Извлечены из повреждённого фото через RGB-фильтры. Скрытый слой данных восстановлен." },
+        { date: "26.05", event: "Ключ от архива", clue: "LOOP_BREAKER_2024", details: "Взлом 4-значного кода сейфа. Метод_Wordle — зелёный/жёлтый/серый. Код вёл к зашифрованному архиву." },
+        { date: "28.05", event: "Имя Shadow_Walker", clue: "Jean-Pierre Leroy — Chief Security Architect", details: "Данные извлечены из скрытой админ-панели Neocorp. Шесть разделов: пользователи, логи, финансы, переписка, теневые сотрудники, локация." }
     ];
 
     const EVIDENCE_OPTIONS = [
         { id: 1, text: "Логи входа в 3:00 ночи", correct: true },
         { id: 2, text: "Фишинг с гомографом", correct: true },
         { id: 3, text: "Сервер в Секторе 7", correct: true },
-        { id: 4, text: "Проект 'Мёртвая петля'", correct: true },
+        { id: 4, text: "Проект Мёртвая петля", correct: true },
         { id: 5, text: "Соц. инженерия изнутри", correct: true },
         { id: 6, text: "Сообщение Макса", correct: true },
         { id: 7, text: "GPS-координаты бункера", correct: true },
@@ -47,9 +48,9 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     ];
 
     const INTERROGATION_QUESTIONS = [
-        { q: "Какой пароль использовал Shadow_Walker для доступа к архиву?", answer: "LOOP_BREAKER_2024", hint: "Пароль из миссии 8" },
-        { q: "Как назывался проект массового слежения?", answer: "Мёртвая петля", hint: "Проект из миссии 4" },
-        { q: "Как зовут главного подозреваемого?", answer: "Jean-Pierre Leroy", hint: "Имя из миссии 9" }
+        { q: "Какой пароль использовал Shadow_Walker для доступа к архиву?", answer: "LOOP_BREAKER_2024", hint1: "Этот пароль вы взломали в миссии 8, вскрывая сейф", hint2: "LOOP_BREAKER_2024" },
+        { q: "Как назывался проект массового слежения?", answer: "Мёртвая петля", answerAlt: "Мертвая петля", hint1: "Этот проект вы нашли в базе данных Neocorp (миссия 4)", hint2: "Мёртвая петля (или Мертвая петля)" },
+        { q: "Как зовут главного подозреваемого?", answer: "Jean-Pierre Leroy", hint1: "Это имя вы нашли в разделе 'Теневые сотрудники' админ-панели (миссия 9)", hint2: "Jean-Pierre Leroy" }
     ];
 
     const FINAL_CHOICES = [
@@ -88,7 +89,12 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     };
 
     const handleInterrogationAnswer = () => {
-        const correct = interrogationAnswer.toLowerCase().includes(INTERROGATION_QUESTIONS[interrogationStep].answer.toLowerCase().split(' ')[0]);
+        const q = INTERROGATION_QUESTIONS[interrogationStep];
+        const normalize = (s) => s.toLowerCase().replace(/ё/g, 'е').trim();
+        const userAnswer = normalize(interrogationAnswer);
+        const correctAnswer = normalize(q.answer);
+        const altAnswer = q.answerAlt ? normalize(q.answerAlt) : null;
+        const correct = userAnswer.includes(correctAnswer.split(' ')[0]) || (altAnswer && userAnswer.includes(altAnswer.split(' ')[0]));
         if (correct) {
             setInterrogationCorrect(true);
             setTimeout(() => {
@@ -96,6 +102,8 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
                     setInterrogationStep(prev => prev + 1);
                     setInterrogationAnswer('');
                     setInterrogationCorrect(false);
+                    setShowHint(false);
+                    setHintLevel(0);
                 } else {
                     setStage(5);
                 }
@@ -148,17 +156,23 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
                     {TIMELINE_EVENTS.map((event, idx) => (
                         <motion.div key={event.date} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }}
                             onClick={() => handleTimelineClick(event)}
-                            style={{ position: 'relative', marginBottom: '15px', padding: '15px',
+                            style={{ position: 'relative', marginBottom: '12px', padding: '14px',
                                 background: timeline.includes(event.date) ? 'rgba(0,255,65,0.05)' : '#111',
-                                border: `1px solid ${timeline.includes(event.date) ? '#00ff41' : '#222'}`, cursor: 'pointer' }}>
-                            <div style={{ position: 'absolute', left: '-25px', top: '15px', width: '12px', height: '12px', borderRadius: '50%',
+                                border: `1px solid ${timeline.includes(event.date) ? '#00ff41' : '#222'}`, cursor: 'pointer', transition: '0.2s' }}>
+                            <div style={{ position: 'absolute', left: '-25px', top: '14px', width: '12px', height: '12px', borderRadius: '50%',
                                 background: timeline.includes(event.date) ? '#00ff41' : '#333', border: '2px solid #000' }} />
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                <span style={{ color: '#4d94ff', fontSize: '12px', fontWeight: 'bold' }}>{event.date}.2024</span>
+                                <span style={{ color: '#4d94ff', fontSize: '11px', fontWeight: 'bold' }}>{event.date}.2024</span>
                                 {timeline.includes(event.date) && <CheckCircle2 size={14} color="#00ff41" />}
                             </div>
-                            <div style={{ color: '#fff', fontSize: '13px' }}>{event.event}</div>
-                            {timeline.includes(event.date) && <div style={{ color: '#00ff41', fontSize: '11px', marginTop: '5px' }}>{event.clue}</div>}
+                            <div style={{ color: '#fff', fontSize: '13px', fontWeight: 'bold', marginBottom: '4px' }}>{event.event}</div>
+                            {timeline.includes(event.date) && (
+                                <div>
+                                    <div style={{ color: '#00ff41', fontSize: '11px', marginBottom: '4px' }}>{event.clue}</div>
+                                    <div style={{ color: '#888', fontSize: '11px', lineHeight: '1.5', borderTop: '1px solid #222', paddingTop: '8px', marginTop: '6px' }}>{event.details}</div>
+                                </div>
+                            )}
+                            {!timeline.includes(event.date) && <div style={{ color: '#666', fontSize: '10px' }}>Нажмите для изучения</div>}
                         </motion.div>
                     ))}
                 </div>
@@ -286,12 +300,20 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
                             </motion.div>
                         )}
                     </div>
-                    <button onClick={() => setShowHint(!showHint)} className="lockdown-btn" style={{ width: '100%' }}>
+                    <button onClick={() => { setShowHint(!showHint); if (!showHint) setHintLevel(1); }} className="lockdown-btn" style={{ width: '100%' }}>
                         <HelpCircle size={14} style={{ marginRight: '8px' }} />ПОДСКАЗКА
                     </button>
                     {showHint && (
-                        <div style={{ background: '#000', border: '1px solid #f7b500', padding: '12px', color: '#f7b500', fontSize: '11px', marginTop: '10px' }}>
-                            {INTERROGATION_QUESTIONS[interrogationStep].hint}
+                        <div style={{ background: '#000', border: '1px solid #f7b500', padding: '12px', color: '#f7b500', fontSize: '11px', marginTop: '10px', lineHeight: '1.5' }}>
+                            {hintLevel === 1 && (
+                                <div>
+                                    <div>{INTERROGATION_QUESTIONS[interrogationStep].hint1}</div>
+                                    <button onClick={() => setHintLevel(2)} style={{ marginTop: '8px', background: '#f7b500', color: '#000', border: 'none', padding: '4px 8px', fontSize: '10px', cursor: 'pointer' }}>
+                                        Показать ответ
+                                    </button>
+                                </div>
+                            )}
+                            {hintLevel === 2 && <div>{INTERROGATION_QUESTIONS[interrogationStep].hint2}</div>}
                         </div>
                     )}
                 </div>
