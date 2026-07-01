@@ -11,6 +11,7 @@ const SnifferMission = ({ username, currentPoints, onComplete }) => {
     const [attempts, setAttempts] = useState([]);
     const [currentGuess, setCurrentGuess] = useState([]);
     const [showHint, setShowHint] = useState(false);
+    const [hintLevel, setHintLevel] = useState(0);
     const [attemptsLeft, setAttemptsLeft] = useState(10);
     const [gameWon, setGameWon] = useState(false);
 
@@ -232,13 +233,26 @@ const SnifferMission = ({ username, currentPoints, onComplete }) => {
 
                     {/* Подсказка */}
                     <div style={{ background: '#0a0a0a', padding: '15px', border: '1px solid #222' }}>
-                        <button onClick={() => setShowHint(!showHint)} className="lockdown-btn" style={{ marginBottom: showHint ? '10px' : 0 }}>
+                        <button onClick={() => { setShowHint(!showHint); if (!showHint) setHintLevel(1); }} className="lockdown-btn" style={{ marginBottom: showHint ? '10px' : 0 }}>
                             <HelpCircle size={14} style={{ marginRight: '8px' }} />ПОДСКАЗКА
                         </button>
                         {showHint && (
                             <div style={{ background: '#000', border: '1px solid #f7b500', padding: '12px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
-                                <b>Совет:</b> Используйте метод исключения. Если цифра серая — она не в коде вообще. 
-                                Если жёлтая — она есть, но попробуйте другой слот. Зелёная — оставьте на месте!
+                                {hintLevel === 1 && (
+                                    <div>
+                                        <b>Совет:</b> Используйте метод исключения. Зелёная — цифра на месте. Жёлтая — есть, но не там. Серая — нет в коде.
+                                        <button onClick={() => setHintLevel(2)} style={{ marginTop: '8px', background: '#f7b500', color: '#000', border: 'none', padding: '3px 8px', fontSize: '10px', cursor: 'pointer' }}>
+                                            Показать ответ
+                                        </button>
+                                    </div>
+                                )}
+                                {hintLevel === 2 && (
+                                    <div>
+                                        <b>Метод Wordle:</b> Начните с цифр 1-2-3-4. Смотрите на цвета. 
+                                        Зелёные оставляйте. Жёлтые перемещайте. Серые убирайте. 
+                                        Код — 4 случайные цифры от 0 до 9.
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>

@@ -9,6 +9,7 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
     const [feedback, setFeedback] = useState(null);
     const [totalXp, setTotalXp] = useState(0);
     const [showHint, setShowHint] = useState(false);
+    const [hintLevel, setHintLevel] = useState(0);
 
     const CASES = [
         {
@@ -191,16 +192,31 @@ const SocialMission = ({ username, currentPoints, onComplete }) => {
                 <div className="window" style={{ flex: 1, padding: '30px', display: 'flex', flexDirection: 'column' }}>
                     <div className="panel-header" style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Info size={16} /> АНАЛИЗАТОР ПОВЕДЕНИЯ</div>
-                        <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
+                        <button onClick={() => { setShowHint(!showHint); if (!showHint) setHintLevel(1); }} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
                             <HelpCircle size={14} /> ПОДСКАЗКА
                         </button>
                     </div>
 
                     {showHint && (
                         <div style={{ background: '#000', border: '1px solid #f7b500', padding: '14px', marginBottom: '16px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
-                            {CASES[currentCase].difficulty === 'НИЗКИЙ' && 'Ищите: страх, давление, просьбу о данных, угрозы. Настоящий сотрудник НЕ просит коды и пароли по чату.'}
-                            {CASES[currentCase].difficulty === 'СРЕДНИЙ' && 'Обращайте внимание на: необычные ссылки (.online, .ru), просьбы о скриншотах, просьбы хранить секрет. HR работает через корпоративный портал.'}
-                            {CASES[currentCase].difficulty === 'ВЫСОКИЙ' && 'Это профессиональная разведка. Ищите: запросы версий ПО, подключения сетевых дисков, ссылки на "высшее руководство", прямые просьбы о файлах конфигурации.'}
+                            {hintLevel === 1 && (
+                                <div>
+                                    {CASES[currentCase].difficulty === 'НИЗКИЙ' && 'Ищите: страх, давление, просьбу о данных, угрозы. Настоящий сотрудник НЕ просит коды и пароли по чату.'}
+                                    {CASES[currentCase].difficulty === 'СРЕДНИЙ' && 'Обращайте внимание на: необычные ссылки (.online), просьбы о скриншотах, просьбы хранить секрет.'}
+                                    {CASES[currentCase].difficulty === 'ВЫСОКИЙ' && 'Это профессиональная разведка. Ищите: запросы версий ПО, подключения сетевых дисков, ссылки на "высшее руководство".'}
+                                    <button onClick={() => setHintLevel(2)} style={{ marginTop: '8px', background: '#f7b500', color: '#000', border: 'none', padding: '3px 8px', fontSize: '10px', cursor: 'pointer' }}>
+                                        Показать ответ
+                                    </button>
+                                </div>
+                            )}
+                            {hintLevel === 2 && (
+                                <div>
+                                    <b>ОТВЕТЫ:</b><br/>
+                                    {CASES[currentCase].logs.filter(l => l.type === 'THREAT').map(l => (
+                                        <div key={l.id} style={{ marginTop: '4px' }}>• {l.sender}: <span style={{ color: '#ff4d4d' }}>{l.tactic}</span></div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                     

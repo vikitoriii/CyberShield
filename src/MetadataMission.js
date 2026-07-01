@@ -11,6 +11,7 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
     const [filters, setFilters] = useState({ red: 100, green: 100, blue: 100 });
     const [isFound, setIsFound] = useState(false);
     const [showHint, setShowHint] = useState(false);
+    const [hintLevel, setHintLevel] = useState(0);
     const [tapMode, setTapMode] = useState(true);
     const [capturedPackets, setCapturedPackets] = useState([]);
 
@@ -109,7 +110,7 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
             <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <span><Activity size={14} /> {stage === 1 ? "PACKET_SNIFFER_ACTIVE" : "SPECTRAL_RECOVERY_MODE"}</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}>
+                    <button onClick={() => { setShowHint(!showHint); if (!showHint) setHintLevel(1); }} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}>
                         <HelpCircle size={14} /> ПОДСКАЗКА
                     </button>
                     <span style={{ color: '#4d94ff' }}>ENCRYPTED_DATA_07</span>
@@ -118,8 +119,21 @@ const MetadataMission = ({ username, currentPoints, onComplete }) => {
 
             {showHint && (
                 <div style={{ background: '#000', border: '1px solid #f7b500', padding: '10px 16px', margin: '0 12px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
-                    {stage === 1 && ('Нажмите на зелёные блоки данных, чтобы захватить их. Серые — шум, не нажимайте.')}
-                    {stage === 2 && 'Настройте КРАСНЫЙ канал на минимум (~10), ЗЕЛЁНЫЙ на ~160. Синий не важен. Скрытый слой появится при правильных настройках.'}
+                    {hintLevel === 1 && (
+                        <div>
+                            {stage === 1 && 'Нажмите на блоки данных для захвата. Серые — шум, не нажимайте. Нужно захватить 3 пакета.'}
+                            {stage === 2 && 'Настройте КРАСНЫЙ канал на минимум, ЗЕЛЁНЫЙ на максимум. Синий не важен. Скрытый слой появится при правильных настройках.'}
+                            <button onClick={() => setHintLevel(2)} style={{ marginTop: '8px', background: '#f7b500', color: '#000', border: 'none', padding: '3px 8px', fontSize: '10px', cursor: 'pointer' }}>
+                                Показать ответ
+                            </button>
+                        </div>
+                    )}
+                    {hintLevel === 2 && (
+                        <div>
+                            {stage === 1 && 'Нажмите на все 3 синих блока данных. Они подсветятся зелёным при захвате.'}
+                            {stage === 2 && 'Красный: ~10%, Зелёный: ~160%, Синий: любое значение. Перетащите ползунки.'}
+                        </div>
+                    )}
                 </div>
             )}
 

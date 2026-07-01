@@ -10,6 +10,7 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
   const [isFinished, setIsFinished] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   const [showHint, setShowHint] = useState(false);
+  const [hintLevel, setHintLevel] = useState(0);
 
   const emails = [
     {
@@ -62,11 +63,11 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
     },
     {
       id: 7,
-      sender: "admin@gosuslugi.by",
-      subject: "Вам положена выплата 450 BYN",
+      sender: "security@tinkoff-secure.ru",
+      subject: "Ваша карта заблокирована — срочно подтвердите данные",
       type: "phishing",
-      text: "Согласно постановлению №124, вам начислена социальная выплата в размере 450 BYN. Укажите карту для зачисления.",
-      analysis: "ФИШИНГ: Госуслуги НИКОГДА не рассылают письма с обещаниями денег. Официальный сайт — gosuslugi.by, но он не рассылает такие письма."
+      text: "Уважаемый клиент! Ваша банковская карта Т-Банк была заблокирована из-за подозрительной транзакции на сумму 47 350 руб. Для разблокировки перейдите по ссылке и введите данные карты. У вас есть 30 минут, иначе карта будет аннулирована.",
+      analysis: "ФИШИНГ: Настоящий Т-Банк НИКОГДА не просит ввести данные карты по ссылке из email. Домен .ru вместо .com. Давление сроками (30 минут) — классический триггер паники."
     },
     {
       id: 8,
@@ -100,6 +101,18 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
     const isCorrect = isPhishingClaim === isActuallyPhishing;
     setResults(prev => ({ ...prev, [selectedMail.id]: isCorrect ? 'correct' : 'wrong' }));
     setProcessedIds(prev => [...prev, selectedMail.id]);
+
+    if (!isCorrect) {
+      const wrongCount = Object.values(results).filter(r => r === 'wrong').length + 1;
+      if (wrongCount >= 3) {
+        setTimeout(() => {
+          setProcessedIds([]);
+          setResults({});
+          setSelectedMail(null);
+          setFilter('all');
+        }, 1500);
+      }
+    }
   };
 
   const finishMission = () => {
@@ -167,7 +180,7 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
           <h3 style={{ fontSize: '12px', margin: 0 }}>TRAFFIC_ANALYZER: {processedIds.length}/{emails.length}</h3>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
+          <button onClick={() => { setShowHint(!showHint); if (!showHint) setHintLevel(1); }} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
             <HelpCircle size={14} /> ПОДСКАЗКА
           </button>
           <div className="filter-pills">
@@ -179,13 +192,32 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
       </div>
 
       {showHint && (
-        <div style={{ background: '#000', border: '1px solid #f7b500', padding: '12px 16px', marginBottom: '16px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <HelpCircle size={14} style={{ flexShrink: 0, marginTop: '2px' }} />
-          <div>
-            <b>Как отличить фишинг:</b> Проверяйте домен отправителя (опечатки, подмена букв), 
-            ссылки ведут на подозрительные сайты? Просьбы о паролях/кодах — всегда фишинг. 
-            Срочность + страх = признак атаки. Настоящие сервисы не просят данные по email.
-          </div>
+        <div style={{ background: '#000', border: '1px solid #f7b500', padding: '12px 16px', marginBottom: '16px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
+          {hintLevel === 1 && (
+            <div>
+              <b>Как отличить фишинг:</b> Проверяйте домен отправителя (опечатки, подмена букв), 
+              ссылки ведут на подозрительные сайты? Просьбы о паролях/кодах — всегда фишинг. 
+              Срочность + страх = признак атаки. Настоящие сервисы не просят данные по email.
+              <button onClick={() => setHintLevel(2)} style={{ marginTop: '8px', background: '#f7b500', color: '#000', border: 'none', padding: '3px 8px', fontSize: '10px', cursor: 'pointer' }}>
+                Показать ответ
+              </button>
+            </div>
+          )}
+          {hintLevel === 2 && (
+            <div>
+              <b>ОТВЕТЫ:</b><br/>
+              1. paypaI.com — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (кириллическая I)<br/>
+              2. nasha-firma.by — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (корпоративный домен)<br/>
+              3. fedex-courier.net — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (.zip архив)<br/>
+              4. steampowered.com — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (официальный)<br/>
+              5. googIe.support — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (подмена l→I)<br/>
+              6. onliner.by — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (обычная рассылка)<br/>
+              7. tinkoff-secure.ru — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (данные карты)<br/>
+              8. github.com — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (официальный)<br/>
+              9. nasha-firma.by — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (CEO-FRAUD)<br/>
+              10. nalog.gov.by — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (.gov.by)
+            </div>
+          )}
         </div>
       )}
 

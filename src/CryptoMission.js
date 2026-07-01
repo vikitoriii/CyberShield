@@ -9,6 +9,7 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
     const [selectedSector, setSelectedSector] = useState(null);
     const [xpEarned, setXpEarned] = useState(0);
     const [showHint, setShowHint] = useState(false);
+    const [hintLevel, setHintLevel] = useState(0);
 
     // Данные для этапов
     const TARGET_FREQ = 104; // Целевая частота (104.4 MHz)
@@ -71,7 +72,7 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
                     </div>
                 </div>
                 {stage > 0 && stage < 4 && (
-                    <button onClick={() => setShowHint(!showHint)} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
+                    <button onClick={() => { setShowHint(!showHint); if (!showHint) setHintLevel(1); }} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', letterSpacing: '1px' }}>
                         <HelpCircle size={14} /> ПОДСКАЗКА
                     </button>
                 )}
@@ -79,9 +80,23 @@ const CryptoMission = ({ username, currentPoints, onComplete }) => {
 
             {showHint && stage > 0 && stage < 4 && (
                 <div style={{ background: '#000', border: '1px solid #f7b500', padding: '14px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5', textAlign: 'center' }}>
-                    {stage === 1 && 'Настройте тюнер на частоту ~22 на слайдере. Это соответствует 104.4 MHz. Ищите момент, когда амплитуда максимальна.'}
-                    {stage === 2 && 'Это шифр Цезаря (ROT13). Каждая буква сдвинута на 13 позиций. Попробуйте сдвиг 13 — это универсальный ключ ROT13.'}
-                    {stage === 3 && 'Расшифрованное сообщение указывает на СЕКТОР 7. Выберите ячейку SEC_7 на сетке.'}
+                    {hintLevel === 1 && (
+                        <div>
+                            {stage === 1 && 'Настройте тюнер на нужную частоту. Ищите момент, когда амплитуда максимальна.'}
+                            {stage === 2 && 'Это шифр Цезаря. Каждая буква сдвинута на одинаковое количество позиций в алфавите.'}
+                            {stage === 3 && 'Расшифрованное сообщение указывает на конкретный сектор. Выберите его на сетке.'}
+                            <button onClick={() => setHintLevel(2)} style={{ marginTop: '8px', background: '#f7b500', color: '#000', border: 'none', padding: '3px 8px', fontSize: '10px', cursor: 'pointer' }}>
+                                Показать ответ
+                            </button>
+                        </div>
+                    )}
+                    {hintLevel === 2 && (
+                        <div>
+                            {stage === 1 && 'Частота: 22 на слайдере = 104.4 MHz. Перетащите ползунок на 22.'}
+                            {stage === 2 && 'Сдвиг: 13. Перетащите слайдер на значение 13 (ROT13).'}
+                            {stage === 3 && 'Сектор: SEC_7. Нажмите на ячейку 7 на сетке.'}
+                        </div>
+                    )}
                 </div>
             )}
 

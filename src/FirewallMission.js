@@ -10,6 +10,7 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
     const [frequency, setFrequency] = useState(10);
     const [matrixClicks, setMatrixClicks] = useState([]);
     const [showHint, setShowHint] = useState(false);
+    const [hintLevel, setHintLevel] = useState(0);
     const [health, setHealth] = useState(100);
 
     const TARGET_FREQ = 74; 
@@ -94,7 +95,7 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
             <div style={{ flex: 1, padding: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                 
                 {/* ПОМОЩЬ (ПОДСКАЗКА С ОТВЕТОМ) */}
-                <button onClick={() => setShowHint(!showHint)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', cursor: 'pointer', zIndex: 10 }}>
+                <button onClick={() => { setShowHint(!showHint); if (!showHint) setHintLevel(1); }} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', cursor: 'pointer', zIndex: 10 }}>
                     <HelpCircle color="#f7b500" size={24} />
                 </button>
 
@@ -102,10 +103,25 @@ const FirewallMission = ({ username, currentPoints, onComplete }) => {
                     {showHint && (
                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} 
                             style={{ position: 'absolute', right: '10px', top: '50px', width: '260px', background: '#1a1a00', border: '1px solid #f7b500', padding: '12px', color: '#f7b500', fontSize: '11px', zIndex: 100, lineHeight: '1.5' }}>
-                            <b>ПОДСКАЗКА:</b><br/>
-                            {stage === 1 && 'Ищите число, которое выделяется зелёным цветом среди серых логов. Оно появляется и исчезает — будьте внимательны.'}
-                            {stage === 2 && 'Настройте ползунок так, чтобы амплитуда волны была максимальной. Частота около 74 на слайдере.'}
-                            {stage === 3 && 'Последовательность: 2 → 7 → 13 → 8. Нажимайте по порядку, при ошибке начинайте заново.'}
+                            {hintLevel === 1 && (
+                                <div>
+                                    <b>ПОДСКАЗКА:</b><br/>
+                                    {stage === 1 && 'Ищите число, которое выделяется зелёным цветом среди серых логов. Оно мелькает и исчезает.'}
+                                    {stage === 2 && 'Настройте ползунок так, чтобы амплитуда волны была максимальной. Частота около 74.'}
+                                    {stage === 3 && 'Последовательность кнопок: 2 → 7 → 13 → 8. Нажимайте по порядку.'}
+                                    <button onClick={() => setHintLevel(2)} style={{ marginTop: '8px', background: '#f7b500', color: '#000', border: 'none', padding: '3px 8px', fontSize: '10px', cursor: 'pointer' }}>
+                                        Показать ответ
+                                    </button>
+                                </div>
+                            )}
+                            {hintLevel === 2 && (
+                                <div>
+                                    <b>ОТВЕТ:</b><br/>
+                                    {stage === 1 && 'Код: ' + targetCode + '. Он появляется зелёным в логах.'}
+                                    {stage === 2 && 'Частота: 74. Перетащите слайдер на значение 74.'}
+                                    {stage === 3 && 'Порядок: 2, 7, 13, 8. Нажимайте эти кнопки на матрице.'}
+                                </div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>
