@@ -63,11 +63,11 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
     },
     {
       id: 7,
-      sender: "security@tinkoff-secure.ru",
+      sender: "alerts@belarusbank-by.info",
       subject: "Ваша карта заблокирована — срочно подтвердите данные",
       type: "phishing",
-      text: "Уважаемый клиент! Ваша банковская карта Т-Банк была заблокирована из-за подозрительной транзакции на сумму 47 350 руб. Для разблокировки перейдите по ссылке и введите данные карты. У вас есть 30 минут, иначе карта будет аннулирована.",
-      analysis: "ФИШИНГ: Настоящий Т-Банк НИКОГДА не просит ввести данные карты по ссылке из email. Домен .ru вместо .com. Давление сроками (30 минут) — классический триггер паники."
+      text: "Уважаемый клиент! Ваша банковская карта Беларусбанк была заблокирована из-за подозрительной транзакции на сумму 4 750 BYN. Для разблокировки перейдите по ссылке и введите данные карты. У вас есть 20 минут, иначе карта будет аннулирована.",
+      analysis: "ФИШИНГ: Настоящий Беларусбанк НИКОГДА не просит ввести данные карты по ссылке из email. Домен .by.info вместо официального .by. Давление сроками (20 минут) — классический триггер паники."
     },
     {
       id: 8,
@@ -212,7 +212,7 @@ const PhishingMission = ({ username, currentPoints, onComplete }) => {
               4. steampowered.com — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (официальный)<br/>
               5. googIe.support — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (подмена l→I)<br/>
               6. onliner.by — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (обычная рассылка)<br/>
-              7. tinkoff-secure.ru — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (данные карты)<br/>
+              7. belarusbank-by.info — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (данные карты)<br/>
               8. github.com — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (официальный)<br/>
               9. nasha-firma.by — <span style={{ color: '#ff4d4d' }}>ФИШИНГ</span> (CEO-FRAUD)<br/>
               10. nalog.gov.by — <span style={{ color: '#00ff41' }}>БЕЗОПАСНО</span> (.gov.by)

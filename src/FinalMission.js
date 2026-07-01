@@ -56,9 +56,30 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     ];
 
     const FINAL_CHOICES = [
-        { id: "arrest", label: "АРЕСТОВАТЬ", desc: "Передать данные полиции", icon: "👮", result: "Leroy арестован. Макс освобождён. Справедливость восторжествовала." },
-        { id: "expose", label: "ОПОЗОРИТЬ", desc: "Опубликовать в прессе", icon: "📰", result: "Скандал в СМИ. Neocorp разоблачён. Макс свободен." },
-        { id: "confront", label: "КОНФРОНТАЦИЯ", desc: "Личная встреча", icon: "⚔️", result: "Драматическая развязка. Leroy сдаётся. Макс спасён." }
+        { 
+            id: "arrest", label: "АРЕСТОВАТЬ", desc: "Передать данные полиции", icon: "👮", 
+            result: "Leroy арестован. Макс освобождён. Справедливость восторжествовала.",
+            title: "АРЕСТ",
+            color: "#4d94ff",
+            story: "Спецоперация проведена в 4:00 утра. Группа захвата вошла в бункер под Эйфелевой башней. Leroy не успел уничтожить доказательства. Он задержан и передан в руки Interpol. Проект «Мёртвая петля» полностью ликвидирован.",
+            maxLetter: "Привет, агент! Я свободен. Спасибо тебе. Когда я лежал в темноте этого бункера, я знал — кто-то придет. И ты пришел. Спасибо, что не сдался. Я вернусь к работе, но теперь буду осторожнее. Ты настоящий герой. — Макс"
+        },
+        { 
+            id: "expose", label: "ОПОЗОРИТЬ", desc: "Опубликовать в прессе", icon: "📰", 
+            result: "Скандал в СМИ. Neocorp разоблачён. Макс свободен.",
+            title: "РАЗОБЛАЧЕНИЕ",
+            color: "#f7b500",
+            story: "Доказательства опубликованы в крупнейших СМИ. Компания Neocorp обвиняется в массовой слежке за гражданами. Leroy бежал из страны, но Interpol выдал ордер на арест. Макс освобождён. Общество в шоке — проект «Мёртвая петля» стал символом цифрового контроля.",
+            maxLetter: "Привет! Я на свободе. То, что ты сделал — изменило мир. Люди теперь знают правду о Neocorp. Я горжусь тобой. Может, однажды мы снова будем работать вместе. Спасибо за всё. — Макс"
+        },
+        { 
+            id: "confront", label: "КОНФРОНТАЦИЯ", desc: "Личная встреча", icon: "⚔️", 
+            result: "Драматическая развязка. Leroy сдаётся. Макс спасён.",
+            title: "КОНФРОНТАЦИЯ",
+            color: "#ff4d4d",
+            story: "Ты вошёл в бункер один. Leroy ждал тебя. «Я знал, что ты придешь», — сказал он. Разговор длился 47 минут. В конце Leroy сдался добровольно. Макс был освобождён. Позже Leroy признался: он хотел, чтобы его остановили.",
+            maxLetter: "Привет, агент. Я слышал, что ты пришел один. Без поддержки, без оружия. Просто чтобы спасти меня. Ты — самый отважный человек, которого я знаю. Спасибо. Я буду помнить это всю жизнь. — Макс"
+        }
     ];
 
     useEffect(() => {
@@ -399,16 +420,33 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
 
     // ЭКРАН 6: ФИНАЛ
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="window animate-fade mission-win">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="window animate-fade mission-win" style={{ padding: '30px 16px' }}>
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', damping: 10 }}>
                 <div className="mission-win-icon">
                     <Award size={72} color="#00ff41" />
                 </div>
             </motion.div>
-            <h1 className="glitch-text mission-win-title" style={{ color: '#00ff41' }}>МИССИЯ ВЫПОЛНЕНА</h1>
+            <h1 className="glitch-text mission-win-title" style={{ color: finalChoice?.color || '#00ff41' }}>{finalChoice?.title || 'МИССИЯ ВЫПОЛНЕНА'}</h1>
             <p className="mission-win-subtitle" style={{ padding: '0 12px' }}>{finalChoice?.result}</p>
             
-            <div className="mission-stats">
+            {/* Story based on choice */}
+            <div style={{ background: '#000', border: `1px solid ${finalChoice?.color}33`, padding: '20px', margin: '20px auto', maxWidth: '600px', textAlign: 'left' }}>
+                <div style={{ color: finalChoice?.color, fontSize: '10px', letterSpacing: '2px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Shield size={14} /> ФИНАЛЬНЫЙ ОТЧЁТ
+                </div>
+                <p style={{ color: '#ccc', fontSize: '13px', lineHeight: '1.7', margin: 0 }}>{finalChoice?.story}</p>
+            </div>
+
+            {/* Max's letter */}
+            <div style={{ background: '#0a0a0a', border: '1px solid #00ff41', padding: '20px', margin: '20px auto', maxWidth: '600px', textAlign: 'left', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: '-10px', left: '20px', background: '#0a0a0a', padding: '0 8px' }}>
+                    <span style={{ color: '#00ff41', fontSize: '10px', letterSpacing: '2px', fontWeight: 'bold' }}>✉ ПИСЬМО ОТ МАКСА</span>
+                </div>
+                <p style={{ color: '#aaa', fontSize: '13px', lineHeight: '1.8', margin: 0, fontStyle: 'italic', whiteSpace: 'pre-line' }}>{finalChoice?.maxLetter}</p>
+                <div style={{ textAlign: 'right', marginTop: '12px', color: '#00ff41', fontSize: '12px', fontWeight: 'bold' }}>— Макс</div>
+            </div>
+            
+            <div className="mission-stats" style={{ margin: '20px auto', maxWidth: '600px' }}>
                 <div className="mission-stat">
                     <div className="mission-stat-label">МИССИЙ</div>
                     <div className="mission-stat-value" style={{ color: '#4d94ff' }}>10</div>
@@ -419,18 +457,18 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
                 </div>
                 <div className="mission-stat">
                     <div className="mission-stat-label">РЕЗУЛЬТАТ</div>
-                    <div className="mission-stat-value" style={{ color: '#f7b500', fontSize: '14px' }}>ПОБЕДА</div>
+                    <div className="mission-stat-value" style={{ color: finalChoice?.color || '#f7b500', fontSize: '14px' }}>{finalChoice?.label || 'ПОБЕДА'}</div>
                 </div>
             </div>
 
-            <div className="mission-clue">
+            <div className="mission-clue" style={{ maxWidth: '600px', margin: '0 auto 20px' }}>
                 <p className="mission-clue-text">
                     Вы прошли путь от стажёра до агента. Раскрыли сеть Neocorp, нашли Макса и обезвредили 
                     <b style={{ color: '#ff4d4d' }}> Shadow_Walker</b>. Помните: <b style={{ color: '#00ff41' }}>бдительность — лучшая защита!</b>
                 </p>
             </div>
 
-            <button className="btn-huge" onClick={() => onComplete(currentPoints + 10000)}>ЗАВЕРШИТЬ ИГРУ</button>
+            <button className="btn-huge" onClick={() => onComplete(currentPoints + 10000)} style={{ maxWidth: '400px', margin: '0 auto' }}>ЗАВЕРШИТЬ ИГРУ</button>
         </motion.div>
     );
 };
