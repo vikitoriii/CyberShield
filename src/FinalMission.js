@@ -19,6 +19,8 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     const [health, setHealth] = useState(100);
     const [showHint, setShowHint] = useState(false);
     const [hintLevel, setHintLevel] = useState(0);
+    const [timelineErrors, setTimelineErrors] = useState(0);
+    const [timelineWrongFlash, setTimelineWrongFlash] = useState(null);
 
     const TIMELINE_EVENTS = [
         { date: "10.05", event: "Shadow_Walker впервые замечен", clue: "Вход в систему в 3:00 ночи. Пароль изменён внешним скриптом.", details: "Лог показывает подключение с IP 192.168.7.42. Сессия длилась 22 минуты. Все действия были автоматизированы." },
@@ -67,8 +69,14 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     }, [stage]);
 
     const handleTimelineClick = (event) => {
-        if (!timeline.includes(event.date)) {
+        if (timeline.includes(event.date)) return;
+        const nextExpected = TIMELINE_EVENTS[timeline.length];
+        if (event.date === nextExpected.date) {
             setTimeline([...timeline, event.date]);
+        } else {
+            setTimelineErrors(prev => prev + 1);
+            setTimelineWrongFlash(event.date);
+            setTimeout(() => setTimelineWrongFlash(null), 600);
         }
     };
 
@@ -143,38 +151,82 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
     );
 
     // ЭКРАН 1: ХРОНОЛОГИЯ
-    if (stage === 1) return (
+    if (stage === 1) {
+        const nextEvent = TIMELINE_EVENTS[timeline.length];
+        return (
         <div className="window animate-fade" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
                 <span><Terminal size={14} /> ХРОНОЛОГИЯ</span>
-                <span style={{ color: '#f7b500' }}>{timeline.length}/{TIMELINE_EVENTS.length}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    {timelineErrors > 0 && <span style={{ color: '#ff4d4d', fontSize: '10px' }}>ОШИБОК: {timelineErrors}</span>}
+                    <span style={{ color: '#f7b500' }}>{timeline.length}/{TIMELINE_EVENTS.length}</span>
+                    <button onClick={() => { setShowHint(!showHint); if (!showHint) setHintLevel(1); }} style={{ background: 'none', border: 'none', color: showHint ? '#f7b500' : '#666', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px' }}>
+                        <HelpCircle size={14} /> ПОДСКАЗКА
+                    </button>
+                </div>
             </div>
-            <div style={{ flex: 1, padding: '30px', overflowY: 'auto' }}>
-                <p style={{ color: '#888', marginBottom: '20px' }}>Нажмите на каждое событие по порядку:</p>
+
+            {showHint && (
+                <div style={{ background: '#000', border: '1px solid #f7b500', padding: '10px 16px', margin: '0 12px', color: '#f7b500', fontSize: '11px', lineHeight: '1.5' }}>
+                    {hintLevel === 1 && (
+                        <div>
+                            Нажимайте на события в строгом хронологическом порядке — от ранних дат к поздним. Обратите внимание на даты в формате ДД.ММ.
+                            <button onClick={() => setHintLevel(2)} style={{ marginTop: '8px', background: '#f7b500', color: '#000', border: 'none', padding: '3px 8px', fontSize: '10px', cursor: 'pointer' }}>
+                                Показать ответ
+                            </button>
+                        </div>
+                    )}
+                    {hintLevel === 2 && (
+                        <div>
+                            <b>Порядок:</b> 10.05 → 12.05 → 14.05 → 18.05 → 20.05 → 22.05 → 24.05 → 26.05 → 28.05
+                            <div style={{ marginTop: '4px', color: '#888' }}>Просто нажимайте события сверху вниз по порядку.</div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            <div style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
+                <p style={{ color: '#888', marginBottom: '16px', fontSize: '13px' }}>
+                    {nextEvent 
+                        ? <>Следующее событие: <span style={{ color: '#4d94ff' }}>{nextEvent.date}.2024</span> — нажмите на него</>
+                        : 'Все события найдены!'
+                    }
+                </p>
                 <div style={{ position: 'relative', paddingLeft: '30px' }}>
                     <div style={{ position: 'absolute', left: '10px', top: 0, bottom: 0, width: '2px', background: '#222' }} />
-                    {TIMELINE_EVENTS.map((event, idx) => (
-                        <motion.div key={event.date} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }}
-                            onClick={() => handleTimelineClick(event)}
-                            style={{ position: 'relative', marginBottom: '12px', padding: '14px',
-                                background: timeline.includes(event.date) ? 'rgba(0,255,65,0.05)' : '#111',
-                                border: `1px solid ${timeline.includes(event.date) ? '#00ff41' : '#222'}`, cursor: 'pointer', transition: '0.2s' }}>
-                            <div style={{ position: 'absolute', left: '-25px', top: '14px', width: '12px', height: '12px', borderRadius: '50%',
-                                background: timeline.includes(event.date) ? '#00ff41' : '#333', border: '2px solid #000' }} />
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                <span style={{ color: '#4d94ff', fontSize: '11px', fontWeight: 'bold' }}>{event.date}.2024</span>
-                                {timeline.includes(event.date) && <CheckCircle2 size={14} color="#00ff41" />}
-                            </div>
-                            <div style={{ color: '#fff', fontSize: '13px', fontWeight: 'bold', marginBottom: '4px' }}>{event.event}</div>
-                            {timeline.includes(event.date) && (
-                                <div>
-                                    <div style={{ color: '#00ff41', fontSize: '11px', marginBottom: '4px' }}>{event.clue}</div>
-                                    <div style={{ color: '#888', fontSize: '11px', lineHeight: '1.5', borderTop: '1px solid #222', paddingTop: '8px', marginTop: '6px' }}>{event.details}</div>
+                    {TIMELINE_EVENTS.map((event, idx) => {
+                        const isDone = timeline.includes(event.date);
+                        const isNext = nextEvent && event.date === nextEvent.date;
+                        const isWrongFlash = timelineWrongFlash === event.date;
+                        return (
+                            <motion.div key={event.date} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }}
+                                onClick={() => handleTimelineClick(event)}
+                                style={{ position: 'relative', marginBottom: '12px', padding: '14px',
+                                    background: isWrongFlash ? 'rgba(255,77,77,0.15)' : isDone ? 'rgba(0,255,65,0.05)' : '#111',
+                                    border: `1px solid ${isWrongFlash ? '#ff4d4d' : isDone ? '#00ff41' : isNext ? '#f7b500' : '#222'}`, 
+                                    cursor: isDone ? 'default' : 'pointer', transition: '0.3s', opacity: !isDone && !isNext && timeline.length > 0 ? 0.4 : 1 }}>
+                                <div style={{ position: 'absolute', left: '-25px', top: '14px', width: '12px', height: '12px', borderRadius: '50%',
+                                    background: isDone ? '#00ff41' : isNext ? '#f7b500' : '#333', border: '2px solid #000',
+                                    boxShadow: isNext ? '0 0 8px rgba(247,181,0,0.5)' : 'none' }} />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                                    <span style={{ color: isDone ? '#00ff41' : isNext ? '#f7b500' : '#4d94ff', fontSize: '11px', fontWeight: 'bold' }}>{event.date}.2024</span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        {isNext && !isDone && <span style={{ color: '#f7b500', fontSize: '9px', letterSpacing: '1px' }}>→ СЛЕДУЮЩЕЕ</span>}
+                                        {isDone && <CheckCircle2 size={14} color="#00ff41" />}
+                                        {isWrongFlash && <span style={{ color: '#ff4d4d', fontSize: '10px', fontWeight: 'bold' }}>НЕВЕРНО</span>}
+                                    </div>
                                 </div>
-                            )}
-                            {!timeline.includes(event.date) && <div style={{ color: '#666', fontSize: '10px' }}>Нажмите для изучения</div>}
-                        </motion.div>
-                    ))}
+                                <div style={{ color: isDone ? '#fff' : '#888', fontSize: '13px', fontWeight: 'bold', marginBottom: '4px' }}>{event.event}</div>
+                                {isDone && (
+                                    <div>
+                                        <div style={{ color: '#00ff41', fontSize: '11px', marginBottom: '4px' }}>{event.clue}</div>
+                                        <div style={{ color: '#888', fontSize: '11px', lineHeight: '1.5', borderTop: '1px solid #222', paddingTop: '8px', marginTop: '6px' }}>{event.details}</div>
+                                    </div>
+                                )}
+                                {!isDone && !isNext && <div style={{ color: '#444', fontSize: '10px' }}>Ожидает очереди</div>}
+                            </motion.div>
+                        );
+                    })}
                 </div>
             </div>
             {timeline.length >= TIMELINE_EVENTS.length && (
@@ -183,7 +235,8 @@ const FinalMission = ({ username, currentPoints, onComplete }) => {
                 </div>
             )}
         </div>
-    );
+        );
+    }
 
     // ЭКРАН 2: СБОР ДОКАЗАТЕЛЬСТВ
     if (stage === 2) return (
